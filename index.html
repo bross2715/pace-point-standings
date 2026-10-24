@@ -672,7 +672,7 @@ function rankIdx(L,val,hi){
   return out;
 }
 var DESCS={
-  rank:['Season rank','Position in the standings by total points. Ties go to the rulebook tiebreakers: wins, stage wins, best average finish, then most recent better finish.'],
+  rank:['Points position','Position in the standings by total points. Ties go to the rulebook tiebreakers: wins, stage wins, best average finish, then most recent better finish.'],
   pts:['Points','Finishing points, plus stage points (10, 8, 6, 4, 2 for the top five in stages 1 and 2), plus 1 for each fastest lap. A freebie pays last place points.'],
   avg:['Avg finish','Average finishing position across races he finished. Lower is better.'],
   best:['Best finish','His best finishing position in any race.'],
@@ -715,7 +715,7 @@ function detail(car){
     openSheet();return;
   }
   var tags=['#'+car].concat(d.team?[d.team]:[]).concat(d.plat==='PS'?['PlayStation']:d.plat==='XB'?['Xbox']:[]);
-  var h='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'66,'+d.c2+' 70%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+x.rank+'<span>Season rank</span></div><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+esc(d.tag)+'</div></div></div><div class="tags">'+tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('')+'</div></div><div class="body">';
+  var h='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'66,'+d.c2+' 70%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+x.rank+'<span>Points position</span></div><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+esc(d.tag)+'</div></div></div><div class="tags">'+tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('')+'</div></div><div class="body">';
   var R={};
   var bsl=(x.lapRank||[]).filter(function(q){return q>0;});
   var bsv=bsl.length?Math.min.apply(null,bsl):null;
@@ -730,6 +730,8 @@ function detail(car){
   R.cb=rankIdx(L,function(v){return v.cb>0?v.cb:null;},true);
   R.stg=rankIdx(L,function(v){return v.avgStg;},false);
   R.rank=rankIdx(L,function(v){return v.rank;},false);
+  R.avg=rankIdx(L,function(v){return v.avg;},false);
+  R.avgQ=rankIdx(L,function(v){return v.avgQ;},false);
   function bar(k){
     var info=R[k]&&R[k][car];
     if(!info) return '';
@@ -740,14 +742,13 @@ function detail(car){
   function g(v,l,k,extra){return '<div class="g"'+(k?' data-k="'+k+'"':'')+'><b>'+v+'</b><span>'+l+'</span>'+(extra||'')+'</div>';}
   function sg(v){return v==null?'N/A':(v>0?'+':'')+(Math.round(v*10)/10);}
   h+='<div class="sec">Season '+D.season+'</div><div class="grid">'+
-    g(x.rank,'Rank','rank',bar('rank'))+g(x.pts,'Points','pts')+g(x.avg==null?'N/A':x.avg.toFixed(1),'Avg finish','avg')+
+    g(x.rank,'Points position','rank',bar('rank'))+g(x.pts,'Points','pts')+g(x.avg==null?'N/A':x.avg.toFixed(1),'Avg finish','avg',bar('avg'))+
     g(x.best?x.best:'N/A','Best','best')+g(x.worst?x.worst:'N/A','Worst','worst')+g(x.starts,'Starts','starts')+
     g(x.t5,'Top 5','t5')+g(x.t10,'Top 10','t10')+g(x.wins,'Wins','wins')+
     g(x.sw,'Stage wins','sw')+g(x.sp,'Stage pts','sp')+g(x.fl,'Fastest laps','fl')+
-    g(x.avgQ==null?'N/A':x.avgQ.toFixed(1),'Avg start','avgQ')+g(x.poles,'Poles','poles')+g(x.free,'Freebies','free')+'</div>';
+    g(x.avgQ==null?'N/A':x.avgQ.toFixed(1),'Avg start','avgQ',bar('avgQ'))+g(x.poles,'Poles','poles')+g(x.free,'Freebies','free')+'</div>';
   h+='<div class="sec">Advanced</div><div class="grid">'+
     g(x.rating==null?'N/A':x.rating.toFixed(1),'Rating','rating',bar('rating'))+
-    g(R.rrank[car]?R.rrank[car].rank:'N/A','Rating rank','rrank',bar('rrank'))+
     g(paceOf(x)==null?'N/A':paceOf(x).toFixed(0),'Pace','pace',bar('pace'))+
     g(x.avgPaceRank==null?'N/A':x.avgPaceRank.toFixed(1),'Avg speed rank','speed',bar('speed'))+
     g(x.avgPct==null?'N/A':x.avgPct.toFixed(2)+'%','Off fastest','pct',bar('pct'))+
