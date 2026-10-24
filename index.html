@@ -664,7 +664,7 @@ function teamAdv(S){
 function teamsTab(L){
   var T=C.teams(D,L);
   T.forEach(function(t){t.m=teamMetrics(t);});
-  var S=teamSorted(T);
+  var S=T.slice().sort(function(p,q){return p.rank-q.rank;});
   var h=scrub()+'<div class="call"><b>Team points</b> add up the top three scorers from each team in every race, using the same scoring as the driver standings. A fourth or fifth driver only counts when they outscore a teammate. Drivers without a team are not counted.</div>';
   S.forEach(function(t){
     h+='<div class="lcard"><div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><div class="rk" style="width:24px">'+t.rank+'</div><div class="n1" style="font-size:26px;flex:1">'+esc(t.team)+'</div><div class="pt"><b>'+t.pts+'</b><span>'+t.wins+(t.wins===1?' win':' wins')+'</span></div></div>';
@@ -673,7 +673,7 @@ function teamsTab(L){
     });
     h+='</div>';
   });
-  if(T.length) h+=teamAdv(S);
+  if(T.length) h+=teamAdv(teamSorted(T));
   if(!T.length) h+='<div class="empty">No teams yet.</div>';
   return h;
 }
