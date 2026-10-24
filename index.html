@@ -614,6 +614,31 @@ function paceTab(){
   h+='<div class="call" style="margin-top:10px">Best laps come from the post race lobby screens. Vs speed is the speed rank minus the finish.</div>';
   return h;
 }
+function teamAdv(T){
+  if(!T.length) return '';
+  function mean(a){return a.length?a.reduce(function(s,v){return s+v;},0)/a.length:null;}
+  function f1(v){return v==null?'&ndash;':v.toFixed(1);}
+  function sg(v){return v==null?'&ndash;':(v>0?'+':'')+v.toFixed(1);}
+  var h='<div class="n1" style="margin:16px 0 6px">Advanced team stats</div>'+
+    '<div class="call">Averages pool every race result from each team\'s drivers. Pace rk is the lap time rank in each race (1 is quickest). Gain is starting spot minus finish, so plus means places gained.</div>'+
+    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums">'+
+    '<tr style="color:var(--mut);text-align:right"><th style="text-align:left;padding:6px 4px">Team</th><th>Avg fin</th><th>Best</th><th>Top 5</th><th>Top 10</th><th>Stage pts</th><th>Fast laps</th><th>Pace rk</th><th>Gain</th></tr>';
+  T.forEach(function(t){
+    var fins=[],lp=[],gn=[],best=0,t5=0,t10=0,sp=0,fl=0;
+    t.members.forEach(function(x){
+      (x.fin||[]).forEach(function(f,i){
+        if(!(f>0)) return;
+        fins.push(f);
+        if(x.lapRank&&x.lapRank[i]>0) lp.push(x.lapRank[i]);
+        if(x.qual&&x.qual[i]>0) gn.push(x.qual[i]-f);
+        if(!best||f<best) best=f;
+      });
+      t5+=x.t5||0; t10+=x.t10||0; sp+=x.sp||0; fl+=x.fl||0;
+    });
+    h+='<tr style="border-top:1px solid rgba(128,128,128,.25);text-align:right"><td style="text-align:left;padding:6px 4px;font-weight:700">'+esc(t.team)+'</td><td>'+f1(mean(fins))+'</td><td>'+(best||'&ndash;')+'</td><td>'+t5+'</td><td>'+t10+'</td><td>'+sp+'</td><td>'+fl+'</td><td>'+f1(mean(lp))+'</td><td>'+sg(mean(gn))+'</td></tr>';
+  });
+  return h+'</table></div>';
+}
 function teamsTab(L){
   var T=C.teams(D,L);
   var h=scrub()+'<div class="call"><b>Team points</b> add up the top three scorers from each team in every race, using the same scoring as the driver standings. A fourth or fifth driver only counts when they outscore a teammate. Drivers without a team are not counted.</div>';
@@ -624,6 +649,7 @@ function teamsTab(L){
     });
     h+='</div>';
   });
+  h+=teamAdv(T);
   if(!T.length) h+='<div class="empty">No teams yet.</div>';
   return h;
 }
