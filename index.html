@@ -126,10 +126,11 @@ td.r,th.r{text-align:right}
 .dh .rkb span{display:block;font:600 9px/1 'Barlow',sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-top:3px}
 .g[data-k]{cursor:pointer}
 .g .rnk{display:block;font-size:10px;color:var(--mut);margin-top:4px}
-.hcb{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#9fd0ff,#22d36b 50%,#ff3b3b);margin-top:6px}
+.hcb{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#ff3b3b,#ffc83d 50%,#22d36b);margin-top:6px}
 .g{position:relative}
-.g .crk{position:absolute;top:8px;right:10px;font:800 18px/1 'Barlow Condensed',sans-serif}
-.hcb i{position:absolute;top:-5px;width:16px;height:16px;margin-left:-8px;border-radius:50%;box-shadow:0 0 0 2px #07080a,0 0 0 4px currentColor,0 0 10px currentColor}
+.g .crk{position:absolute;top:8px;right:10px;font:800 24px/1 'Barlow Condensed',sans-serif}
+.g .crk sup{font-size:12px;vertical-align:top;margin-left:1px}
+.hcb i{position:absolute;top:-4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;border:2px solid #07080a}
 .hz{font:700 9px/1 'Barlow',sans-serif;letter-spacing:.12em;text-transform:uppercase;margin-top:5px}
 .hz.hot{color:#ff3b3b}.hz.steady{color:#22d36b}.hz.cool{color:#9fd0ff}
 #desc{margin-top:12px}
@@ -699,8 +700,9 @@ var DESCS={
 };
 var TITLES=['Leader of the pack','Hot on the trail','Podium chasers','Knocking on the door','Top five and climbing','Right in the mix','Solid midfield','Still in it','Middle of the pack','Quietly grinding','Hanging around','Chase line','Need a spark','Bubble trouble','Right on the cut','Below the line','Bottom feeder','Dog pound','Kennel club','Dog pound VIP'];
 function titleOf(r){return TITLES[r-1]||'Dog pound';}
+function ord(n){var t=n%100;var suf=(t>=11&&t<=13)?'th':({1:'st',2:'nd',3:'rd'})[n%10]||'th';return n+'<sup>'+suf+'</sup>';}
 function ptColor(p){
-  var lo=[159,208,255], mid=[34,211,107], hi=[255,59,59], from, to, t;
+  var lo=[255,59,59], mid=[255,200,61], hi=[34,211,107], from, to, t;
   if(p<=0.5){from=lo;to=mid;t=p/0.5;}else{from=mid;to=hi;t=(p-0.5)/0.5;}
   function m(i){return Math.round(from[i]+(to[i]-from[i])*t);}
   return 'rgb('+m(0)+','+m(1)+','+m(2)+')';
@@ -712,7 +714,7 @@ function detail(car){
     document.getElementById('sheet').innerHTML='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'55,'+d.c2+')"><button class="x" id="cx">&times;</button><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+esc(d.tag)+'</div></div></div></div><div class="body"><div class="call" style="margin-top:14px">No starts yet this season.</div></div>';
     openSheet();return;
   }
-  var tags=['#'+car].concat(d.team?[d.team]:[]).concat(d.plat==='PS'?['PlayStation']:d.plat==='XB'?['Xbox']:[]).concat([titleOf(x.rank)]);
+  var tags=['#'+car].concat(d.team?[d.team]:[]).concat(d.plat==='PS'?['PlayStation']:d.plat==='XB'?['Xbox']:[]);
   var h='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'66,'+d.c2+' 70%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+x.rank+'<span>Season rank</span></div><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+esc(d.tag)+'</div></div></div><div class="tags">'+tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('')+'</div></div><div class="body">';
   var R={};
   var bsl=(x.lapRank||[]).filter(function(q){return q>0;});
@@ -733,7 +735,7 @@ function detail(car){
     if(!info) return '';
     var p=info.n>1?(info.n-info.rank)/(info.n-1):1;
     var c=ptColor(p);
-    return '<em class="crk" style="color:'+c+'">'+info.rank+'</em><div class="hcb"><i style="left:'+(p*100).toFixed(1)+'%;background:'+c+';color:'+c+'"></i></div>';
+    return '<em class="crk" style="color:'+c+'">'+ord(info.rank)+'</em><div class="hcb"><i style="left:'+(p*100).toFixed(1)+'%;background:'+c+';color:'+c+'"></i></div>';
   }
   function g(v,l,k,extra){return '<div class="g"'+(k?' data-k="'+k+'"':'')+'><b>'+v+'</b><span>'+l+'</span>'+(extra||'')+'</div>';}
   function sg(v){return v==null?'N/A':(v>0?'+':'')+(Math.round(v*10)/10);}
