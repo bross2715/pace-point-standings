@@ -748,7 +748,7 @@ function detail(car){
   function g(v,l,k,extra){return '<div class="g"'+(k?' data-k="'+k+'"':'')+'><b>'+v+'</b><span>'+l+'</span>'+(extra||'')+'</div>';}
   function sg(v){return v==null?'N/A':(v>0?'+':'')+(Math.round(v*10)/10);}
   h+='<div class="sec">Season '+D.season+'</div><div class="grid">'+
-    g(x.rank,'Points rank','rank',corner('rank'))+g(x.pts,'Points','pts')+g(x.avg==null?'N/A':x.avg.toFixed(1),'Avg finish','avg',bar('avg'))+
+    g(x.rank,'Points rank','rank')+g(x.pts,'Points','pts')+g(x.avg==null?'N/A':x.avg.toFixed(1),'Avg finish','avg',bar('avg'))+
     g(x.best?x.best:'N/A','Best','best')+g(x.worst?x.worst:'N/A','Worst','worst')+g(x.starts,'Starts','starts')+
     g(x.t5,'Top 5','t5')+g(x.t10,'Top 10','t10')+g(x.wins,'Wins','wins')+
     g(x.sw,'Stage wins','sw')+g(x.sp,'Stage pts','sp')+g(x.fl,'Fastest laps','fl')+
