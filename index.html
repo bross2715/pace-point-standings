@@ -121,6 +121,16 @@ th{font-family:var(--hd);font-weight:700;letter-spacing:.8px;text-transform:uppe
 td{padding:9px 4px;font-size:12px;border-bottom:1px solid var(--line)}
 td.r,th.r{text-align:right}
 .foot{margin:22px 4px 0;font-size:11px;color:#6d747d;line-height:1.5}
+.dh{position:relative}
+.dh .rkb{position:absolute;top:12px;right:52px;background:rgba(0,0,0,.4);color:#fff;padding:6px 10px;border-radius:6px;font:800 22px/1 'Barlow Condensed',sans-serif;text-align:right}
+.dh .rkb span{display:block;font:600 9px/1 'Barlow',sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-top:3px}
+.g[data-k]{cursor:pointer}
+.g .rnk{display:block;font-size:10px;color:var(--mut);margin-top:4px}
+.hcb{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#9fd0ff,#22d36b 50%,#ff3b3b);margin-top:6px}
+.hcb i{position:absolute;top:-4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#fff;border:2px solid #07080a}
+.hz{font:700 9px/1 'Barlow',sans-serif;letter-spacing:.12em;text-transform:uppercase;margin-top:5px}
+.hz.hot{color:#ff3b3b}.hz.steady{color:#22d36b}.hz.cool{color:#9fd0ff}
+#desc{margin-top:12px}
 </style>
 </head>
 <body>
@@ -652,6 +662,39 @@ function leaders(){
   defs.forEach(function(d){h+='<div class="lcard"><h3>'+d[0]+'</h3>'+top(d[1],d[2],d[3],d[4])+'</div>';});
   return h;
 }
+function rankIdx(L,val,hi){
+  var vs=L.map(function(v){return {car:v.car,v:val(v)};}).filter(function(e){return e.v!=null;});
+  var out={};
+  vs.forEach(function(e){var better=vs.filter(function(f){return hi?f.v>e.v:f.v<e.v;}).length;out[e.car]={rank:better+1,n:vs.length};});
+  return out;
+}
+var DESCS={
+  rank:['Season rank','Position in the standings by total points. Ties go to the rulebook tiebreakers: wins, stage wins, best average finish, then most recent better finish.'],
+  pts:['Points','Finishing points, plus stage points (10, 8, 6, 4, 2 for the top five in stages 1 and 2), plus 1 for each fastest lap. A freebie pays last place points.'],
+  avg:['Avg finish','Average finishing position across races he finished. Lower is better.'],
+  best:['Best finish','His best finishing position in any race.'],
+  worst:['Worst finish','His worst finishing position in any race.'],
+  starts:['Starts','Races he started. Freebies do not count as starts.'],
+  t5:['Top 5','Races finished in the top five.'],
+  t10:['Top 10','Races finished in the top ten.'],
+  wins:['Wins','Race wins.'],
+  sw:['Stage wins','Stage 1 or stage 2 finishes in first place.'],
+  sp:['Stage points','Total stage points for the season.'],
+  fl:['Fastest laps','Races where he set the fastest lap.'],
+  avgQ:['Avg start','Average starting spot. Daytona uses the duel order.'],
+  poles:['Poles','Races started from the pole.'],
+  free:['Freebies','Freebies used. They pay last place points and do not count as starts.'],
+  rating:['Driver Rating','0 to 100. 35% finishing: 1 minus (average finish minus 1) divided by (field size minus 1). 30% pace: season pace averaged. 15% spots gained: 0.5 plus average spots gained divided by (2 times (field size minus 1)), capped 0 to 1. 20% stage points: stage points per start divided by 20. The weighted average times 100.'],
+  rrank:['Rating rank','Position in the league by Driver Rating.'],
+  pace:['Pace','0 to 100 score for overall speed. Each race averages two parts: qualifying (the pre race lap when recorded, otherwise the starting spot, skipped at Daytona) and the race best lap rank. Season pace is the average of those race scores.'],
+  speed:['Avg speed rank','Each race ranks every car by best race lap, 1 being quickest. This is the average of those ranks across races. Lower is better.'],
+  pct:['Off fastest','How far his best lap was off the fastest lap of each race, as a percentage, averaged across races. Percent works across track lengths, so it stays fair. Lower is better.'],
+  bspeed:['Best speed rank','His single best speed rank in any race. 1 is the quickest lap of that race. Lower is better. This replaces the raw best lap, which depends on track length.'],
+  vs:['Vs speed','Speed rank minus finishing position, averaged. Positive means he finished better than his best lap suggested. Higher is better.'],
+  gain:['Spots gained','Starting spot minus finishing spot, averaged over races. Positive means he gained spots. Higher is better.'],
+  cb:['Best comeback','Biggest comeback: worst stage position minus finish, in races with full stage data. Higher is better.'],
+  stg:['Avg stage pos','Average position across both stages. Lower is better.']
+};
 function detail(car){
   var N=ovw()?R:st.n;
   var L=C.standings(D,N), x=L.filter(function(y){return y.car===car;})[0], d=byCar[car];
@@ -660,20 +703,46 @@ function detail(car){
     openSheet();return;
   }
   var tags=['#'+car].concat(d.team?[d.team]:[]).concat(d.plat==='PS'?['PlayStation']:d.plat==='XB'?['Xbox']:[]);
-  var h='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'66,'+d.c2+' 70%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+esc(d.tag)+'</div></div></div><div class="tags">'+tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('')+'</div></div><div class="body">';
-  function g(v,l){return '<div class="g"><b>'+v+'</b><span>'+l+'</span></div>';}
-  h+='<div class="sec">Season '+D.season+'</div><div class="grid">'+
-    g(x.rank,'Rank')+g(x.pts,'Points')+g(x.avg==null?'N/A':x.avg.toFixed(1),'Avg finish')+
-    g(x.best?x.best:'N/A','Best')+g(x.worst?x.worst:'N/A','Worst')+g(x.starts,'Starts')+
-    g(x.t5,'Top 5')+g(x.t10,'Top 10')+g(x.wins,'Wins')+
-    g(x.sw,'Stage wins')+g(x.sp,'Stage pts')+g(x.fl,'Fastest laps')+
-    g(x.avgQ==null?'N/A':x.avgQ.toFixed(1),'Avg start')+g(x.poles,'Poles')+g(x.free,'Freebies')+'</div>';
-  var rk2=L.filter(function(y){return y.rating!=null;}).sort(function(p,q){return q.rating-p.rating;}).map(function(y){return y.car;}).indexOf(car)+1;
+  var h='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'66,'+d.c2+' 70%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+x.rank+'<span>Season rank</span></div><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+esc(d.tag)+'</div></div></div><div class="tags">'+tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('')+'</div></div><div class="body">';
+  var R={};
+  var bsl=(x.lapRank||[]).filter(function(q){return q>0;});
+  var bsv=bsl.length?Math.min.apply(null,bsl):null;
+  R.rating=rankIdx(L,function(v){return v.rating;},true);
+  R.rrank=R.rating;
+  R.pace=rankIdx(L,function(v){return paceOf(v);},true);
+  R.speed=rankIdx(L,function(v){return v.avgPaceRank;},false);
+  R.pct=rankIdx(L,function(v){return v.avgPct;},false);
+  R.bspeed=rankIdx(L,function(v){var lr=(v.lapRank||[]).filter(function(q){return q>0;});return lr.length?Math.min.apply(null,lr):null;},false);
+  R.vs=rankIdx(L,function(v){return v.fvp;},true);
+  R.gain=rankIdx(L,function(v){return v.gain;},true);
+  R.cb=rankIdx(L,function(v){return v.cb>0?v.cb:null;},true);
+  R.stg=rankIdx(L,function(v){return v.avgStg;},false);
+  R.rank=rankIdx(L,function(v){return v.rank;},false);
+  function bar(k){
+    var info=R[k]&&R[k][car];
+    if(!info) return '';
+    var p=info.n>1?(info.n-info.rank)/(info.n-1):1;
+    var z=p>=2/3?'hot':p<=1/3?'cool':'steady';
+    return '<em class="rnk">#'+info.rank+' of '+info.n+'</em><div class="hcb"><i style="left:'+(p*100).toFixed(0)+'%"></i></div><div class="hz '+z+'">'+(z==='hot'?'HOT':z==='cool'?'COOL':'STEADY')+'</div>';
+  }
+  function g(v,l,k,extra){return '<div class="g"'+(k?' data-k="'+k+'"':'')+'><b>'+v+'</b><span>'+l+'</span>'+(extra||'')+'</div>';}
   function sg(v){return v==null?'N/A':(v>0?'+':'')+(Math.round(v*10)/10);}
+  h+='<div class="sec">Season '+D.season+'</div><div class="grid">'+
+    g(x.rank,'Rank','rank',bar('rank'))+g(x.pts,'Points','pts')+g(x.avg==null?'N/A':x.avg.toFixed(1),'Avg finish','avg')+
+    g(x.best?x.best:'N/A','Best','best')+g(x.worst?x.worst:'N/A','Worst','worst')+g(x.starts,'Starts','starts')+
+    g(x.t5,'Top 5','t5')+g(x.t10,'Top 10','t10')+g(x.wins,'Wins','wins')+
+    g(x.sw,'Stage wins','sw')+g(x.sp,'Stage pts','sp')+g(x.fl,'Fastest laps','fl')+
+    g(x.avgQ==null?'N/A':x.avgQ.toFixed(1),'Avg start','avgQ')+g(x.poles,'Poles','poles')+g(x.free,'Freebies','free')+'</div>';
   h+='<div class="sec">Advanced</div><div class="grid">'+
-    g(x.rating==null?'N/A':x.rating.toFixed(1),'Rating')+g(rk2?rk2:'N/A','Rating rank')+g(paceOf(x)==null?'N/A':paceOf(x).toFixed(0),'Pace')+g(x.avgPaceRank==null?'N/A':x.avgPaceRank.toFixed(1),'Avg speed rank')+
-    g(x.avgPct==null?'N/A':x.avgPct.toFixed(2)+'%','Off fastest')+g(x.bestLap?x.bestLap.toFixed(3):'N/A','Best lap')+g(sg(x.fvp),'Vs speed')+
-    g(sg(x.gain),'Spots gained')+g(x.cb>0?'+'+x.cb:'N/A','Best comeback')+g(x.avgStg==null?'N/A':x.avgStg.toFixed(1),'Avg stage pos')+'</div>';
+    g(x.rating==null?'N/A':x.rating.toFixed(1),'Rating','rating',bar('rating'))+
+    g(R.rrank[car]?R.rrank[car].rank:'N/A','Rating rank','rrank',bar('rrank'))+
+    g(paceOf(x)==null?'N/A':paceOf(x).toFixed(0),'Pace','pace',bar('pace'))+
+    g(x.avgPaceRank==null?'N/A':x.avgPaceRank.toFixed(1),'Avg speed rank','speed',bar('speed'))+
+    g(x.avgPct==null?'N/A':x.avgPct.toFixed(2)+'%','Off fastest','pct',bar('pct'))+
+    g(bsv==null?'N/A':bsv,'Best speed rank','bspeed',bar('bspeed'))+
+    g(sg(x.fvp),'Vs speed','vs',bar('vs'))+
+    g(sg(x.gain),'Spots gained','gain',bar('gain'))+g(x.cb>0?'+'+x.cb:'N/A','Best comeback','cb',bar('cb'))+
+    g(x.avgStg==null?'N/A':x.avgStg.toFixed(1),'Avg stage pos','stg',bar('stg'))+'</div><div id="desc" hidden></div>';
   // trend
   var W=320,H=120,pl=26,pr=10,pt=10,pb=18,maxP=Math.max(D.fieldSize,x.worst||1,1);
   var pts=[];
@@ -696,6 +765,16 @@ function detail(car){
   }
   h+='</table></div>';
   document.getElementById('sheet').innerHTML=h;
+  var desc=document.getElementById('desc');
+  Array.prototype.forEach.call(document.querySelectorAll('#sheet .g[data-k]'),function(el){
+    el.addEventListener('click',function(){
+      var k=el.getAttribute('data-k');
+      if(!desc.hidden&&desc.getAttribute('data-k')===k){desc.hidden=true;desc.removeAttribute('data-k');desc.innerHTML='';return;}
+      var dd=DESCS[k];
+      desc.setAttribute('data-k',k);desc.hidden=false;
+      desc.innerHTML='<div class="call"><b>'+dd[0]+'</b><br>'+dd[1]+'</div>';
+    });
+  });
   openSheet();
 }
 function openSheet(){var o=document.getElementById('ov');o.classList.add('on');document.body.style.overflow='hidden';
