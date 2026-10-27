@@ -443,7 +443,7 @@ var D=JSON.parse(document.getElementById('pace-data').textContent);
 var CH=JSON.parse(document.getElementById('pace-chips').textContent);
 var C=window.PaceCore;
 var R=D.races.length;               // race count is always derived from the races array
-var st={n:R,tab:'tower',all:false,view:'all',vopen:false,tk:'pts',trev:false};
+var st={n:R,tab:'tower',all:false,view:'all',vopen:false,tk:'pts',trev:false,ps:'rating'};
 var byCar={};D.drivers.forEach(function(d){byCar[d.car]=d;});
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function chip(car,size){
@@ -591,13 +591,33 @@ function resultsTab(L){
   return h;
 }
 function paceTab(){
-  var L=baseList(), race=st.view==='all'?null:st.view, h=viewBar();
-  h+='<div class="call"><b>Driver Rating</b> runs 0 to 100: 35% finishing, 30% pace, 15% spots gained from the start, and 20% stage points. Pace is half qualifying and half race best lap. Qualifying is the pre race lap when recorded, otherwise the starting spot. Daytona counts race best lap only, since the Duels set that order.</div><div class="call" style="margin-top:8px"><b>Pace</b> is a 0 to 100 score for how fast a driver is. Half comes from qualifying and half from the race best lap. <b>Speed rank</b> is only the race best lap: where it ranked against the field in each race, with 1 the quickest, averaged across races. Lower is better.</div>';
+  var L=baseList(), race=st.view==='all'?null:st.view, ps=st.ps||'rating';
+  var h='<div class="vb">'+[['rating','Driver Rating'],['pace','Pace'],['speed','Speed rank']].map(function(b){return '<button data-ps="'+b[0]+'" class="'+(ps===b[0]?'on':'')+'">'+b[1]+'</button>';}).join('')+'</div>'+viewBar();
+  return h+(ps==='rating'?ratingView(L,race):ps==='pace'?paceView(L,race):speedView(L,race));
+}
+function ratingView(L,race){
+  var h='<div class="call"><b>Driver Rating</b> runs 0 to 100: 35% finishing, 30% pace, 15% spots gained from the start, and 20% stage points. Pace is half qualifying and half race best lap. Qualifying is the pre race lap when recorded, otherwise the starting spot. Daytona counts race best lap only, since the Duels set that order.</div>';
   var a=L.filter(function(x){return x.rating!=null;}).sort(function(p,q){return (q.rating-p.rating)||(p.rank-q.rank);});
   h+='<div class="sec">Driver Rating'+(race==null?'':': '+esc(trackOf(race)))+'</div>';
+  if(!a.length) h+='<div class="empty">No ratings yet.</div>';
   a.forEach(function(x,k){
-    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+(x.avgPaceRank==null?'No lap data':'Pace '+paceOf(x).toFixed(0)+' &middot; speed rank '+x.avgPaceRank.toFixed(1))+'</div></div><div class="rt"><div class="rating">'+x.rating.toFixed(1)+'</div></div></div>';
+    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+(x.avgPaceRank==null?'No lap data':'Pace '+(paceOf(x)==null?'N/A':paceOf(x).toFixed(0))+' &middot; speed rank '+x.avgPaceRank.toFixed(1))+'</div></div><div class="rt"><div class="rating">'+x.rating.toFixed(1)+'</div></div></div>';
   });
+  return h;
+}
+function paceView(L,race){
+  var h='<div class="call"><b>Pace</b> is a 0 to 100 score for how fast a driver is. Half comes from qualifying and half from the race best lap. Qualifying is the pre race lap when recorded, otherwise the starting spot. Daytona counts race best lap only, since the Duels set that order. Season pace is the average of the race scores.</div>';
+  var a=L.filter(function(x){return paceOf(x)!=null;}).sort(function(p,q){return (paceOf(q)-paceOf(p))||(p.rank-q.rank);});
+  h+='<div class="sec">Pace'+(race==null?'':': '+esc(trackOf(race)))+'</div>';
+  if(!a.length) h+='<div class="empty">No pace data yet.</div>';
+  a.forEach(function(x,k){
+    var sub=(x.avgQ==null?'No start':(race==null?'Avg start ':'Started P')+(race==null?x.avgQ.toFixed(1):Math.round(x.avgQ)))+(x.avgPaceRank==null?'':' &middot; speed rank '+(race==null?x.avgPaceRank.toFixed(1):Math.round(x.avgPaceRank)));
+    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+sub+'</div></div><div class="rt"><b>'+paceOf(x).toFixed(0)+'</b><span>PACE</span></div></div>';
+  });
+  return h;
+}
+function speedView(L,race){
+  var h='<div class="call"><b>Speed rank</b> is only the race best lap: where it ranked against the field in each race, with 1 the quickest, averaged across races. Lower is better.</div>';
   if(race==null){
     h+='<div class="sec">Season speed</div>';
     var pa=L.filter(function(x){return x.paceN>0;}).sort(function(p,q){return (p.avgPct-q.avgPct)||(p.rank-q.rank);});
@@ -870,6 +890,7 @@ function render(){
   if(r) r.addEventListener('input',function(){st.n=parseInt(r.value,10);render();var rr=document.getElementById('rng');rr&&rr.focus&&rr.focus();});
   Array.prototype.forEach.call(document.querySelectorAll('[data-v]'),function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-v');if(v==='all'){st.view='all';st.vopen=false;}else{st.view=parseInt(v,10);st.vopen=true;}render();});});
   Array.prototype.forEach.call(document.querySelectorAll('[data-tk]'),function(th){th.addEventListener('click',function(){var k=th.getAttribute('data-tk');if(st.tk===k){st.trev=!st.trev;}else{st.tk=k;st.trev=false;}render();});});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ps]'),function(b){b.addEventListener('click',function(){st.ps=b.getAttribute('data-ps');render();});});
   var vt=document.getElementById('vtog'); if(vt) vt.addEventListener('click',function(){st.vopen=!st.vopen;render();});
   var mo=document.getElementById('more'); if(mo) mo.addEventListener('click',function(){st.all=!st.all;render();});
   Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.toggle('on',b.getAttribute('data-t')===st.tab);});
