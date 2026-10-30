@@ -95,6 +95,7 @@ main{padding:14px 12px}
 .rr.win{border-left:4px solid var(--gold)}
 .rt{text-align:right}.rt b{display:block;font-family:var(--hd);font-weight:800;font-size:20px;line-height:1}.rt span{display:block;font-size:10px;color:var(--mut);margin-top:3px;white-space:nowrap}
 .gn{font-family:var(--hd);font-weight:700}.gn.up{color:var(--green)}.gn.dn{color:var(--red)}.gn.z{color:var(--mut)}
+.chg{font-family:var(--hd);font-weight:700;font-size:13px;line-height:1;margin-top:5px;letter-spacing:.3px}.chg.up{color:var(--green)}.chg.dn{color:var(--red)}.chg.z{color:var(--mut)}
 .sum{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .sum div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
 .sum small{display:block;font-family:var(--hd);font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;color:var(--mut)}
@@ -595,35 +596,55 @@ function paceTab(){
   var h='<div class="vb">'+[['rating','Driver Rating'],['pace','Pace'],['speed','Speed rank']].map(function(b){return '<button data-ps="'+b[0]+'" class="'+(ps===b[0]?'on':'')+'">'+b[1]+'</button>';}).join('')+'</div>'+viewBar();
   return h+(ps==='rating'?ratingView(L,race):ps==='pace'?paceView(L,race):speedView(L,race));
 }
+function prevMap(){
+  if(st.view!=='all'||R<2) return null;
+  var m={}; C.standings(D,R-1).forEach(function(x){m[x.car]=x;}); return m;
+}
+function chgVal(d,hi,dec,suf){
+  if(d==null||isNaN(d)) return {c:'z',s:'NEW'};
+  var k=Math.pow(10,dec), r=Math.round(d*k)/k;
+  if(r===0) return {c:'z',s:(0).toFixed(dec)+(suf||'')};
+  return {c:((hi?r>0:r<0)?'up':'dn'),s:(r>0?'+':'')+r.toFixed(dec)+(suf||'')};
+}
+function chg(d,hi,dec,suf){var v=chgVal(d,hi,dec,suf);return '<div class="chg '+v.c+'">'+v.s+'</div>';}
+function chgS(d,hi,dec){var v=chgVal(d,hi,dec,'');return '<span class="gn '+v.c+'">'+v.s+'</span>';}
 function ratingView(L,race){
-  var h='<div class="call"><b>Driver Rating</b> runs 0 to 100: 35% finishing, 30% pace, 15% spots gained from the start, and 20% stage points. Pace is half qualifying and half race best lap. Qualifying is the pre race lap when recorded, otherwise the starting spot. Daytona counts race best lap only, since the Duels set that order.</div>';
+  var pm=race==null?prevMap():null;
+  var h='<div class="call"><b>Driver Rating</b> runs 0 to 100: 35% finishing, 30% pace, 15% spots gained from the start, and 20% stage points. Pace is half qualifying and half race best lap. Qualifying is the pre race lap when recorded, otherwise the starting spot. Daytona counts race best lap only, since the Duels set that order.'+(pm?' The green or red number is the change since the previous race.':'')+'</div>';
   var a=L.filter(function(x){return x.rating!=null;}).sort(function(p,q){return (q.rating-p.rating)||(p.rank-q.rank);});
   h+='<div class="sec">Driver Rating'+(race==null?'':': '+esc(trackOf(race)))+'</div>';
   if(!a.length) h+='<div class="empty">No ratings yet.</div>';
   a.forEach(function(x,k){
-    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+(x.avgPaceRank==null?'No lap data':'Pace '+(paceOf(x)==null?'N/A':paceOf(x).toFixed(0))+' &middot; speed rank '+x.avgPaceRank.toFixed(1))+'</div></div><div class="rt"><div class="rating">'+x.rating.toFixed(1)+'</div></div></div>';
+    var pv=pm&&pm[x.car], ch=pm?chg(pv&&pv.rating!=null?x.rating-pv.rating:null,true,1):'';
+    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+(x.avgPaceRank==null?'No lap data':'Pace '+(paceOf(x)==null?'N/A':paceOf(x).toFixed(0))+' &middot; speed rank '+x.avgPaceRank.toFixed(1))+'</div></div><div class="rt"><div class="rating">'+x.rating.toFixed(1)+'</div>'+ch+'</div></div>';
   });
   return h;
 }
 function paceView(L,race){
-  var h='<div class="call"><b>Pace</b> is a 0 to 100 score for how fast a driver is. Half comes from qualifying and half from the race best lap. Qualifying is the pre race lap when recorded, otherwise the starting spot. Daytona counts race best lap only, since the Duels set that order. Season pace is the average of the race scores.</div>';
+  var pm=race==null?prevMap():null;
+  var h='<div class="call"><b>Pace</b> is a 0 to 100 score for how fast a driver is. Half comes from qualifying and half from the race best lap. Qualifying is the pre race lap when recorded, otherwise the starting spot. Daytona counts race best lap only, since the Duels set that order. Season pace is the average of the race scores.'+(pm?' The green or red number is the change since the previous race.':'')+'</div>';
   var a=L.filter(function(x){return paceOf(x)!=null;}).sort(function(p,q){return (paceOf(q)-paceOf(p))||(p.rank-q.rank);});
   h+='<div class="sec">Pace'+(race==null?'':': '+esc(trackOf(race)))+'</div>';
   if(!a.length) h+='<div class="empty">No pace data yet.</div>';
   a.forEach(function(x,k){
+    var pv=pm&&pm[x.car], ch=pm?chg(pv&&paceOf(pv)!=null?paceOf(x)-paceOf(pv):null,true,1):'';
     var sub=(x.avgQ==null?'No start':(race==null?'Avg start ':'Started P')+(race==null?x.avgQ.toFixed(1):Math.round(x.avgQ)))+(x.avgPaceRank==null?'':' &middot; speed rank '+(race==null?x.avgPaceRank.toFixed(1):Math.round(x.avgPaceRank)));
-    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+sub+'</div></div><div class="rt"><b>'+paceOf(x).toFixed(0)+'</b><span>PACE</span></div></div>';
+    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+sub+'</div></div><div class="rt"><b>'+paceOf(x).toFixed(0)+'</b><span>PACE</span>'+ch+'</div></div>';
   });
   return h;
 }
 function speedView(L,race){
-  var h='<div class="call"><b>Speed rank</b> is only the race best lap: where it ranked against the field in each race, with 1 the quickest, averaged across races. Lower is better.</div>';
+  var h='<div class="call"><b>Speed rank</b> is only the race best lap: where it ranked against the field in each race, with 1 the quickest, averaged across races. Lower is better.'+(race==null&&prevMap()?' The green or red numbers are the change since the previous race.':'')+'</div>';
   if(race==null){
+    var pm=prevMap();
     h+='<div class="sec">Season speed</div>';
     var pa=L.filter(function(x){return x.paceN>0;}).sort(function(p,q){return (p.avgPct-q.avgPct)||(p.rank-q.rank);});
     if(!pa.length) h+='<div class="empty">No best laps recorded yet.</div>';
     pa.forEach(function(x,k){
-      h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">Speed rank '+x.avgPaceRank.toFixed(1)+(x.fvp==null?'':' &middot; vs speed '+gainCell(Math.round(x.fvp*10)/10))+'</div></div><div class="rt"><b>'+x.avgPct.toFixed(2)+'%</b><span>OFF FASTEST</span></div></div>';
+      var pv=pm&&pm[x.car], hasP=pv&&pv.paceN>0;
+      var ch=pm?chg(hasP?x.avgPct-pv.avgPct:null,false,2,'%'):'';
+      var sr=pm&&hasP?' '+chgS(x.avgPaceRank-pv.avgPaceRank,false,1):'';
+      h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">Speed rank '+x.avgPaceRank.toFixed(1)+sr+(x.fvp==null?'':' &middot; vs speed '+gainCell(Math.round(x.fvp*10)/10))+'</div></div><div class="rt"><b>'+x.avgPct.toFixed(2)+'%</b><span>OFF FASTEST</span>'+ch+'</div></div>';
     });
     h+='<div class="call" style="margin-top:10px">Season speed averages how far each driver best race lap was off the quickest lap of that race. Tap By race for the lap times of each race. Vs speed is speed rank minus finish, so green means finishing ahead of your best lap.</div>';
     return h;
@@ -639,20 +660,28 @@ function speedView(L,race){
   return h;
 }
 var TEAM_COLS=[['pts','Pts',1],['wins','Wins',1],['avgFin','Avg fin',-1],['best','Best',-1],['t5','Top 5',1],['t10','Top 10',1],['sp','Stage pts',1],['fl','Fast laps',1],['pace','Pace rk',-1],['gain','Gain',1]];
+function meanOf(a){return a.length?a.reduce(function(s,v){return s+v;},0)/a.length:null;}
 function teamMetrics(t){
-  function mean(a){return a.length?a.reduce(function(s,v){return s+v;},0)/a.length:null;}
-  var fins=[],lp=[],gn=[],best=0,t5=0,t10=0,sp=0,fl=0;
+  var fins=[],lp=[],gn=[],pr=[],pc=[],vs=[],sg=[],qs=[],rt=[],best=0,worst=0,bs=0,cb=0,t5=0,t10=0,sp=0,sw=0,fl=0,poles=0,starts=0,wins=0;
   t.members.forEach(function(x){
     (x.fin||[]).forEach(function(f,i){
       if(!(f>0)) return;
       fins.push(f);
-      if(x.lapRank&&x.lapRank[i]>0) lp.push(x.lapRank[i]);
-      if(x.qual&&x.qual[i]>0) gn.push(x.qual[i]-f);
       if(!best||f<best) best=f;
+      if(f>worst) worst=f;
+      if(x.lapRank&&x.lapRank[i]>0){lp.push(x.lapRank[i]); vs.push(x.lapRank[i]-f); if(!bs||x.lapRank[i]<bs) bs=x.lapRank[i];}
+      if(x.lapPct&&x.lapPct[i]!=null) pc.push(x.lapPct[i]);
+      if(x.qual&&x.qual[i]>0){gn.push(x.qual[i]-f); qs.push(x.qual[i]);}
+      ((x.stp&&x.stp[i])||[]).forEach(function(p){if(p>0) sg.push(p);});
     });
-    t5+=x.t5||0; t10+=x.t10||0; sp+=x.sp||0; fl+=x.fl||0;
+    (x.pr||[]).forEach(function(v){if(v!=null) pr.push(v);});
+    if(x.rating!=null) rt.push(x.rating);
+    if(x.cb>cb) cb=x.cb;
+    t5+=x.t5||0; t10+=x.t10||0; sp+=x.sp||0; sw+=x.sw||0; fl+=x.fl||0; poles+=x.poles||0; starts+=x.starts||0; wins+=x.wins||0;
   });
-  return {pts:t.pts,wins:t.wins,avgFin:mean(fins),best:best||null,t5:t5,t10:t10,sp:sp,fl:fl,pace:mean(lp),gain:mean(gn)};
+  var speed=meanOf(lp), avgFin=meanOf(fins);
+  return {pts:t.pts,wins:wins,avgFin:avgFin,avg:avgFin,best:best||null,worst:worst||null,avgQ:meanOf(qs),t5:t5,t10:t10,sp:sp,sw:sw,fl:fl,poles:poles,starts:starts,
+    rating:meanOf(rt),paceScore:pr.length?100*meanOf(pr):null,pace:speed,speed:speed,pct:meanOf(pc),bspeed:bs||null,vs:meanOf(vs),gain:meanOf(gn),cb:cb>0?cb:null,stg:meanOf(sg)};
 }
 function teamSorted(T){
   var col=TEAM_COLS.filter(function(c){return c[0]===st.tk;})[0]||TEAM_COLS[0];
@@ -680,7 +709,7 @@ function teamAdv(S){
   h+='</tr>';
   S.forEach(function(t){
     var m=t.m;
-    h+='<tr style="border-top:1px solid rgba(128,128,128,.25);text-align:right"><td style="text-align:left;padding:6px 4px;font-weight:700">'+esc(t.team)+'</td>'+
+    h+='<tr data-team="'+esc(t.team)+'" style="cursor:pointer;border-top:1px solid rgba(128,128,128,.25);text-align:right"><td style="text-align:left;padding:6px 4px;font-weight:700">'+esc(t.team)+'</td>'+
       '<td>'+m.pts+'</td><td>'+m.wins+'</td><td>'+f1(m.avgFin)+'</td><td>'+(m.best||'&ndash;')+'</td><td>'+m.t5+'</td><td>'+m.t10+'</td><td>'+m.sp+'</td><td>'+m.fl+'</td><td>'+f1(m.pace)+'</td><td>'+sg(m.gain)+'</td></tr>';
   });
   return h+'</table></div>';
@@ -689,9 +718,9 @@ function teamsTab(L){
   var T=C.teams(D,L);
   T.forEach(function(t){t.m=teamMetrics(t);});
   var S=T.slice().sort(function(p,q){return p.rank-q.rank;});
-  var h=scrub()+'<div class="call"><b>Team points</b> add up the top three scorers from each team in every race, using the same scoring as the driver standings. A fourth or fifth driver only counts when they outscore a teammate. Drivers without a team are not counted.</div>';
+  var h=scrub()+'<div class="call"><b>Team points</b> add up the top three scorers from each team in every race, using the same scoring as the driver standings. A fourth or fifth driver only counts when they outscore a teammate. Drivers without a team are not counted. Tap a team for its full stats.</div>';
   S.forEach(function(t){
-    h+='<div class="lcard"><div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><div class="rk" style="width:24px">'+t.rank+'</div><div class="n1" style="font-size:26px;flex:1">'+esc(t.team)+'</div><div class="pt"><b>'+t.pts+'</b><span>'+t.wins+(t.wins===1?' win':' wins')+'</span></div></div>';
+    h+='<div class="lcard"><div data-team="'+esc(t.team)+'" style="display:flex;align-items:center;gap:10px;margin-bottom:4px;cursor:pointer"><div class="rk" style="width:24px">'+t.rank+'</div><div class="n1" style="font-size:26px;flex:1">'+esc(t.team)+'</div><div class="pt"><b>'+t.pts+'</b><span>'+t.wins+(t.wins===1?' win':' wins')+'</span></div></div>';
     t.members.forEach(function(x){
       h+='<div class="lr" data-car="'+esc(x.car)+'"><div class="rk" style="font-size:15px;color:var(--mut)">'+x.rank+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(x.d.name)+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+x.tp+(x.tp!==x.pts?'<span style="display:block;font-size:10px;color:var(--mut)">of '+x.pts+'</span>':'')+'</div></div>';
     });
@@ -858,6 +887,10 @@ function detail(car){
   }
   h+='</table></div>';
   document.getElementById('sheet').innerHTML=h;
+  bindFlip(DESCS);
+  openSheet();
+}
+function bindFlip(map){
   Array.prototype.forEach.call(document.querySelectorAll('#sheet .g[data-k]'),function(el){
     el.addEventListener('click',function(){
       var k=el.getAttribute('data-k');
@@ -867,13 +900,94 @@ function detail(car){
         el.style.gridColumn='';
         return;
       }
+      var dd=map[k]; if(!dd) return;
       if(!el.hasAttribute('data-front')) el.setAttribute('data-front',el.innerHTML);
-      var dd=DESCS[k];
       el.innerHTML='<b style="font-size:14px;line-height:1.2">'+dd[0]+'</b><span style="display:block;margin-top:6px;font-size:11px;line-height:1.4;text-transform:none;letter-spacing:0;color:var(--fg,inherit)">'+dd[1]+'</span>';
       el.setAttribute('data-open','1');
       el.style.gridColumn='1 / -1';
     });
   });
+}
+var TDESC={
+  rank:['Team rank','Position in the team standings by team points. Ties go to wins, then team name.'],
+  pts:['Team points','Each race, the three best point scorers on the team count. This is those counted points added up over every race.'],
+  wins:['Wins','Race wins by any driver on the team.'],
+  starts:['Starts','Race starts by all team drivers added together. Freebies do not count.'],
+  avg:['Avg finish','Average finishing position across every race result from the team drivers. Lower is better.'],
+  best:['Best finish','The best finishing position any team driver got in any race.'],
+  worst:['Worst finish','The worst finishing position any team driver got in any race.'],
+  t5:['Top 5','Top five finishes by team drivers, added together across races.'],
+  t10:['Top 10','Top ten finishes by team drivers, added together across races.'],
+  sw:['Stage wins','Stage 1 or stage 2 wins by team drivers.'],
+  sp:['Stage points','Stage points earned by every driver on the team, all season.'],
+  fl:['Fastest laps','Races where a team driver set the fastest lap.'],
+  avgQ:['Avg start','Average starting spot across every start by team drivers. Lower is better.'],
+  poles:['Poles','Races where a team driver started on the pole.'],
+  drv:['Drivers','Drivers on the team roster.'],
+  rating:['Driver Rating','The average Driver Rating of the team drivers, 0 to 100. Higher is better.'],
+  pace:['Pace','The average of every team driver race pace score (0 to 100). Each score is half qualifying and half race best lap rank. Higher is better.'],
+  speed:['Avg speed rank','Each race ranks all cars by best race lap, 1 being quickest. This averages the ranks of every team driver across races. Lower is better.'],
+  pct:['Off fastest','How far each team driver best lap was off the fastest lap of the race, as a percentage, averaged. Lower is better.'],
+  bspeed:['Best speed rank','The best spot any team driver got in the lap time line up of a race. 1st means a team driver had the quickest lap. Lower is better.'],
+  vs:['Vs speed','Speed rank minus finishing position, averaged over every team result. Positive means finishing better than the best lap suggested. Higher is better.'],
+  gain:['Spots gained','Starting spot minus finishing spot, averaged over every team result. Positive means gaining spots. Higher is better.'],
+  cb:['Best comeback','The biggest comeback by any team driver: worst stage position minus finish, in races with full stage data. Higher is better.'],
+  stg:['Avg stage pos','Average position across both stages, over every team result. Lower is better.']
+};
+function teamDetail(name){
+  var N=st.n, L=C.standings(D,N), T=C.teams(D,L);
+  T.forEach(function(q){q.m=teamMetrics(q);});
+  var tm=T.filter(function(q){return q.team===name;})[0];
+  if(!tm) return;
+  var m=tm.m;
+  var BK={avg:['avg',false],avgQ:['avgQ',false],rating:['rating',true],pace:['paceScore',true],speed:['speed',false],pct:['pct',false],bspeed:['bspeed',false],vs:['vs',true],gain:['gain',true],cb:['cb',true],stg:['stg',false]};
+  function info(k){
+    var b=BK[k]; if(!b||m[b[0]]==null) return null;
+    var key=b[0], v=m[key], pool=T.filter(function(q){return q.m[key]!=null;});
+    var better=pool.filter(function(q){return b[1]?q.m[key]>v:q.m[key]<v;}).length;
+    return {rank:better+1,n:pool.length};
+  }
+  function bar(k){
+    var i=info(k); if(!i) return '';
+    var p=i.n>1?(i.n-i.rank)/(i.n-1):1, c=ptColor(p);
+    return '<em class="crk" style="color:'+c+'">'+ord(i.rank)+'</em><div class="hcb"><i style="left:'+(p*100).toFixed(1)+'%;background:'+c+';color:'+c+'"></i></div>';
+  }
+  function g(v,l,k,extra){return '<div class="g"'+(k?' data-k="'+k+'"':'')+'><b>'+v+'</b><span>'+l+'</span>'+(extra||'')+'</div>';}
+  function sg(v){return v==null?'N/A':(v>0?'+':'')+(Math.round(v*10)/10);}
+  function f1(v){return v==null?'N/A':v.toFixed(1);}
+  var h='<div class="dh" style="background:linear-gradient(135deg,#3a1018 0%,#12141a 75%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+tm.rank+'<span>Team rank</span></div><div class="who"><div><h2>'+esc(tm.team)+'</h2><div class="gt">'+tm.members.length+' drivers &middot; '+tm.pts+' team points</div></div></div><div class="tags">'+tm.members.map(function(x){return chip(x.car,'sm');}).join('')+'</div></div><div class="body">';
+  h+='<div class="call" style="margin-top:12px">Ordinals and bars rank this team against the other teams. Tap any stat for the math.</div>';
+  h+='<div class="sec">Season '+D.season+'</div><div class="grid">'+
+    g(tm.rank,'Team rank','rank')+g(tm.pts,'Team points','pts')+g(m.wins,'Wins','wins')+
+    g(m.starts,'Starts','starts')+g(f1(m.avg),'Avg finish','avg',bar('avg'))+g(m.best||'N/A','Best','best')+
+    g(m.worst||'N/A','Worst','worst')+g(m.t5,'Top 5','t5')+g(m.t10,'Top 10','t10')+
+    g(m.sw,'Stage wins','sw')+g(m.sp,'Stage pts','sp')+g(m.fl,'Fastest laps','fl')+
+    g(f1(m.avgQ),'Avg start','avgQ',bar('avgQ'))+g(m.poles,'Poles','poles')+g(tm.members.length,'Drivers','drv')+'</div>';
+  h+='<div class="sec">Advanced</div><div class="grid">'+
+    g(f1(m.rating),'Rating','rating',bar('rating'))+
+    g(m.paceScore==null?'N/A':m.paceScore.toFixed(0),'Pace','pace',bar('pace'))+
+    g(f1(m.speed),'Avg speed rank','speed',bar('speed'))+
+    g(m.pct==null?'N/A':m.pct.toFixed(2)+'%','Off fastest','pct',bar('pct'))+
+    g(m.bspeed==null?'N/A':m.bspeed,'Best speed rank','bspeed',bar('bspeed'))+
+    g(sg(m.vs),'Vs speed','vs',bar('vs'))+
+    g(sg(m.gain),'Spots gained','gain',bar('gain'))+g(m.cb==null?'N/A':'+'+m.cb,'Best comeback','cb',bar('cb'))+
+    g(f1(m.stg),'Avg stage pos','stg',bar('stg'))+'</div>';
+  h+='<div class="sec">Drivers</div><div class="lcard" style="padding:4px 12px">';
+  tm.members.forEach(function(x){
+    h+='<div class="lr" data-car="'+esc(x.car)+'"><div class="rk" style="font-size:15px;color:var(--mut)">'+x.rank+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(x.d.name)+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+x.tp+(x.tp!==x.pts?'<span style="display:block;font-size:10px;color:var(--mut)">of '+x.pts+'</span>':'')+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div class="sec">Race log</div><table><tr><th>Race</th><th>Track</th><th class="r">Team pts</th><th class="r">Best</th><th class="r">Avg fin</th></tr>';
+  for(var k=N-1;k>=0;k--){
+    var rp=tm.members.map(function(x){return x.r[k]||0;}).sort(function(a,b){return b-a;}).slice(0,3).reduce(function(s,v){return s+v;},0);
+    var fk=tm.members.map(function(x){return x.fin[k];}).filter(function(v){return v>0;});
+    h+='<tr><td>'+(k+1)+'</td><td>'+esc(trackOf(k))+'</td><td class="r">'+rp+'</td><td class="r">'+(fk.length?'P'+Math.min.apply(null,fk):'&ndash;')+'</td><td class="r">'+(fk.length?meanOf(fk).toFixed(1):'&ndash;')+'</td></tr>';
+  }
+  h+='</table></div>';
+  var sh=document.getElementById('sheet');
+  sh.innerHTML=h; sh.scrollTop=0;
+  Array.prototype.forEach.call(document.querySelectorAll('#sheet [data-car]'),function(el){el.addEventListener('click',function(){detail(el.getAttribute('data-car'));});});
+  bindFlip(TDESC);
   openSheet();
 }
 function openSheet(){var o=document.getElementById('ov');o.classList.add('on');document.body.style.overflow='hidden';
@@ -891,6 +1005,7 @@ function render(){
   Array.prototype.forEach.call(document.querySelectorAll('[data-v]'),function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-v');if(v==='all'){st.view='all';st.vopen=false;}else{st.view=parseInt(v,10);st.vopen=true;}render();});});
   Array.prototype.forEach.call(document.querySelectorAll('[data-tk]'),function(th){th.addEventListener('click',function(){var k=th.getAttribute('data-tk');if(st.tk===k){st.trev=!st.trev;}else{st.tk=k;st.trev=false;}render();});});
   Array.prototype.forEach.call(document.querySelectorAll('[data-ps]'),function(b){b.addEventListener('click',function(){st.ps=b.getAttribute('data-ps');render();});});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-team]'),function(el){el.addEventListener('click',function(){teamDetail(el.getAttribute('data-team'));});});
   var vt=document.getElementById('vtog'); if(vt) vt.addEventListener('click',function(){st.vopen=!st.vopen;render();});
   var mo=document.getElementById('more'); if(mo) mo.addEventListener('click',function(){st.all=!st.all;render();});
   Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.toggle('on',b.getAttribute('data-t')===st.tab);});
