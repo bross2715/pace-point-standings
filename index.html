@@ -85,6 +85,7 @@ main{padding:14px 12px}
 .lr:first-of-type{border-top:0}
 .lr .v{font-family:var(--hd);font-weight:800;font-size:20px}
 .empty{color:var(--mut);font-size:13px;padding:8px 0}
+.lxb{display:block;width:100%;margin-top:8px;background:none;border:1px solid var(--line);color:var(--mut);border-radius:10px;padding:10px;font-family:var(--hd);font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-size:13px;min-height:42px;cursor:pointer}
 .vb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
 .vb button,.vc button{font-family:var(--hd);font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-size:14px;color:var(--mut);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:9px 14px;min-height:40px;cursor:pointer}
 .vb button.on,.vc button.on{color:var(--txt);border-color:var(--brand);background:#1a0d12}
@@ -450,7 +451,7 @@ var D=JSON.parse(document.getElementById('pace-data').textContent);
 var CH=JSON.parse(document.getElementById('pace-chips').textContent);
 var C=window.PaceCore;
 var R=D.races.length;               // race count is always derived from the races array
-var st={n:R,tab:'tower',all:false,view:'all',vopen:false,tk:'pts',trev:false,ps:'rating'};
+var st={n:R,tab:'tower',all:false,view:'all',vopen:false,tk:'pts',trev:false,ps:'rating',lx:{}};
 var byCar={};D.drivers.forEach(function(d){byCar[d.car]=d;});
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function chip(car,size){
@@ -738,18 +739,22 @@ function teamsTab(L){
 }
 function leaders(){
   var L=baseList();
-  function top(fn,filter,fmt,asc){
-    var a=L.filter(filter).sort(function(p,q){var d=asc?fn(p)-fn(q):fn(q)-fn(p);return d||(p.rank-q.rank);});
+  function top(fn,filter,fmt,asc,name,allf){
+    function sortBy(f){return L.filter(f).sort(function(p,q){var d=asc?fn(p)-fn(q):fn(q)-fn(p);return d||(p.rank-q.rank);});}
+    function line(x,rk,v){return '<div class="lr" data-car="'+esc(x.car)+'"><div class="rk">'+rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+fmt(v)+'</div></div>';}
+    function listAll(arr){var prev=null,rk=0,s='';arr.forEach(function(x,i){var v=fn(x);if(v!==prev){rk=i+1;prev=v;}s+=line(x,rk,v);});return s;}
+    var a=sortBy(filter);
     if(!a.length) return '<div class="empty">No data yet.</div>';
+    var all=sortBy(function(x){var v=fn(x);return v!=null&&!isNaN(v)&&allf(x);});
+    var open=!!st.lx[name];
+    var btn=function(txt){return '<button class="lxb" data-lx="'+esc(name)+'">'+txt+'</button>';};
+    if(open) return listAll(all)+btn('Show top 3 only &#9650;');
     var third=a[Math.min(2,a.length-1)], tv=fn(third);
     a=a.filter(function(x,i){return i<3||fn(x)===tv;});
     var extra=a.length>5?a.length-5:0; if(extra) a=a.slice(0,5);
-    var prev=null,rk=0,h='';
-    a.forEach(function(x,i){
-      var v=fn(x); if(v!==prev){rk=i+1;prev=v;}
-      h+='<div class="lr" data-car="'+esc(x.car)+'"><div class="rk">'+rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+fmt(v)+'</div></div>';
-    });
+    var h=listAll(a);
     if(extra) h+='<div class="empty">+'+extra+' more tied</div>';
+    if(all.length>a.length) h+=btn('Show everyone ('+all.length+') &#9660;');
     return h;
   }
   var id=function(v){return v;};
@@ -765,13 +770,13 @@ function leaders(){
    ['Poles',function(x){return x.poles;},function(x){return x.poles>0;},id],
    ['Driver Rating',function(x){return Math.round(x.rating*10)/10;},function(x){return x.rating!=null;},function(v){return v.toFixed(1);}],
    ['Fastest Racers (% off fastest)',function(x){return Math.round(x.avgPct*100)/100;},function(x){return x.paceN>0;},function(v){return v.toFixed(2)+'%';},true],
-   ['Finish Above Lap Time',function(x){return Math.round(x.fvp*10)/10;},function(x){return x.fvp!=null&&x.fvp>0;},function(v){return '+'+v.toFixed(1);}],
-   ['Spots Gained From Start',function(x){return Math.round(x.gain*10)/10;},function(x){return x.gain!=null&&x.gain>0;},function(v){return '+'+v.toFixed(1);}],
-   ['Best Comeback',function(x){return x.cb;},function(x){return x.cb>0;},function(v){return '+'+v;}],
+   ['Finish Above Lap Time',function(x){return Math.round(x.fvp*10)/10;},function(x){return x.fvp!=null&&x.fvp>0;},function(v){return (v>0?'+':'')+v.toFixed(1);}],
+   ['Spots Gained From Start',function(x){return Math.round(x.gain*10)/10;},function(x){return x.gain!=null&&x.gain>0;},function(v){return (v>0?'+':'')+v.toFixed(1);}],
+   ['Best Comeback',function(x){return x.cb;},function(x){return x.cb>0;},function(v){return (v>0?'+':'')+v;}],
    ['Best Average Start',function(x){return Math.round(x.avgQ*10)/10;},function(x){return x.qn>0;},function(v){return v.toFixed(1);},true]
   ];
   var h=viewBar();
-  defs.forEach(function(d){h+='<div class="lcard"><h3>'+d[0]+'</h3>'+top(d[1],d[2],d[3],d[4])+'</div>';});
+  defs.forEach(function(d){h+='<div class="lcard"><h3>'+d[0]+'</h3>'+top(d[1],d[2],d[3],d[4],d[0],d[5]||function(){return true;})+'</div>';});
   return h;
 }
 function rankIdx(L,val,hi){
@@ -1012,6 +1017,7 @@ function render(){
   Array.prototype.forEach.call(document.querySelectorAll('[data-tk]'),function(th){th.addEventListener('click',function(){var k=th.getAttribute('data-tk');if(st.tk===k){st.trev=!st.trev;}else{st.tk=k;st.trev=false;}render();});});
   Array.prototype.forEach.call(document.querySelectorAll('[data-ps]'),function(b){b.addEventListener('click',function(){st.ps=b.getAttribute('data-ps');render();});});
   Array.prototype.forEach.call(document.querySelectorAll('[data-team]'),function(el){el.addEventListener('click',function(){teamDetail(el.getAttribute('data-team'));});});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-lx]'),function(b){b.addEventListener('click',function(){var k=b.getAttribute('data-lx'),y=window.scrollY;st.lx[k]=!st.lx[k];render();window.scrollTo(0,y);});});
   var vt=document.getElementById('vtog'); if(vt) vt.addEventListener('click',function(){st.vopen=!st.vopen;render();});
   var mo=document.getElementById('more'); if(mo) mo.addEventListener('click',function(){st.all=!st.all;render();});
   Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.toggle('on',b.getAttribute('data-t')===st.tab);});
