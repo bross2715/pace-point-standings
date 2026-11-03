@@ -28,7 +28,11 @@ main{padding:14px 12px}
 .scrub{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px 12px;margin-bottom:12px}
 .scrub .lab{display:flex;justify-content:space-between;font-family:var(--hd);font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:13px;color:var(--mut)}
 .scrub .lab b{color:var(--txt)}
-.scrub input{width:100%;margin:10px 0 0;accent-color:var(--brand)}
+.rpills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.rp{flex:1 1 0;min-width:44px;background:var(--bg);border:1px solid var(--line);color:var(--mut);border-radius:10px;padding:8px 6px;font-family:var(--hd);font-weight:700;letter-spacing:.6px;text-transform:uppercase;font-size:15px;line-height:1.1;min-height:44px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.rp span{font-size:11px;letter-spacing:.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.rpills.nm .rp{flex:1 1 calc(25% - 6px)}
+.rp.on{background:var(--brand);border-color:var(--brand);color:#fff}
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:84px}
 .card .k{font-family:var(--hd);font-weight:700;letter-spacing:1.2px;text-transform:uppercase;font-size:12px;color:var(--mut)}
@@ -473,7 +477,9 @@ function hdr(){
 }
 function scrub(){
   if(R<2) return '<div class="scrub"><div class="lab"><span>Race <b>1</b> of '+D.schedule.length+' complete</span><span>'+esc(trackOf(0))+'</span></div></div>';
-  return '<div class="scrub"><div class="lab"><span>After race <b id="sn">'+st.n+'</b></span><span id="st">'+esc(trackOf(st.n-1))+'</span></div><input id="rng" type="range" min="1" max="'+R+'" value="'+st.n+'"></div>';
+  var names=R<=8, h='<div class="scrub"><div class="lab"><span>After race <b id="sn">'+st.n+'</b></span><span id="st">'+esc(trackOf(st.n-1))+'</span></div><div class="rpills'+(names?' nm':'')+'">';
+  for(var i=1;i<=R;i++) h+='<button class="rp'+(i===st.n?' on':'')+'" data-n="'+i+'" aria-label="After race '+i+', '+esc(trackOf(i-1))+'"><b>'+(names?'R':'')+i+'</b>'+(names?'<span>'+esc(trackOf(i-1))+'</span>':'')+'</button>';
+  return h+'</div></div>';
 }
 function delta(x){
   if(x.delta==null) return '<div class="dl">&ndash;</div>';
@@ -1011,8 +1017,7 @@ function render(){
   var L=C.standings(D,st.n), m=document.getElementById('main');
   m.innerHTML=st.tab==='tower'?tower(L):st.tab==='results'?resultsTab(L):st.tab==='pace'?paceTab():st.tab==='chase'?chase(L):st.tab==='stage'?stage(L):st.tab==='teams'?teamsTab(L):leaders();
   Array.prototype.forEach.call(document.querySelectorAll('[data-car]'),function(el){el.addEventListener('click',function(){detail(el.getAttribute('data-car'));});});
-  var r=document.getElementById('rng');
-  if(r) r.addEventListener('input',function(){st.n=parseInt(r.value,10);render();var rr=document.getElementById('rng');rr&&rr.focus&&rr.focus();});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-n]'),function(b){b.addEventListener('click',function(){var y=window.scrollY;st.n=parseInt(b.getAttribute('data-n'),10);render();window.scrollTo(0,y);});});
   Array.prototype.forEach.call(document.querySelectorAll('[data-v]'),function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-v');if(v==='all'){st.view='all';st.vopen=false;}else{st.view=parseInt(v,10);st.vopen=true;}render();});});
   Array.prototype.forEach.call(document.querySelectorAll('[data-tk]'),function(th){th.addEventListener('click',function(){var k=th.getAttribute('data-tk');if(st.tk===k){st.trev=!st.trev;}else{st.tk=k;st.trev=false;}render();});});
   Array.prototype.forEach.call(document.querySelectorAll('[data-ps]'),function(b){b.addEventListener('click',function(){st.ps=b.getAttribute('data-ps');render();});});
