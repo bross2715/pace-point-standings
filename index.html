@@ -819,31 +819,31 @@ function detail(car){
   }
   var tags=['#'+car].concat(d.team?[d.team]:[]).concat(d.plat==='PS'?['PlayStation']:d.plat==='XB'?['Xbox']:[]);
   var h='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'66,'+d.c2+' 70%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+x.rank+'<span>Points rank</span></div><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+esc(d.tag)+'</div></div></div><div class="tags">'+tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('')+'</div></div><div class="body">';
-  var R={};
+  var RK={};
   var bsl=(x.lapRank||[]).filter(function(q){return q>0;});
   var bsv=bsl.length?Math.min.apply(null,bsl):null;
-  R.rating=rankIdx(L,function(v){return v.rating;},true);
-  R.rrank=R.rating;
-  R.pace=rankIdx(L,function(v){return paceOf(v);},true);
-  R.speed=rankIdx(L,function(v){return v.avgPaceRank;},false);
-  R.pct=rankIdx(L,function(v){return v.avgPct;},false);
-  R.bspeed=rankIdx(L,function(v){var lr=(v.lapRank||[]).filter(function(q){return q>0;});return lr.length?Math.min.apply(null,lr):null;},false);
-  R.vs=rankIdx(L,function(v){return v.fvp;},true);
-  R.gain=rankIdx(L,function(v){return v.gain;},true);
-  R.cb=rankIdx(L,function(v){return v.cb>0?v.cb:null;},true);
-  R.stg=rankIdx(L,function(v){return v.avgStg;},false);
-  R.rank=rankIdx(L,function(v){return v.rank;},false);
-  R.avg=rankIdx(L,function(v){return v.avg;},false);
-  R.avgQ=rankIdx(L,function(v){return v.avgQ;},false);
+  RK.rating=rankIdx(L,function(v){return v.rating;},true);
+  RK.rrank=RK.rating;
+  RK.pace=rankIdx(L,function(v){return paceOf(v);},true);
+  RK.speed=rankIdx(L,function(v){return v.avgPaceRank;},false);
+  RK.pct=rankIdx(L,function(v){return v.avgPct;},false);
+  RK.bspeed=rankIdx(L,function(v){var lr=(v.lapRank||[]).filter(function(q){return q>0;});return lr.length?Math.min.apply(null,lr):null;},false);
+  RK.vs=rankIdx(L,function(v){return v.fvp;},true);
+  RK.gain=rankIdx(L,function(v){return v.gain;},true);
+  RK.cb=rankIdx(L,function(v){return v.cb>0?v.cb:null;},true);
+  RK.stg=rankIdx(L,function(v){return v.avgStg;},false);
+  RK.rank=rankIdx(L,function(v){return v.rank;},false);
+  RK.avg=rankIdx(L,function(v){return v.avg;},false);
+  RK.avgQ=rankIdx(L,function(v){return v.avgQ;},false);
   function bar(k){
-    var info=R[k]&&R[k][car];
+    var info=RK[k]&&RK[k][car];
     if(!info) return '';
     var p=info.n>1?(info.n-info.rank)/(info.n-1):1;
     var c=ptColor(p);
     return '<em class="crk" style="color:'+c+'">'+ord(info.rank)+'</em><div class="hcb"><i style="left:'+(p*100).toFixed(1)+'%;background:'+c+';color:'+c+'"></i></div>';
   }
   function corner(k){
-    var info=R[k]&&R[k][car];
+    var info=RK[k]&&RK[k][car];
     if(!info) return '';
     var p=info.n>1?(info.n-info.rank)/(info.n-1):1;
     return '<em class="crk" style="color:'+ptColor(p)+'">'+ord(info.rank)+'</em>';
