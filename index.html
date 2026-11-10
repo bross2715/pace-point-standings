@@ -175,6 +175,9 @@ td.r,th.r{text-align:right}
 .sr i{display:block;height:7px;background:#1a1d22;border-radius:4px;overflow:hidden}.sr i u{display:block;height:100%;border-radius:4px}
 .sr b{font-family:var(--hd);font-weight:800;font-size:16px;text-align:right}
 .sr em{font:800 13px/1 'Barlow Condensed',sans-serif;font-style:normal;text-align:right}
+.xp{margin:8px 0 0;padding:10px 12px;background:#14171c;border:1px solid var(--line);border-left:3px solid #e0222b;border-radius:10px}
+.xp b{display:block;font-family:var(--hd);font-size:15px}.xp span{display:block;margin-top:4px;font-size:12px;line-height:1.4;color:#cfd3d9}
+.shr{height:4px;background:#1a1d22;border-radius:2px;margin:-2px 0 6px 40px;overflow:hidden}.shr u{display:block;height:100%;background:#e0222b;border-radius:2px}
 .hcb i{position:absolute;top:-4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;border:2px solid #07080a}
 .hz{font:700 9px/1 'Barlow',sans-serif;letter-spacing:.12em;text-transform:uppercase;margin-top:5px}
 .hz.hot{color:#ff3b3b}.hz.steady{color:#22d36b}.hz.cool{color:#9fd0ff}
@@ -2123,26 +2126,36 @@ function teamDetail(name){
   function g(v,l,k,extra){return '<div class="g"'+(k?' data-k="'+k+'"':'')+'><b>'+v+'</b><span>'+l+'</span>'+(extra||'')+'</div>';}
   function sg(v){return v==null?'N/A':(v>0?'+':'')+(Math.round(v*10)/10);}
   function f1(v){return v==null?'N/A':v.toFixed(1);}
-  var h='<div class="dh" style="background:linear-gradient(135deg,#3a1018 0%,#12141a 75%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+tm.rank+'<span>Team rank</span></div><div class="who"><div style="min-width:0;padding-right:130px">'+mfrIco(tm.team,'th')+'<h2>'+esc(teamFull(tm.team))+'</h2><div class="gt">'+esc(tm.team)+(teamMfr(tm.team)?' &middot; '+esc(teamMfr(tm.team)):'')+' &middot; '+tm.members.filter(function(x){return !x.d.retired;}).length+' drivers &middot; '+tm.pts+' team points</div></div></div><div class="tags">'+tm.members.filter(function(x){return !x.d.retired;}).slice().sort(function(p,q){return parseInt(p.car,10)-parseInt(q.car,10);}).map(function(x){return chip(x.car,'sm');}).join('')+'</div></div><div class="body">';
-  h+='<div class="call" style="margin-top:12px">Ordinals and bars rank this team against the other teams. Tap any stat for the math.</div>';
-  h+='<div class="sec">Season '+D.season+'</div><div class="grid">'+
-    g(tm.rank,'Team rank','rank')+g(tm.pts,'Team points','pts')+g(m.wins,'Wins','wins')+
-    g(m.starts,'Starts','starts')+g(f1(m.avg),'Avg finish','avg',bar('avg'))+g(m.best||'N/A','Best','best')+
-    g(m.worst||'N/A','Worst','worst')+g(m.t5,'Top 5','t5')+g(m.t10,'Top 10','t10')+
-    g(m.sw,'Stage wins','sw')+g(m.sp,'Stage pts','sp')+g(m.fl,'Fastest laps','fl')+
-    g(f1(m.avgQ),'Avg start','avgQ',bar('avgQ'))+g(m.poles,'Poles','poles')+g(tm.members.filter(function(x){return !x.d.retired;}).length,'Drivers','drv')+'</div>';
-  h+='<div class="sec">Advanced</div><div class="grid">'+
-    g(f1(m.rating),'Rating','rating',bar('rating'))+
-    g(m.paceScore==null?'N/A':m.paceScore.toFixed(0),'Pace','pace',bar('pace'))+
-    g(f1(m.speed),'Avg speed rank','speed',bar('speed'))+
-    g(m.pct==null?'N/A':m.pct.toFixed(2)+'%','Off fastest','pct',bar('pct'))+
-    g(m.bspeed==null?'N/A':m.bspeed,'Best speed rank','bspeed',bar('bspeed'))+
-    g(sg(m.vs),'Vs speed','vs',bar('vs'))+
-    g(sg(m.gain),'Spots gained','gain',bar('gain'))+g(m.cb==null?'N/A':'+'+m.cb,'Best comeback','cb',bar('cb'))+
-    g(f1(m.stg),'Avg stage pos','stg',bar('stg'))+'</div>';
+  var h='<div class="dh" style="background:linear-gradient(135deg,#3a1018 0%,#12141a 75%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+tm.rank+'<span>Team rank</span></div><div class="who"><div style="min-width:0;padding-right:130px">'+mfrIco(tm.team,'th')+'<h2>'+esc(teamFull(tm.team))+'</h2><div class="gt">'+esc(tm.team)+(teamMfr(tm.team)?' &middot; '+esc(teamMfr(tm.team)):'')+' &middot; '+tm.members.filter(function(x){return !x.d.retired;}).length+' drivers &middot; '+tm.pts+' team points</div></div></div><div class="tags">'+tm.members.filter(function(x){return !x.d.retired;}).slice().sort(function(p,q){return parseInt(p.car,10)-parseInt(q.car,10);}).map(function(x){return chip(x.car,'sm');}).join('')+'</div></div>'+'@@OVR@@'+'<div class="body">';
+  function rk(k){var i=info(k);if(!i)return null;var p=i.n>1?(i.n-i.rank)/(i.n-1):1;return {r:i.rank,p:p,c:ptColor(p)};}
+  function att(l,k){var q=rk(k);if(!q)return '';var v=Math.round(40+q.p*59);return '<div class="att" data-k="'+k+'" style="cursor:pointer"><span>'+l+'</span><i><u style="width:'+v+'%;background:'+q.c+'"></u></i><b>'+v+'</b></div>';}
+  var ovrH='<div class="ovr"><div class="big" data-k="rating" style="cursor:pointer"><small>RATING</small>'+(m.rating==null?'--':Math.round(m.rating))+'</div><div class="atts">'+att('Pace','pace')+att('Finish','avg')+att('Start','avgQ')+att('Racecraft','gain')+att('Speed','speed')+'</div></div>';
+  function hero(v,l,k){var q=rk(k);return '<div class="hg" data-k="'+k+'"><span>'+l+'</span><b>'+v+'</b><em'+(q?' style="color:'+q.c+'"':'')+'>'+(q?ord(q.r)+' of '+info(k).n+' teams':'')+'</em></div>';}
+  function chipS(v,l,k){return '<div class="cs'+(+v?'':' z')+'" data-k="'+k+'"><b>'+v+'</b><span>'+l+'</span></div>';}
+  function srow(label,val,k,hint){var q=rk(k);if(!q)return '<div class="sr" data-k="'+k+'"><span>'+label+'</span><i></i><b>'+val+'</b><em>N/A</em></div>';return '<div class="sr" data-k="'+k+'"><span>'+label+(hint?'<small>'+hint+'</small>':'')+'</span><i><u style="width:'+Math.max(4,q.p*100).toFixed(0)+'%;background:'+q.c+'"></u></i><b>'+val+'</b><em style="color:'+q.c+'">'+ord(q.r)+'</em></div>';}
+  var nDrv=tm.members.filter(function(x){return !x.d.retired;}).length, F=Math.max(D.fieldSize,m.worst||1,2);
+  function pos(v){return ((v-1)/(F-1)*100).toFixed(1);}
+  var rng=(m.best&&m.worst)?'<div class="rng" data-k="best"><div class="rt"><span>Finish range</span><b>P'+m.best+' <small>best</small> &nbsp; P'+m.worst+' <small>worst</small></b></div><div class="rl"><i class="rb" style="left:'+pos(m.best)+'%;width:'+Math.max(2,pos(m.worst)-pos(m.best))+'%;background:#e0222b"></i>'+(m.avg!=null?'<i class="ra" style="left:'+pos(Math.min(Math.max(m.avg,1),F))+'%"></i>':'')+'</div><div class="rs"><span>P1</span><span>avg P'+f1(m.avg)+'</span><span>P'+F+'</span></div></div>':'';
+  h+='<div class="hrow">'+hero(tm.pts,'Team points','rank')+hero(f1(m.avg),'Avg finish','avg')+hero(f1(m.avgQ),'Avg start','avgQ')+'</div>';
+  h+='<div class="sec">Results</div><div class="cstrip">'+chipS(m.wins,'Wins','wins')+chipS(m.t5,'Top 5','t5')+chipS(m.t10,'Top 10','t10')+chipS(m.poles,'Poles','poles')+chipS(m.sw,'Stage wins','sw')+chipS(m.fl,'Fast laps','fl')+'</div>';
+  h+='<div class="mini"><span data-k="starts"><b>'+m.starts+'</b> starts</span><span data-k="sp"><b>'+m.sp+'</b> stage pts</span><span data-k="drv"><b>'+nDrv+'</b> drivers</span></div>';
+  h+=rng;
+  h+='<div class="sec">Speed &amp; racecraft</div><div class="srows">'+
+    srow('Off fastest',m.pct==null?'N/A':m.pct.toFixed(2)+'%','pct','avg gap to best lap')+
+    srow('Vs speed',sg(m.vs),'vs','finish vs speed rank')+
+    srow('Spots gained',sg(m.gain),'gain','start to finish')+
+    srow('Best comeback',m.cb==null?'N/A':'+'+m.cb,'cb')+
+    srow('Avg stage pos',f1(m.stg),'stg')+
+    srow('Best speed rank',m.bspeed==null?'N/A':m.bspeed,'bspeed')+'</div>';
+  // team points per race
+  var rps=[];for(var q=0;q<N;q++)rps.push(tm.members.map(function(x){return x.r[q]||0;}).sort(function(a,b){return b-a;}).slice(0,3).reduce(function(s,v){return s+v;},0));
+  var mx=Math.max.apply(null,rps.concat([1])),bw=Math.min(40,260/Math.max(N,1)),bs='<svg viewBox="0 0 320 120" width="100%" role="img" aria-label="Team points by race">';
+  rps.forEach(function(v,q){var bh=Math.round(80*v/mx),x0=20+q*(280/Math.max(N,1))+(280/Math.max(N,1)-bw)/2;bs+='<rect x="'+x0+'" y="'+(92-bh)+'" width="'+bw+'" height="'+bh+'" rx="4" fill="#e0222b"/><text x="'+(x0+bw/2)+'" y="'+(88-bh)+'" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">'+v+'</text><text x="'+(x0+bw/2)+'" y="110" fill="#8b929c" font-size="10" text-anchor="middle">R'+(q+1)+'</text>';});
+  bs+='</svg>';
+  h+='<div class="sec">Team points by race</div><div class="g" style="padding:8px 6px">'+bs+'</div>';
   h+='<div class="sec">Drivers</div><div class="lcard" style="padding:4px 12px">';
   tm.members.forEach(function(x){
-    h+='<div class="lr" data-car="'+esc(x.car)+'"><div class="rk" style="font-size:15px;color:var(--mut)">'+x.rank+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(x.d.name)+'</div><div class="n2 tgl"><span class="tg">'+esc(x.d.tag)+'</span>'+(x.d.team?'<span class="tm">'+esc(x.d.team)+'</span>':'')+(x.d.retired?' &middot; retired':'')+'</div></div><div class="v">'+x.tp+(x.tp!==x.pts?'<span style="display:block;font-size:10px;color:var(--mut)">of '+x.pts+'</span>':'')+'</div></div>';
+    h+='<div class="lr" data-car="'+esc(x.car)+'"><div class="rk" style="font-size:15px;color:var(--mut)">'+x.rank+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(x.d.name)+'</div><div class="n2 tgl"><span class="tg">'+esc(x.d.tag)+'</span>'+(x.d.team?'<span class="tm">'+esc(x.d.team)+'</span>':'')+(x.d.retired?' &middot; retired':'')+'</div></div><div class="v">'+x.tp+(x.tp!==x.pts?'<span style="display:block;font-size:10px;color:var(--mut)">of '+x.pts+'</span>':'')+'</div></div><div class="shr"><u style="width:'+Math.round(100*x.tp/Math.max(tm.pts,1))+'%"></u></div>';
   });
   h+='</div>';
   h+='<div class="sec">Race log</div><table><tr><th>Race</th><th>Track</th><th class="r">Team pts</th><th class="r">Best</th><th class="r">Avg fin</th></tr>';
@@ -2152,11 +2165,24 @@ function teamDetail(name){
     h+='<tr><td>'+(k+1)+'</td><td>'+esc(trackOf(k))+'</td><td class="r">'+rp+'</td><td class="r">'+(fk.length?'P'+Math.min.apply(null,fk):'&ndash;')+'</td><td class="r">'+(fk.length?meanOf(fk).toFixed(1):'&ndash;')+'</td></tr>';
   }
   h+='</table></div>';
+  h=h.replace('@@OVR@@',ovrH);
   var sh=document.getElementById('sheet');
   sh.innerHTML=h; sh.scrollTop=0;
   Array.prototype.forEach.call(document.querySelectorAll('#sheet [data-car]'),function(el){el.addEventListener('click',function(){detail(el.getAttribute('data-car'));});});
-  bindFlip(TDESC);
+  bindXp(TDESC);
   openSheet();
+}
+function bindXp(map){
+  Array.prototype.forEach.call(document.querySelectorAll('#sheet [data-k]'),function(el){
+    el.addEventListener('click',function(){
+      var dd=map[el.getAttribute('data-k')]; if(!dd) return;
+      var wrap=el.closest('.hrow,.cstrip,.mini,.rng,.srows,.ovr')||el, was=wrap.nextElementSibling&&wrap.nextElementSibling.classList.contains('xp')&&wrap.nextElementSibling.getAttribute('data-for')===el.getAttribute('data-k');
+      Array.prototype.forEach.call(document.querySelectorAll('#sheet .xp'),function(o){o.parentNode.removeChild(o);});
+      if(was) return;
+      var x=document.createElement('div');x.className='xp';x.setAttribute('data-for',el.getAttribute('data-k'));x.innerHTML='<b>'+dd[0]+'</b><span>'+dd[1]+'</span>';
+      wrap.parentNode.insertBefore(x,wrap.nextSibling);
+    });
+  });
 }
 function openSheet(){var o=document.getElementById('ov');o.classList.add('on');document.body.style.overflow='hidden';
   document.getElementById('cx')&&(document.getElementById('cx').onclick=closeSheet);}
