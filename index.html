@@ -117,7 +117,6 @@ main{padding:14px 12px}
 .dh{padding:18px 16px 16px;position:relative;border-radius:18px 18px 0 0}
 .dh .x{position:absolute;right:10px;top:10px;width:44px;height:44px;border:0;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:20px;cursor:pointer}
 .dh .who{display:flex;align-items:center;gap:12px}
-.dh .who>div{min-width:0;padding-right:130px}
 .dh h2{margin:0;font-family:var(--hd);font-weight:800;font-style:italic;font-size:30px;text-transform:uppercase;line-height:1}
 .dh .gt{font-size:12px;color:#d6dae0;margin-top:3px}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
@@ -1490,7 +1489,7 @@ function teamDetail(name){
   function g(v,l,k,extra){return '<div class="g"'+(k?' data-k="'+k+'"':'')+'><b>'+v+'</b><span>'+l+'</span>'+(extra||'')+'</div>';}
   function sg(v){return v==null?'N/A':(v>0?'+':'')+(Math.round(v*10)/10);}
   function f1(v){return v==null?'N/A':v.toFixed(1);}
-  var h='<div class="dh" style="background:linear-gradient(135deg,#3a1018 0%,#12141a 75%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+tm.rank+'<span>Team rank</span></div><div class="who"><div><h2>'+esc(teamFull(tm.team))+'</h2><div class="gt">'+esc(tm.team)+(teamMfr(tm.team)?' &middot; '+esc(teamMfr(tm.team)):'')+' &middot; '+tm.members.length+' drivers &middot; '+tm.pts+' team points</div></div></div><div class="tags">'+tm.members.map(function(x){return chip(x.car,'sm');}).join('')+'</div></div><div class="body">';
+  var h='<div class="dh" style="background:linear-gradient(135deg,#3a1018 0%,#12141a 75%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+tm.rank+'<span>Team rank</span></div><div class="who"><div style="min-width:0;padding-right:130px"><h2>'+esc(teamFull(tm.team))+'</h2><div class="gt">'+esc(tm.team)+(teamMfr(tm.team)?' &middot; '+esc(teamMfr(tm.team)):'')+' &middot; '+tm.members.length+' drivers &middot; '+tm.pts+' team points</div></div></div><div class="tags">'+tm.members.map(function(x){return chip(x.car,'sm');}).join('')+'</div></div><div class="body">';
   h+='<div class="call" style="margin-top:12px">Ordinals and bars rank this team against the other teams. Tap any stat for the math.</div>';
   h+='<div class="sec">Season '+D.season+'</div><div class="grid">'+
     g(tm.rank,'Team rank','rank')+g(tm.pts,'Team points','pts')+g(m.wins,'Wins','wins')+
