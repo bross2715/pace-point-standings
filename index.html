@@ -119,6 +119,7 @@ main{padding:14px 12px}
 .dh .x{position:absolute;right:10px;top:10px;width:44px;height:44px;border:0;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:20px;cursor:pointer}
 .dh .who{display:flex;align-items:center;gap:12px}
 .dh h2{margin:0;font-family:var(--hd);font-weight:800;font-style:italic;font-size:30px;text-transform:uppercase;line-height:1}
+.img.pl.mf.tb{width:auto;height:11px;border-radius:0;margin-left:6px;vertical-align:-1px}img.pl.mf.tc{width:auto;height:20px;border-radius:0;flex:none}img.pl.mf.th{width:auto;height:26px;border-radius:0;display:block;margin-bottom:6px}
 .ems{display:inline-flex;gap:4px;margin-left:7px;vertical-align:1px}.ems img.pl{width:13px;height:13px;border-radius:50%;margin:0}.n2 img.pl.mf.s{width:auto;height:11px;border-radius:0;margin:0 0 0 5px;flex:none}
 .tag img.pl.t{width:auto;height:16px;border-radius:0;vertical-align:-3px;margin-right:6px}
 .n2 img.pl.s{width:12px;height:12px;border-radius:50%;flex:none;margin-right:5px}
@@ -1359,7 +1360,7 @@ function teamAdv(S){
   h+='</tr>';
   S.forEach(function(t){
     var m=t.m;
-    h+='<tr data-team="'+esc(t.team)+'" style="cursor:pointer;border-top:1px solid rgba(128,128,128,.25);text-align:right"><td style="text-align:left;padding:6px 4px;font-weight:700">'+esc(t.team)+'</td>'+
+    h+='<tr data-team="'+esc(t.team)+'" style="cursor:pointer;border-top:1px solid rgba(128,128,128,.25);text-align:right"><td style="text-align:left;padding:6px 4px;font-weight:700">'+esc(t.team)+mfrIco(t.team,'tb')+'</td>'+
       '<td>'+m.pts+'</td><td>'+m.wins+'</td><td>'+f1(m.avgFin)+'</td><td>'+(m.best||'&ndash;')+'</td><td>'+m.t5+'</td><td>'+m.t10+'</td><td>'+m.sp+'</td><td>'+m.fl+'</td><td>'+f1(m.pace)+'</td><td>'+sg(m.gain)+'</td></tr>';
   });
   return h+'</table></div>';
@@ -1370,7 +1371,7 @@ function teamsTab(L){
   var S=T.slice().sort(function(p,q){return p.rank-q.rank;});
   var h=scrub()+'<div class="call"><b>Team points</b> add up the top three scorers from each team in every race, using the same scoring as the driver standings. A fourth or fifth driver only counts when they outscore a teammate. Retired drivers keep the points they already scored for their team. Drivers without a team are not counted. Tap a team for its full stats.</div>';
   S.forEach(function(t){
-    h+='<div class="lcard"><div data-team="'+esc(t.team)+'" style="display:flex;align-items:center;gap:10px;margin-bottom:4px;cursor:pointer"><div class="rk" style="width:24px">'+t.rank+'</div><div class="n1" style="font-size:26px;flex:1">'+esc(t.team)+'</div><div class="pt"><b>'+t.pts+'</b><span>'+t.wins+(t.wins===1?' win':' wins')+'</span></div></div>';
+    h+='<div class="lcard"><div data-team="'+esc(t.team)+'" style="display:flex;align-items:center;gap:10px;margin-bottom:4px;cursor:pointer"><div class="rk" style="width:24px">'+t.rank+'</div><div class="n1" style="font-size:26px;flex:1;display:flex;align-items:center;gap:10px">'+esc(t.team)+mfrIco(t.team,'tc')+'</div><div class="pt"><b>'+t.pts+'</b><span>'+t.wins+(t.wins===1?' win':' wins')+'</span></div></div>';
     t.members.forEach(function(x){
       h+='<div class="lr" data-car="'+esc(x.car)+'"><div class="rk" style="font-size:15px;color:var(--mut)">'+x.rank+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(x.d.name)+'</div><div class="n2 tgl"><span class="tg">'+esc(x.d.tag)+'</span>'+(x.d.team?'<span class="tm">'+esc(x.d.team)+'</span>':'')+(x.d.retired?' &middot; retired':'')+'</div></div><div class="v">'+x.tp+(x.tp!==x.pts?'<span style="display:block;font-size:10px;color:var(--mut)">of '+x.pts+'</span>':'')+'</div></div>';
     });
@@ -1513,7 +1514,7 @@ function detail(car){
     document.getElementById('sheet').innerHTML='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'55,'+d.c2+')"><button class="x" id="cx">&times;</button><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+esc(d.tag)+'</div></div></div></div><div class="body"><div class="call" style="margin-top:14px">No starts yet this season.</div></div>';
     openSheet();return;
   }
-  var tags=['#'+car].concat(d.team?[teamFull(d.team)+(teamMfr(d.team)?' ('+teamMfr(d.team)+')':'')]:[]).concat(d.plat==='PS'?['PlayStation']:d.plat==='XB'?['Xbox']:[]).concat(d.retired?['Done for the year']:[]).concat(Object.keys(D.paintWinners||{}).filter(function(w){return D.paintWinners[w]===car;}).map(function(w){return '\uD83C\uDF36\uFE0F Paint scheme of the week \u00B7 Wk '+w;}));
+  var tags=[].concat(d.team?[teamFull(d.team)+(teamMfr(d.team)?' ('+teamMfr(d.team)+')':'')]:[]).concat(d.retired?['Done for the year']:[]).concat(Object.keys(D.paintWinners||{}).filter(function(w){return D.paintWinners[w]===car;}).map(function(w){return '\uD83C\uDF36\uFE0F Paint scheme of the week \u00B7 Wk '+w;}));
   var h='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'66,'+d.c2+' 70%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+x.rank+'<span>Points rank</span></div><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+platIco(d)+esc(d.tag)+'</div></div></div><div class="tags">'+tags.map(function(t){var pm=/^\uD83C\uDF36.*Wk (\d+)$/.exec(t);var isT=d.team&&t.indexOf(teamFull(d.team))===0;return '<span class="tag"'+(pm?' data-pw="'+pm[1]+'" style="cursor:pointer"':'')+'>'+(isT?mfrIco(d.team,'t'):'')+esc(t)+'</span>';}).join('')+'</div></div><div class="body">';
   var RK={};
   var bsl=(x.lapRank||[]).filter(function(q){return q>0;});
@@ -1651,7 +1652,7 @@ function teamDetail(name){
   function g(v,l,k,extra){return '<div class="g"'+(k?' data-k="'+k+'"':'')+'><b>'+v+'</b><span>'+l+'</span>'+(extra||'')+'</div>';}
   function sg(v){return v==null?'N/A':(v>0?'+':'')+(Math.round(v*10)/10);}
   function f1(v){return v==null?'N/A':v.toFixed(1);}
-  var h='<div class="dh" style="background:linear-gradient(135deg,#3a1018 0%,#12141a 75%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+tm.rank+'<span>Team rank</span></div><div class="who"><div style="min-width:0;padding-right:130px"><h2>'+esc(teamFull(tm.team))+'</h2><div class="gt">'+esc(tm.team)+(teamMfr(tm.team)?' &middot; '+esc(teamMfr(tm.team)):'')+' &middot; '+tm.members.filter(function(x){return !x.d.retired;}).length+' drivers &middot; '+tm.pts+' team points</div></div></div><div class="tags">'+tm.members.filter(function(x){return !x.d.retired;}).slice().sort(function(p,q){return parseInt(p.car,10)-parseInt(q.car,10);}).map(function(x){return chip(x.car,'sm');}).join('')+'</div></div><div class="body">';
+  var h='<div class="dh" style="background:linear-gradient(135deg,#3a1018 0%,#12141a 75%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+tm.rank+'<span>Team rank</span></div><div class="who"><div style="min-width:0;padding-right:130px">'+mfrIco(tm.team,'th')+'<h2>'+esc(teamFull(tm.team))+'</h2><div class="gt">'+esc(tm.team)+(teamMfr(tm.team)?' &middot; '+esc(teamMfr(tm.team)):'')+' &middot; '+tm.members.filter(function(x){return !x.d.retired;}).length+' drivers &middot; '+tm.pts+' team points</div></div></div><div class="tags">'+tm.members.filter(function(x){return !x.d.retired;}).slice().sort(function(p,q){return parseInt(p.car,10)-parseInt(q.car,10);}).map(function(x){return chip(x.car,'sm');}).join('')+'</div></div><div class="body">';
   h+='<div class="call" style="margin-top:12px">Ordinals and bars rank this team against the other teams. Tap any stat for the math.</div>';
   h+='<div class="sec">Season '+D.season+'</div><div class="grid">'+
     g(tm.rank,'Team rank','rank')+g(tm.pts,'Team points','pts')+g(m.wins,'Wins','wins')+
