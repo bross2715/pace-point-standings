@@ -649,6 +649,8 @@ function team(d){return (d.team?'<span class="tm">'+esc(d.team)+'</span>':'')+(d
 function trackOf(i){return D.races[i]?D.races[i].track:'';}
 function dateOf(i){return (D.scheduleDates&&D.scheduleDates[i])||'';}
 function blockOf(i){var b=(D.scheduleBlocks||[]).filter(function(x){return i+1>=x.from&&i+1<=x.to;})[0];return b?b.name:'';}
+function pepN(car){var n=0,P=D.paintWinners||{};Object.keys(P).forEach(function(w){if(P[w]===car)n++;});return n;}
+function pepper(car){var n=pepN(car);return n?'<span class="st" title="Paint scheme of the week">&#127798;&#65039;'+(n>1?'&times;'+n:'')+'</span>':'';}
 function stars(x){return x.wins?'<span class="st">&#127937;'+(x.wins>1?'&times;'+x.wins:'')+'</span>':'';}
 function hdr(){
   var ovw=(st.tab==='leaders'||st.tab==='pace'), n=ovw?(st.view==='all'?R:st.view+1):st.n;
@@ -985,7 +987,7 @@ function tower(L){
   show.forEach(function(x){
     h+='<div class="row'+(x.inChase?' in':'')+'" data-car="'+esc(x.car)+'">'+
       '<div class="rk">'+x.rank+'</div>'+delta(x)+chip(x.car)+
-      '<div><div class="n1">'+esc(dispName(x.d))+stars(x)+'</div><div class="n2">'+esc(x.d.tag)+team(x.d)+'</div></div>'+
+      '<div><div class="n1">'+esc(dispName(x.d))+stars(x)+pepper(x.d.car)+'</div><div class="n2">'+esc(x.d.tag)+team(x.d)+'</div></div>'+
       '<div class="tr'+(x.startedThis?'':' z')+'">'+(x.startedThis?'+'+x.thisRace:'&ndash;')+(x.freeThis?'<small>FREE</small>':'')+'</div>'+
       '<div class="pt"><b>'+x.pts+'</b><span class="'+(x.gap?'neg':'')+'">'+(x.gap?'-'+x.gap:'LEADER')+'</span></div></div>';
   });
@@ -1001,7 +1003,7 @@ function chase(L){
     var cls=x.toCut<0?'neg':(near?'near':'');
     var fm=x.form==='HOT'?'<span class="form hot">&#9650; HOT</span>':x.form==='COOL'?'<span class="form cool">&#9660; COOL</span>':x.form==='RETIRED'?'<span class="form">RETIRED</span>':'<span class="form steady">STEADY</span>';
     return '<div class="crow'+(x.inChase?'':' out')+'" data-car="'+esc(x.car)+'"><div class="rk">'+x.rank+'</div>'+chip(x.car)+
-      '<div><div class="n1">'+esc(dispName(x.d))+stars(x)+'</div><div class="n2">'+x.pts+' pts'+team(x.d)+'</div></div>'+fm+
+      '<div><div class="n1">'+esc(dispName(x.d))+stars(x)+pepper(x.d.car)+'</div><div class="n2">'+x.pts+' pts'+team(x.d)+'</div></div>'+fm+
       '<div class="cg '+cls+'">'+(x.toCut>0?'+'+x.toCut:x.toCut)+'<small>TO CUT</small></div></div>';
   }
   field.forEach(function(x){h+=crow(x);});
@@ -1063,6 +1065,7 @@ function resultsTab(L){
   var fastest=rt.pace.length?rt.pace[0]:null;
   h+='<div class="sum">'+
     '<div><small>Winner</small><b>'+esc(rt.rows.length?nameOf(rt.rows[0].car):'N/A')+'</b></div>'+
+    ((D.paintWinners||{})[i+1]?'<div style="grid-column:1/-1"><small>&#127798;&#65039; Paint scheme of the week</small><b>'+esc(nameOf(D.paintWinners[i+1]))+'</b></div>':'')+
     '<div><small>Pole</small><b>'+esc(pole?nameOf(pole):'N/A')+'</b></div>'+
     '<div><small>Stage wins</small><b>'+esc(s1&&s1===s2?nameOf(s1)+' x2':s1||s2?[s1,s2].filter(Boolean).map(nameOf).join(', '):(sw||'N/A'))+'</b></div>'+
     '<div><small>Fastest lap point</small><b>'+esc(fl||'N/A')+'</b></div>'+
@@ -1074,7 +1077,7 @@ function resultsTab(L){
     var bits=['F '+r.fp]; if(r.sp) bits.push('S '+r.sp); if(r.fl) bits.push('FL '+r.fl);
     var stg=r.stp[0]||r.stp[1]?' &middot; Stg '+(r.stp[0]||'-')+'/'+(r.stp[1]||'-'):'';
     h+='<div class="rr'+(r.fin===1?' win':'')+'" data-car="'+esc(r.car)+'"><div class="rk">'+r.fin+'</div>'+chip(r.car)+
-      '<div><div class="n1">'+esc(dispName(r.d))+'</div><div class="n2">'+(r.start?'Started '+r.start+' ':'')+(gain==null?'':gainCell(gain))+stg+'</div></div>'+
+      '<div><div class="n1">'+esc(dispName(r.d))+((D.paintWinners||{})[i+1]===r.car?'<span class="st" title="Paint scheme of the week">&#127798;&#65039;</span>':'')+'</div><div class="n2">'+(r.start?'Started '+r.start+' ':'')+(gain==null?'':gainCell(gain))+stg+'</div></div>'+
       '<div class="rt"><b style="color:var(--green)">+'+r.pts+'</b><span>'+bits.join(' + ')+'</span></div></div>';
   });
   if(rt.free.length) h+='<div class="sec">Freebies</div>'+rt.free.map(function(o){return '<div class="rr" data-car="'+esc(o.car)+'"><div class="rk">&ndash;</div>'+chip(o.car)+'<div><div class="n1">'+esc(dispName(o.d))+'</div><div class="n2">Excused absence</div></div><div class="rt"><b style="color:var(--green)">+'+o.r[i]+'</b><span>FREE</span></div></div>';}).join('');
