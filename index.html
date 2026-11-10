@@ -94,6 +94,17 @@ main{padding:14px 12px}
 .lr:first-of-type{border-top:0}
 .lr .v{font-family:var(--hd);font-weight:800;font-size:20px}
 .empty{color:var(--mut);font-size:13px;padding:8px 0}
+.ttfold{padding:0}.ttfh{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 14px}.ttfh h3{margin:0}.ttfh span{font-family:var(--hd);font-weight:700;letter-spacing:.8px;font-size:12px;text-transform:uppercase;color:var(--mut)}.ttfold .ttn{padding:0 14px 12px}
+.sgh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:2px 2px 8px}.sgh b{font-family:var(--hd);font-weight:800;letter-spacing:1.1px;text-transform:uppercase;font-size:15px;color:var(--gold)}.sgh span{font-size:11px;color:var(--mut);text-align:right}
+.sg2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sgc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 8px 4px}
+.sgc h4{margin:0 0 4px 2px;font-family:var(--hd);font-weight:800;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut)}
+.sgr{display:flex;align-items:center;gap:6px;padding:5px 2px;border-top:1px solid var(--line);cursor:pointer}.sgr i{flex:none;width:12px;font-style:normal;font-family:var(--hd);font-weight:700;font-size:12px;color:var(--mut);text-align:center}
+.sgr b{flex:1;min-width:0;font-family:var(--hd);font-weight:800;font-size:14px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sgr em{flex:none;font-style:normal;font-family:var(--hd);font-weight:800;font-size:14px;color:var(--green)}
+.sgs{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:2px 10px 10px}
+.sgs-r{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);cursor:pointer}.sgs-r.zero{opacity:.55}
+.sgs-r .rk{flex:none;width:20px;text-align:center;font-family:var(--hd);font-weight:800;font-size:15px;color:var(--mut)}
+.sgs-r .mid{flex:1;min-width:0}.sgs-r .bar{height:4px;background:#1a1d22;border-radius:2px;margin-top:5px;overflow:hidden}.sgs-r .bar u{display:block;height:100%;background:var(--green);border-radius:2px}
+.sgs-r .w,.sgs-r .p{flex:none;text-align:right;min-width:30px}.sgs-r .w b,.sgs-r .p b{display:block;font-family:var(--hd);font-weight:800;font-size:17px;line-height:1}.sgs-r .w span,.sgs-r .p span{display:block;font-size:8.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mut);margin-top:2px}.sgs-r .p{min-width:36px}
 .lxb{display:block;width:100%;margin-top:8px;background:none;border:1px solid var(--line);color:var(--mut);border-radius:10px;padding:10px;font-family:var(--hd);font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-size:13px;min-height:42px;cursor:pointer}
 .vb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
 .vb button,.vc button{font-family:var(--hd);font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-size:14px;color:var(--mut);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:9px 14px;min-height:40px;cursor:pointer}
@@ -370,6 +381,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
   linear-gradient(180deg,#252e38 0%,#151b22 28%,#0b0e12 58%,#07080a 100%)}
 body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.5))}
+.hdtrk{position:fixed;left:50%;top:56%;width:112vw;max-width:600px;aspect-ratio:100/60;transform:translate(-50%,-50%) rotate(-62deg);z-index:-1;pointer-events:none;opacity:0;transition:opacity .5s ease}
+.hdtrk.on{opacity:1}.hdtrk svg{width:100%;height:100%;display:block}
 header{background:linear-gradient(180deg,rgba(16,18,22,.55),rgba(7,8,10,0))}
 nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 </style>
@@ -460,6 +473,7 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 </style>
 </head>
 <body>
+<div class="hdtrk" id="hdtrk" aria-hidden="true"></div>
 <div class="wrap">
 <header>
   <div class="brand"><span>Pace <b>Point</b> Standings</span><button id="replay" type="button" aria-label="Replay animation" title="Replay animation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.5-4.4M4 5v3.6h3.6"/><path d="M4 13a8 8 0 0 0 14.5 4.4M20 19v-3.6h-3.6"/></svg></button></div>
@@ -963,9 +977,23 @@ function recap(){
     },'image/png');
   }).catch(function(){if(btn){btn.disabled=false;btn.textContent='Could not make the image. Tap to retry';}});
 }
+var BGV={'Daytona':[-70,1],'Las Vegas':[-40,0],'Dover':[-58,1],'Texas':[-50,0],'Iowa':[-62,0],'Darlington':[-75,1],'Michigan':[-35,1],'COTA':[-62,0],'Bristol':[-80,0],'The Rock':[-45,1],'Indianapolis':[-55,0],'Richmond':[-72,0],'San Diego':[-40,1],'Chicagoland':[-66,0],'Charlotte':[-52,1],'Atlanta':[-78,0],'Kansas':[-34,0],'Phoenix':[-68,1],'Watkins Glen':[-58,0],'Martinsville':[-48,1],'Homestead':[-60,0]};
+function paceBg(name){
+  var el=document.getElementById('hdtrk');if(!el||typeof TRK==='undefined')return;
+  var tp=TRK[name];if(!tp)return;
+  var v=BGV[name]||[-62,0],r=Math.abs(v[0])*Math.PI/180,f=Math.abs(Math.cos(r))+0.6*Math.abs(Math.sin(r));
+  el.classList.remove('on');
+  el.style.width='min('+(560/f).toFixed(0)+'px,'+(112/f).toFixed(1)+'vw)';
+  el.style.maxWidth='none';
+  el.style.transform='translate(-50%,-50%) rotate('+v[0]+'deg)'+(v[1]?' scaleX(-1)':'');
+  el.innerHTML='<svg viewBox="0 0 100 60" preserveAspectRatio="xMidYMid meet"><path d="'+tp+'" fill="none" stroke="#fff" stroke-opacity=".11" stroke-width="2.6" stroke-linejoin="round"/><path d="'+tp+'" fill="none" stroke="#ff3b3b" stroke-opacity=".28" stroke-width=".9" stroke-linejoin="round"/></svg>';
+  setTimeout(function(){el.classList.add('on');},30);
+}
+window.paceBg=paceBg;
 function hdr(){
   var ovw=(st.tab==='leaders'||st.tab==='pace'), n=ovw?(st.view==='all'?R:st.view+1):st.n;
   document.getElementById('sub').innerHTML='Season '+D.season+' &middot; Through Race '+n+': <em>'+esc(trackOf(n-1))+'</em>';
+  if(st.tab==='pace'||st.tab==='leaders'||st.tab==='teams'){var _e=document.getElementById('hdtrk');if(_e){_e.classList.remove('on');_e.innerHTML='';}}else paceBg(trackOf(n-1));
   var nx=D.schedule&&D.schedule[R];
   document.getElementById('next').innerHTML=(n===R&&nx)?'Next up: <b>Race '+(R+1)+' &middot; '+esc(nx)+'</b>'+(dateOf(R)?' &middot; '+esc(dateOf(R)):'')+(typeOf(nx)?' &middot; '+esc(typeOf(nx)):'')+(blockOf(R)&&blockOf(R)!=='Regular Season'?' &middot; '+esc(blockOf(R)):''):(n<R&&!ovw?'Replaying standings. Drag back to Race '+R+' for live.':'');
   var f=document.getElementById('foot');
@@ -1341,25 +1369,25 @@ function chase(L){
 }
 function stageRaceCards(){
   var race=D.races[st.n-1];
-  if(!race.stages) return '<div class="call">Stage by stage order for Race '+st.n+' was not recorded. Stage totals below come from the standings sheet.</div>';
-  var h='';
+  if(!race.stages) return '<div class="call">Stage by stage order for Race '+st.n+' was not recorded. Season stage points are below.</div>';
+  var n=D.scoring.stage.length,h='<div class="sgh"><b>Race '+st.n+' &middot; '+esc(race.track)+'</b><span>Stage points scored</span></div><div class="sg2">';
   race.stages.forEach(function(s,i){
-    h+='<div class="lcard"><h3>Stage '+(i+1)+' &middot; '+esc(race.track)+'</h3>';
-    s.forEach(function(c,j){var d=byCar[c];
-      h+='<div class="lr" data-car="'+esc(c)+'"><div class="rk">'+(j+1)+'</div>'+chip(c,'sm')+'<div><div class="n1">'+esc(d.name)+'</div><div class="n2 tgl"><span class="tg">'+esc(d.tag)+'</span>'+team(d)+'</div></div><div class="v">+'+(D.scoring.stage[j]||0)+'</div></div>';});
+    h+='<div class="sgc"><h4>Stage '+(i+1)+'</h4>';
+    s.slice(0,n).forEach(function(c,j){var d=byCar[c];
+      h+='<div class="sgr" data-car="'+esc(c)+'"><i>'+(j+1)+'</i>'+chip(c,'sm')+'<b>'+esc(d.name)+'</b><em>+'+(D.scoring.stage[j]||0)+'</em></div>';});
     h+='</div>';
   });
-  return h;
+  return h+'</div>';
 }
 function stage(L){
   var s=L.slice().sort(function(a,b){return (b.sp-a.sp)||(b.sw-a.sw)||(a.rank-b.rank);});
-  var h=scrub()+'<div class="call"><b>Stage points:</b> '+D.scoring.stage.join(', ')+' for the top '+D.scoring.stage.length+' in each stage.</div>'+stageRaceCards()+'<div class="sec">Season stage points</div>';
-  s.forEach(function(x,i){
-    h+='<div class="srow'+(x.sp?'':' zero')+'" data-car="'+esc(x.car)+'"><div class="rk">'+(i+1)+'</div>'+chip(x.car)+
-     '<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2 tgl"><span class="tg">'+esc(x.d.tag)+'</span>'+team(x.d)+'</div></div>'+
-     '<div class="col"><b>'+x.sw+'</b><span>Wins</span></div><div class="col"><b>'+x.sp+'</b><span>Stage pts</span></div></div>';
-  });
-  return h;
+  var h=scrub()+stageRaceCards()+'<div class="sgh" style="margin-top:16px"><b>Season stage points</b><span>Top '+D.scoring.stage.length+' in each stage score '+D.scoring.stage.join(', ')+'</span></div><div class="sgs">';
+  var scorers=s.filter(function(x){return x.sp>0;}), rest=s.filter(function(x){return !(x.sp>0);}), open=!!st.lx['stz'];
+  var mx=Math.max.apply(null,s.map(function(x){return x.sp;}).concat([1]));
+  function row(x,i){return '<div class="sgs-r'+(x.sp?'':' zero')+'" data-car="'+esc(x.car)+'"><div class="rk">'+(i+1)+'</div>'+chip(x.car,'sm')+'<div class="mid"><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="bar"><u style="width:'+Math.round(100*x.sp/mx)+'%"></u></div></div><div class="w"><b>'+x.sw+'</b><span>Wins</span></div><div class="p"><b>'+x.sp+'</b><span>Pts</span></div></div>';}
+  scorers.forEach(function(x,i){h+=row(x,i);});
+  if(rest.length){ if(open) rest.forEach(function(x,i){h+=row(x,scorers.length+i);}); h+='<button class="lxb" data-lx="stz">'+(open?'Hide drivers with no stage points &#9650;':'Show '+rest.length+' with no stage points &#9660;')+'</button>'; }
+  return h+'</div>';
 }
 function paceOf(x){var a=x.pr.filter(function(v){return v!=null;});return a.length?100*a.reduce(function(s,v){return s+v;},0)/a.length:null;}
 function ovw(){return st.tab==='leaders'||st.tab==='pace';}
@@ -1591,7 +1619,7 @@ function trackTypeSection(){
   return h+'</div>';
 }
 function leaders(){
-  var L=baseList();
+  var L=C.standings(D,R);
   function top(fn,filter,fmt,asc,name,allf){
     function sortBy(f){return L.filter(f).sort(function(p,q){var d=asc?fn(p)-fn(q):fn(q)-fn(p);return d||(p.rank-q.rank);});}
     function line(x,rk,v){return '<div class="lr" data-car="'+esc(x.car)+'"><div class="rk">'+rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+fmt(v)+'</div></div>';}
@@ -1628,8 +1656,10 @@ function leaders(){
    ['Best Comeback',function(x){return x.cb;},function(x){return x.cb>0;},function(v){return (v>0?'+':'')+v;}],
    ['Best Average Start',function(x){return Math.round(x.avgQ*10)/10;},function(x){return x.qn>0;},function(v){return v.toFixed(1);},true]
   ];
-  var h=viewBar();
-  h+=trackTypeSection();
+  var h='';
+  var ttOpen=!!st.lx['ttsec'];
+  h+='<div class="lcard ttfold"><div class="ttfh" data-lx="ttsec"><h3>Track Type Rankings</h3><span>'+(ttOpen?'Close &#9650;':'Open &#9660;')+'</span></div>'+(ttOpen?'':'<div class="ttn" style="margin:4px 0 0">Tap to see how everyone runs on each kind of track.</div>')+'</div>';
+  if(ttOpen) h+=trackTypeSection().replace('<h3>Track Type Rankings</h3>','');
   defs.forEach(function(d){h+='<div class="lcard"><h3>'+d[0]+'</h3>'+top(d[1],d[2],d[3],d[4],d[0],d[5]||function(){return true;})+'</div>';});
   return h;
 }
