@@ -290,15 +290,15 @@ td.r,th.r{text-align:right}
 .bkt{flex:none;display:flex;gap:6px;padding:8px 14px 0;border-bottom:1px solid var(--line)}
 .bkt button{flex:1;min-height:44px;background:none;border:0;border-bottom:3px solid transparent;color:var(--mut);font-family:var(--hd);font-weight:700;font-size:16px;letter-spacing:.6px;text-transform:uppercase;cursor:pointer}
 .bkt button.on{color:var(--txt);border-bottom-color:var(--gold)}
-.pk2{padding:2px 0 10px 32px}
+.pk2{padding:2px 0 10px 0}
 .pr2{margin-top:8px}.pr2>b{font-family:var(--hd);font-weight:700;font-size:12px;letter-spacing:1px;color:var(--mut);text-transform:uppercase}
 .pr2>div{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
-.pbk{display:flex;gap:6px;margin-top:6px}
-.bkc{flex:1;display:grid;grid-template-rows:auto repeat(8,30px);min-width:0}
+.pbk{display:flex;gap:4px;margin-top:6px}
+.bkc{flex:1;display:grid;grid-template-rows:auto repeat(4,44px);min-width:0}
 .bkh{grid-row:1;grid-column:1;font-family:var(--hd);font-weight:700;font-size:11px;letter-spacing:1px;color:var(--mut);text-align:center;margin-bottom:4px}
 .bkm{display:flex;align-items:center;justify-content:center;gap:3px;margin:2px 0;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
 .bkc .bkm{grid-column:1}
-.bn{font-family:var(--hd);font-weight:800;font-size:14px;color:var(--mut);padding:1px 5px;border-radius:5px}
+.bn{font-family:var(--hd);font-weight:800;font-size:13px;color:var(--mut);padding:1px 5px;border-radius:5px}
 .bn.pk{color:var(--txt);background:rgba(255,255,255,.12)}
 .bn.pk.w{color:var(--green);background:rgba(34,211,107,.15)}
 .bn.pk.l{opacity:.5;text-decoration:line-through}
@@ -859,21 +859,20 @@ function picksHtml(T,mycode,npk){
     var key=x.e.src+'|'+x.e.name, open=st.pe===key, a=x.e.code.split(',');
     h+='<div class="lr2" data-pe="'+esc(key)+'" style="cursor:pointer"><div class="rk">'+(i+1)+'</div><div><div class="nm" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+(entryCar(x.e)?chip(entryCar(x.e),'sm'):'')+'<span>'+esc(x.e.name)+'</span>'+(x.s.perfect?'<span class="pf">PERFECT</span>':'')+'</div><div class="ch">'+(x.n>=15&&byCar[a[14]]?'Champion: '+esc(byCar[a[14]].name):x.n+' of 15 picks')+(x.s.dec?' &middot; '+x.s.ok+'-'+x.s.bad:'')+'</div></div><div class="pt">'+x.s.pts+'<small>PTS</small></div></div>';
     if(open){
-      var idx=0; h+='<div class="pk2"><div class="pbk">';
-      T.rounds.forEach(function(rd,r){
-        var n=rd.ms.length, span=8/n;
-        h+='<div class="bkc"><div class="bkh">'+['R16','QF','SF','FINAL'][r]+'</div>';
-        rd.ms.forEach(function(m,i){
-          var c=a[idx++], ok=c&&c!=='-'&&byCar[c], cls=m.st==='done'?(c&&c===m.w?' w':' l'):'';
-          var inner;
-          if(r===0&&m.a&&m.b&&m.a!=='?'&&m.b!=='?'){
-            inner='<span class="bn'+(c===m.a?' pk'+cls:'')+'">'+esc(m.a)+'</span><span class="bn'+(c===m.b?' pk'+cls:'')+'">'+esc(m.b)+'</span>';
-          } else inner='<span class="bn'+(ok?' pk'+cls:'')+'">'+(ok?esc(c):'&ndash;')+'</span>';
-          h+='<div class="bkm" style="grid-row:'+(i*span+2)+' / span '+span+'">'+inner+'</div>';
-        });
-        h+='</div>';
-      });
-      h+='</div></div>';
+      var off=[0,8,12,14];
+      function cell(r,i){
+        var m=T.rounds[r].ms[i], c=a[off[r]+i], ok=c&&c!=='-'&&byCar[c], cls=m.st==='done'?(c&&c===m.w?' w':' l'):'', inner;
+        if(r===0&&m.a&&m.b&&m.a!=='?'&&m.b!=='?') inner='<span class="bn'+(c===m.a?' pk'+cls:'')+'">'+esc(m.a)+'</span><span class="bn'+(c===m.b?' pk'+cls:'')+'">'+esc(m.b)+'</span>';
+        else inner='<span class="bn'+(ok?' pk'+cls:'')+'">'+(ok?esc(c):'&ndash;')+'</span>';
+        return inner;
+      }
+      function col(r,side,lbl){
+        var n=[8,4,2,1][r], per=n/2, span=4/per, o='<div class="bkc"><div class="bkh">'+lbl+'</div>';
+        if(r===3) return o+'<div class="bkm fin" style="grid-row:2 / span 4">'+cell(3,0)+'</div></div>';
+        for(var k=0;k<per;k++) o+='<div class="bkm" style="grid-row:'+(k*span+2)+' / span '+span+'">'+cell(r,side*per+k)+'</div>';
+        return o+'</div>';
+      }
+      h+='<div class="pk2"><div class="pbk">'+col(0,0,'R16')+col(1,0,'QF')+col(2,0,'SF')+col(3,0,'FINAL')+col(2,1,'SF')+col(1,1,'QF')+col(0,1,'R16')+'</div></div>';
     }
   });
   return h+'</div>';
