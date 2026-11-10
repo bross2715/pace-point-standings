@@ -1008,7 +1008,7 @@ function entryCar(e){
 }
 function rulesHtml(){
   var R=(D.tournament||{}).bracketRules; if(!R) return '';
-  return '<div class="how" style="border-color:var(--gold,#ffc83d)"><b style="color:var(--gold,#ffc83d)">'+esc(R.title)+'</b><ul style="margin:8px 0 0;padding-left:18px">'+R.items.map(function(x){return '<li style="margin:3px 0">'+x+'</li>';}).join('')+'</ul>'+(R.note?'<div style="margin-top:8px;font-size:11px;color:var(--mut)"><i>'+esc(R.note)+'</i></div>':'')+'</div>';
+  return '<details style="margin:8px 0;border:1px solid var(--gold,#ffc83d);border-radius:10px;padding:6px 10px;font-size:11px;line-height:1.35;color:var(--mut)"><summary style="cursor:pointer;font-family:var(--hd);font-weight:800;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--gold,#ffc83d);list-style:none">&#127942; '+esc(R.title)+' <span style="font-weight:600;color:var(--mut);text-transform:none;letter-spacing:0"> &middot; tap to read</span></summary><ul style="margin:6px 0 2px;padding-left:16px">'+R.items.map(function(x){return '<li style="margin:2px 0">'+x+'</li>';}).join('')+'</ul></details>';
 }
 function picksHtml(T,mycode,npk){
   var ents=loadEntries(T); if(npk&&!ents.some(function(e){return e.code===mycode;})) ents.push({name:'You',code:mycode,src:'me'});
