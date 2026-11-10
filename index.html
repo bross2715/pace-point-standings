@@ -1022,7 +1022,7 @@ function stageRaceCards(){
   race.stages.forEach(function(s,i){
     h+='<div class="lcard"><h3>Stage '+(i+1)+' &middot; '+esc(race.track)+'</h3>';
     s.forEach(function(c,j){var d=byCar[c];
-      h+='<div class="lr" data-car="'+esc(c)+'"><div class="rk">'+(j+1)+'</div>'+chip(c,'sm')+'<div><div class="n1">'+esc(d.name)+'</div><div class="n2">'+esc(d.tag)+'</div></div><div class="v">+'+(D.scoring.stage[j]||0)+'</div></div>';});
+      h+='<div class="lr" data-car="'+esc(c)+'"><div class="rk">'+(j+1)+'</div>'+chip(c,'sm')+'<div><div class="n1">'+esc(d.name)+'</div><div class="n2">'+esc(d.tag)+team(d)+'</div></div><div class="v">+'+(D.scoring.stage[j]||0)+'</div></div>';});
     h+='</div>';
   });
   return h;
@@ -1077,10 +1077,10 @@ function resultsTab(L){
     var bits=['F '+r.fp]; if(r.sp) bits.push('S '+r.sp); if(r.fl) bits.push('FL '+r.fl);
     var stg=r.stp[0]||r.stp[1]?' &middot; Stg '+(r.stp[0]||'-')+'/'+(r.stp[1]||'-'):'';
     h+='<div class="rr'+(r.fin===1?' win':'')+'" data-car="'+esc(r.car)+'"><div class="rk">'+r.fin+'</div>'+chip(r.car)+
-      '<div><div class="n1">'+esc(dispName(r.d))+((D.paintWinners||{})[i+1]===r.car?'<span class="st" title="Paint scheme of the week">&#127798;&#65039;</span>':'')+'</div><div class="n2">'+(r.start?'Started '+r.start+' ':'')+(gain==null?'':gainCell(gain))+stg+'</div></div>'+
+      '<div><div class="n1">'+esc(dispName(r.d))+team(r.d)+((D.paintWinners||{})[i+1]===r.car?'<span class="st" title="Paint scheme of the week">&#127798;&#65039;</span>':'')+'</div><div class="n2">'+(r.start?'Started '+r.start+' ':'')+(gain==null?'':gainCell(gain))+stg+'</div></div>'+
       '<div class="rt"><b style="color:var(--green)">+'+r.pts+'</b><span>'+bits.join(' + ')+'</span></div></div>';
   });
-  if(rt.free.length) h+='<div class="sec">Freebies</div>'+rt.free.map(function(o){return '<div class="rr" data-car="'+esc(o.car)+'"><div class="rk">&ndash;</div>'+chip(o.car)+'<div><div class="n1">'+esc(dispName(o.d))+'</div><div class="n2">Excused absence</div></div><div class="rt"><b style="color:var(--green)">+'+o.r[i]+'</b><span>FREE</span></div></div>';}).join('');
+  if(rt.free.length) h+='<div class="sec">Freebies</div>'+rt.free.map(function(o){return '<div class="rr" data-car="'+esc(o.car)+'"><div class="rk">&ndash;</div>'+chip(o.car)+'<div><div class="n1">'+esc(dispName(o.d))+team(o.d)+'</div><div class="n2">Excused absence</div></div><div class="rt"><b style="color:var(--green)">+'+o.r[i]+'</b><span>FREE</span></div></div>';}).join('');
   h+='<div class="call" style="margin-top:10px">Started is the official starting spot. The green or red number is spots gained or lost from the start. F is finish points, S is stage points, FL is the fastest lap point. Stg is the running position at the end of stage 1 and stage 2 when the order was recorded.</div>';
   return h;
 }
@@ -1109,7 +1109,7 @@ function ratingView(L,race){
   if(!a.length) h+='<div class="empty">No ratings yet.</div>';
   a.forEach(function(x,k){
     var pv=pm&&pm[x.car], ch=pm?chg(pv&&pv.rating!=null?x.rating-pv.rating:null,true,1):'';
-    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+(x.avgPaceRank==null?'No lap data':'Pace '+(paceOf(x)==null?'N/A':paceOf(x).toFixed(0))+' &middot; speed rank '+x.avgPaceRank.toFixed(1))+'</div></div><div class="rt"><div class="rating">'+x.rating.toFixed(1)+'</div>'+ch+'</div></div>';
+    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="n2">'+(x.avgPaceRank==null?'No lap data':'Pace '+(paceOf(x)==null?'N/A':paceOf(x).toFixed(0))+' &middot; speed rank '+x.avgPaceRank.toFixed(1))+'</div></div><div class="rt"><div class="rating">'+x.rating.toFixed(1)+'</div>'+ch+'</div></div>';
   });
   return h;
 }
@@ -1122,7 +1122,7 @@ function paceView(L,race){
   a.forEach(function(x,k){
     var pv=pm&&pm[x.car], ch=pm?chg(pv&&paceOf(pv)!=null?paceOf(x)-paceOf(pv):null,true,1):'';
     var sub=(x.avgQ==null?'No start':(race==null?'Avg start ':'Started P')+(race==null?x.avgQ.toFixed(1):Math.round(x.avgQ)))+(x.avgPaceRank==null?'':' &middot; speed rank '+(race==null?x.avgPaceRank.toFixed(1):Math.round(x.avgPaceRank)));
-    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+sub+'</div></div><div class="rt"><b>'+paceOf(x).toFixed(0)+'</b><span>PACE</span>'+ch+'</div></div>';
+    h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="n2">'+sub+'</div></div><div class="rt"><b>'+paceOf(x).toFixed(0)+'</b><span>PACE</span>'+ch+'</div></div>';
   });
   return h;
 }
@@ -1137,7 +1137,7 @@ function speedView(L,race){
       var pv=pm&&pm[x.car], hasP=pv&&pv.paceN>0;
       var ch=pm?chg(hasP?x.avgPct-pv.avgPct:null,false,2,'%'):'';
       var sr=pm&&hasP?' '+chgS(x.avgPaceRank-pv.avgPaceRank,false,1):'';
-      h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">Speed rank '+x.avgPaceRank.toFixed(1)+sr+(x.fvp==null?'':' &middot; vs speed '+gainCell(Math.round(x.fvp*10)/10))+'</div></div><div class="rt"><b>'+x.avgPct.toFixed(2)+'%</b><span>OFF FASTEST</span>'+ch+'</div></div>';
+      h+='<div class="rr" data-car="'+esc(x.car)+'"><div class="rk">'+(k+1)+'</div>'+chip(x.car)+'<div><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="n2">Speed rank '+x.avgPaceRank.toFixed(1)+sr+(x.fvp==null?'':' &middot; vs speed '+gainCell(Math.round(x.fvp*10)/10))+'</div></div><div class="rt"><b>'+x.avgPct.toFixed(2)+'%</b><span>OFF FASTEST</span>'+ch+'</div></div>';
     });
     h+='<div class="call" style="margin-top:10px">Season speed averages how far each driver best race lap was off the quickest lap of that race. Tap By race for the lap times of each race. Vs speed is speed rank minus finish, so green means finishing ahead of your best lap.</div>';
     return h;
@@ -1147,7 +1147,7 @@ function speedView(L,race){
   if(!rt.pace.length) h+='<div class="empty">No best laps recorded for this race.</div>';
   rt.pace.forEach(function(p,k){
     var d=p.fin?p.rank-p.fin:null;
-    h+='<div class="rr" data-car="'+esc(p.car)+'"><div class="rk">'+p.rank+'</div>'+chip(p.car)+'<div><div class="n1">'+esc(dispName(p.d))+'</div><div class="n2">'+(p.fin?'Finished P'+p.fin+' &middot; ':'')+(d==null?'':'vs speed '+gainCell(d))+'</div></div><div class="rt"><b>'+lapFmt(p.lap)+'</b><span>'+(k===0?'FASTEST':'+'+p.gap.toFixed(3)+'s')+'</span></div></div>';
+    h+='<div class="rr" data-car="'+esc(p.car)+'"><div class="rk">'+p.rank+'</div>'+chip(p.car)+'<div><div class="n1">'+esc(dispName(p.d))+team(p.d)+'</div><div class="n2">'+(p.fin?'Finished P'+p.fin+' &middot; ':'')+(d==null?'':'vs speed '+gainCell(d))+'</div></div><div class="rt"><b>'+lapFmt(p.lap)+'</b><span>'+(k===0?'FASTEST':'+'+p.gap.toFixed(3)+'s')+'</span></div></div>';
   });
   h+='<div class="call" style="margin-top:10px">Best laps come from the post race lobby screens. Vs speed is the speed rank minus the finish.</div>';
   return h;
@@ -1215,7 +1215,7 @@ function teamsTab(L){
   S.forEach(function(t){
     h+='<div class="lcard"><div data-team="'+esc(t.team)+'" style="display:flex;align-items:center;gap:10px;margin-bottom:4px;cursor:pointer"><div class="rk" style="width:24px">'+t.rank+'</div><div class="n1" style="font-size:26px;flex:1">'+esc(t.team)+'</div><div class="pt"><b>'+t.pts+'</b><span>'+t.wins+(t.wins===1?' win':' wins')+'</span></div></div>';
     t.members.forEach(function(x){
-      h+='<div class="lr" data-car="'+esc(x.car)+'"><div class="rk" style="font-size:15px;color:var(--mut)">'+x.rank+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(x.d.name)+'</div><div class="n2">'+esc(x.d.tag)+(x.d.retired?' &middot; retired':'')+'</div></div><div class="v">'+x.tp+(x.tp!==x.pts?'<span style="display:block;font-size:10px;color:var(--mut)">of '+x.pts+'</span>':'')+'</div></div>';
+      h+='<div class="lr" data-car="'+esc(x.car)+'"><div class="rk" style="font-size:15px;color:var(--mut)">'+x.rank+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(x.d.name)+'</div><div class="n2">'+esc(x.d.tag)+(x.d.team?'<span class="tm">'+esc(x.d.team)+'</span>':'')+(x.d.retired?' &middot; retired':'')+'</div></div><div class="v">'+x.tp+(x.tp!==x.pts?'<span style="display:block;font-size:10px;color:var(--mut)">of '+x.pts+'</span>':'')+'</div></div>';
     });
     h+='</div>';
   });
@@ -1257,7 +1257,7 @@ function trackTypeSection(){
   var rows=typeStats(cur), open=!!st.lx['tt'], show=open?rows:rows.slice(0,5), prev=null, rk=0;
   rows.forEach(function(x,i){ var key=x.avg.toFixed(2); if(key!==prev){rk=i+1;prev=key;} x.rk=rk; });
   show.forEach(function(x){
-    h+='<div class="tt2" data-car="'+esc(x.car)+'"><div class="rk">'+x.rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+x.n+(x.n>1?' starts':' start')+' &middot; best P'+x.best+(x.wins?' &middot; '+x.wins+(x.wins>1?' wins':' win'):'')+'</div></div><div class="v">'+x.avg.toFixed(1)+'<small>AVG FIN</small></div></div>';
+    h+='<div class="tt2" data-car="'+esc(x.car)+'"><div class="rk">'+x.rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="n2">'+x.n+(x.n>1?' starts':' start')+' &middot; best P'+x.best+(x.wins?' &middot; '+x.wins+(x.wins>1?' wins':' win'):'')+'</div></div><div class="v">'+x.avg.toFixed(1)+'<small>AVG FIN</small></div></div>';
   });
   if(rows.length>5) h+='<button class="lxb" data-lx="tt">'+(open?'Show top 5 only &#9650;':'Show everyone ('+rows.length+') &#9660;')+'</button>';
   return h+'</div>';
@@ -1266,7 +1266,7 @@ function leaders(){
   var L=baseList();
   function top(fn,filter,fmt,asc,name,allf){
     function sortBy(f){return L.filter(f).sort(function(p,q){var d=asc?fn(p)-fn(q):fn(q)-fn(p);return d||(p.rank-q.rank);});}
-    function line(x,rk,v){return '<div class="lr" data-car="'+esc(x.car)+'"><div class="rk">'+rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+fmt(v)+'</div></div>';}
+    function line(x,rk,v){return '<div class="lr" data-car="'+esc(x.car)+'"><div class="rk">'+rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+fmt(v)+'</div></div>';}
     function listAll(arr){var prev=null,rk=0,s='';arr.forEach(function(x,i){var v=fn(x);if(v!==prev){rk=i+1;prev=v;}s+=line(x,rk,v);});return s;}
     var a=sortBy(filter);
     if(!a.length) return '<div class="empty">No data yet.</div>';
@@ -1511,7 +1511,7 @@ function teamDetail(name){
     g(f1(m.stg),'Avg stage pos','stg',bar('stg'))+'</div>';
   h+='<div class="sec">Drivers</div><div class="lcard" style="padding:4px 12px">';
   tm.members.forEach(function(x){
-    h+='<div class="lr" data-car="'+esc(x.car)+'"><div class="rk" style="font-size:15px;color:var(--mut)">'+x.rank+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(x.d.name)+'</div><div class="n2">'+esc(x.d.tag)+(x.d.retired?' &middot; retired':'')+'</div></div><div class="v">'+x.tp+(x.tp!==x.pts?'<span style="display:block;font-size:10px;color:var(--mut)">of '+x.pts+'</span>':'')+'</div></div>';
+    h+='<div class="lr" data-car="'+esc(x.car)+'"><div class="rk" style="font-size:15px;color:var(--mut)">'+x.rank+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(x.d.name)+'</div><div class="n2">'+esc(x.d.tag)+(x.d.team?'<span class="tm">'+esc(x.d.team)+'</span>':'')+(x.d.retired?' &middot; retired':'')+'</div></div><div class="v">'+x.tp+(x.tp!==x.pts?'<span style="display:block;font-size:10px;color:var(--mut)">of '+x.pts+'</span>':'')+'</div></div>';
   });
   h+='</div>';
   h+='<div class="sec">Race log</div><table><tr><th>Race</th><th>Track</th><th class="r">Team pts</th><th class="r">Best</th><th class="r">Avg fin</th></tr>';
