@@ -189,6 +189,12 @@ td.r,th.r{text-align:right}
 .xp{margin:8px 0 0;padding:10px 12px;background:#14171c;border:1px solid var(--line);border-left:3px solid #e0222b;border-radius:10px}
 .xp b{display:block;font-family:var(--hd);font-size:15px}.xp span{display:block;margin-top:4px;font-size:12px;line-height:1.4;color:#cfd3d9}
 .shr{height:4px;background:#1a1d22;border-radius:2px;margin:-2px 0 6px 40px;overflow:hidden}.shr u{display:block;height:100%;background:#e0222b;border-radius:2px}
+
+.merow{display:flex;gap:6px;margin:8px 0 2px}.merow .mepill{margin:0;flex:0 1 auto;min-width:0;padding:4px 10px 4px 7px;gap:6px}.merow .mepill small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px}.mepill img.pl{height:18px;width:auto;max-width:34px;margin:0}.mepill{display:flex;align-items:center;gap:8px;margin:8px 0 2px;padding:5px 12px 5px 8px;border:1px solid rgba(255,200,61,.45);background:rgba(255,200,61,.08);border-radius:999px;color:#fff;cursor:pointer;font-family:var(--hd)}
+.mepill .mst{color:#ffc83d;font-size:15px}.mepill b{font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:13px}.mepill small{font-size:12px;color:var(--mut);letter-spacing:.4px;text-transform:uppercase}
+.isme{box-shadow:inset 3px 0 0 #ffc83d}
+.meb{display:flex;gap:8px;margin-top:10px}.meb button{font-family:var(--hd);font-weight:800;letter-spacing:.8px;text-transform:uppercase;font-size:12px;border-radius:999px;padding:6px 12px;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.28);color:#fff;cursor:pointer}
+.meb .mebt.on{border-color:#ffc83d;color:#ffc83d;background:rgba(255,200,61,.1)}
 .hcb i{position:absolute;top:-4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;border:2px solid #07080a}
 .hz{font:700 9px/1 'Barlow',sans-serif;letter-spacing:.12em;text-transform:uppercase;margin-top:5px}
 .hz.hot{color:#ff3b3b}.hz.steady{color:#22d36b}.hz.cool{color:#9fd0ff}
@@ -479,6 +485,7 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
   <div class="brand"><span>Pace <b>Point</b> Standings</span><button id="replay" type="button" aria-label="Replay animation" title="Replay animation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.5-4.4M4 5v3.6h3.6"/><path d="M4 13a8 8 0 0 0 14.5 4.4M20 19v-3.6h-3.6"/></svg></button></div>
   <div class="sub" id="sub"></div>
   <div class="next" id="next"></div>
+  <div class="merow"><button class="mepill" id="mepill" type="button" style="display:none"></button><button class="mepill" id="metpill" type="button" style="display:none"></button></div>
   <nav id="tabs">
     <button data-t="tower" class="on">Tower</button>
     <button data-t="pace">Pace</button>
@@ -991,6 +998,7 @@ function paceBg(name){
 }
 window.paceBg=paceBg;
 function hdr(){
+  updateMe();updateMeTeam();
   var ovw=(st.tab==='leaders'||st.tab==='pace'), n=ovw?(st.view==='all'?R:st.view+1):st.n;
   document.getElementById('sub').innerHTML='Season '+D.season+' &middot; Through Race '+n+': <em>'+esc(trackOf(n-1))+'</em>';
   if(st.tab==='pace'||st.tab==='leaders'||st.tab==='teams'){var _e=document.getElementById('hdtrk');if(_e){_e.classList.remove('on');_e.innerHTML='';}}else paceBg(trackOf(n-1));
@@ -1107,6 +1115,12 @@ function tbanner(){
 }
 
 var PKEY='pace_tb_picks_s'+(D.season||1);
+var MEKEY='pace_me';
+function getMe(){try{var c=localStorage.getItem(MEKEY);return c&&byCar[c]?c:null;}catch(e){return null;}}
+function setMe(c){try{if(c)localStorage.setItem(MEKEY,c);else localStorage.removeItem(MEKEY);}catch(e){}}
+(function(){try{var m=/[?&]me=([^&#]+)/.exec(location.search);if(m){var c=decodeURIComponent(m[1]);if(byCar[c]){setMe(c);}}}catch(e){}})();
+function updateMe(){var el=document.getElementById('mepill');if(!el)return;var c=getMe();if(!c){el.style.display='none';el.innerHTML='';return;}el.style.display='';el.innerHTML='<span class="mst">\u2605</span>'+chip(c,'sm')+'<b>My card</b><small>'+esc(byCar[c].name)+'</small>';el.onclick=function(){detail(c);};}
+function updateMeTeam(){var el=document.getElementById('metpill');if(!el)return;var c=getMe(),t=c&&byCar[c].team;if(!t){el.style.display='none';el.innerHTML='';return;}el.style.display='';el.innerHTML='<span class="mst">\u2605</span><b>My team</b><small>'+esc(t)+'</small>';el.onclick=function(){teamDetail(t);};}
 function isLocked(){try{return !!localStorage.getItem(PKEY+'_lock');}catch(e){return false;}}
 function lockPicks(code){try{localStorage.setItem(PKEY+'_lock',JSON.stringify({code:code,at:new Date().toISOString().slice(0,10)}));}catch(e){}}
 function getPicks(){try{return JSON.parse(localStorage.getItem(PKEY)||'{}')||{};}catch(e){return {};}}
@@ -1210,7 +1224,7 @@ function rulesHtml(){
   return '<details style="margin:8px 0;border:1px solid var(--gold,#ffc83d);border-radius:10px;padding:6px 10px;font-size:11px;line-height:1.35;color:var(--mut)"><summary style="cursor:pointer;font-family:var(--hd);font-weight:800;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--gold,#ffc83d);list-style:none">&#127942; '+esc(R.title)+' <span style="font-weight:600;color:var(--mut);text-transform:none;letter-spacing:0"> &middot; tap to read</span></summary><ul style="margin:6px 0 2px;padding-left:16px">'+R.items.map(function(x){return '<li style="margin:2px 0">'+x+'</li>';}).join('')+'</ul></details>';
 }
 function picksHtml(T,mycode,npk){
-  var ents=loadEntries(T); if(npk&&!ents.some(function(e){return e.code===mycode;})) ents.push({name:'You',code:mycode,src:'me'});
+  var ents=loadEntries(T); if(npk&&!ents.some(function(e){return e.code===mycode;})) ents.push({name:getMe()?byCar[getMe()].name+' (you)':'You',car:getMe()||undefined,code:mycode,src:'me'});
   ents=ents.map(function(e,ix){var s=scoreCode(T,e.code); return {e:e,s:s,n:e.code.split(',').filter(function(x){return x&&x!=='-';}).length};}).sort(function(x,y){return y.s.pts-x.s.pts||y.s.ok-x.s.ok||x.e.name.localeCompare(y.e.name);});
   var h='<div class="lb" style="margin-top:0"><h3>Everyone\'s picks</h3>'+rulesHtml()+'<div class="sub2">Tap a name to see their whole bracket. Scores update live as each round finishes, and a perfect bracket gets a badge. Want in? Fill out your bracket, tap Send my bracket, and send it to the commissioner. It shows up here once he adds it.</div>';
   if(!ents.length) h+='<div class="empty" style="padding:8px 0">No brackets in yet.</div>';
@@ -1249,7 +1263,7 @@ function bracketView(keep){
   h+=rulesHtml();
   h+='<div class="how"><b>Fill out your bracket.</b> Tap any matchup to compare the drivers and pick a winner. Your pick moves on to the next round, so you can call the whole bracket, champion included. Score 1 point per correct first-round pick, 2 in the quarters, 4 in the semis and 8 for the champion. Picks are saved on this device.</div>';
   h+='<div class="sc"><div><b>'+npk+'/15</b><small>Picks made</small></div><div><b>'+sc.pts+'<span style="font-size:13px;color:var(--mut)">/'+sc.max+'</span></b><small>Bracket score</small></div><div class="'+(sc.perfect?'perf':'')+'"><b>'+(sc.dec?(sc.perfect?'PERFECT SO FAR':sc.ok+'-'+sc.bad):'&ndash;')+'</b><small>'+(sc.dec?'Right-wrong':'Waiting on Race '+TD.startRace)+'</small></div></div>';
-  var myname=''; try{myname=localStorage.getItem(PKEY+'_name')||'';}catch(e){}
+  var myname=''; try{myname=localStorage.getItem(PKEY+'_name')||'';}catch(e){} if(!myname&&getMe())myname=byCar[getMe()].name;
   var LK=isLocked();
   if(LK) h+='<div class="pnote" style="text-align:left;padding:0 0 8px"><b>&#128274; Locked in.</b> You sent your bracket, so your picks can\'t be changed. Tap Send my bracket to copy it again.</div>';
   h+='<input class="bnm" id="bname" maxlength="24" placeholder="Your name" value="'+esc(myname)+'"'+(LK?' readonly':'')+'>';
@@ -1792,6 +1806,7 @@ function detail(car){
   }
   h+='</table>';
   document.getElementById('sheet').innerHTML=hHead+buildTabs(car,x,d,N,pOv,h,paintCol);
+  (function(){var dh=document.querySelector('#sheet .dh');if(!dh)return;var box=document.createElement('div');box.className='meb';function paint(){var on=getMe()===car;box.innerHTML='<button type="button" class="mebt'+(on?' on':'')+'" id="mebt">'+(on?'\u2605 This is me':'\u2606 This is me')+'</button>';var b=box.querySelector('#mebt');b.onclick=function(){setMe(on?null:car);updateMe();updateMeTeam();paint();var mm=document.querySelector('#main');mm&&Array.prototype.forEach.call(mm.querySelectorAll('.isme'),function(e){e.classList.remove('isme');});var me=getMe();if(me){Array.prototype.forEach.call(mm.querySelectorAll('[data-car="'+me+'"]'),function(e){e.classList.add('isme');});var mt=byCar[me].team;if(mt)Array.prototype.forEach.call(mm.querySelectorAll('[data-team="'+mt+'"]'),function(e){e.classList.add('isme');});}};}paint();dh.appendChild(box);})();
   bindLB(car);bindTabs();
   openSheet();
 }
@@ -2272,6 +2287,7 @@ function render(){
   var vt=document.getElementById('vtog'); if(vt) vt.addEventListener('click',function(){st.vopen=!st.vopen;render();});
   var mo=document.getElementById('more'); if(mo) mo.addEventListener('click',function(){st.all=!st.all;render();});
   Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.toggle('on',b.getAttribute('data-t')===st.tab);});
+  var _me=getMe();if(_me){Array.prototype.forEach.call(document.querySelectorAll('#main [data-car="'+_me+'"]'),function(el){el.classList.add('isme');});var _mt=byCar[_me].team;if(_mt)Array.prototype.forEach.call(document.querySelectorAll('#main [data-team="'+_mt+'"]'),function(el){el.classList.add('isme');});}
   if(animNext){animNext=false;animateIn();}
 }
 Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.addEventListener('click',function(){st.tab=b.getAttribute('data-t');st.view='all';st.vopen=false;animNext=true;render();window.scrollTo(0,0);});});
