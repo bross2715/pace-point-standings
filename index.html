@@ -354,6 +354,7 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 <style id="pace-motion">
 /* Load-in animation: rows slide in from the left, top to bottom. Plays on first load, on tab change, and from the replay button. */
 @keyframes paceIn{from{transform:translateX(-46px);opacity:0}to{transform:none;opacity:1}}
+.reveal-wait{opacity:0;transform:translateX(-46px)}
 .anim-in{animation:paceIn .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d,0ms)}
 .brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
 #replay{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--mut);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
@@ -361,7 +362,13 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 #replay svg{width:22px;height:22px;display:block}
 #replay.spin svg{animation:paceSpin .6s cubic-bezier(.4,.1,.2,1)}
 @keyframes paceSpin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.anim-in,#replay.spin svg{animation:none}}
+@media (prefers-reduced-motion:reduce){.anim-in,#replay.spin svg{animation:none}.reveal-wait{opacity:1;transform:none}}
+</style>
+<style id="pace-paint">
+/* Number plates: filled with each driver's paint color */
+.plate.paint{border:1px solid rgba(255,255,255,.55);box-shadow:0 2px 4px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.25)}
+.plate.paint img{filter:drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.plate.paint .fb{text-shadow:0 1px 2px rgba(0,0,0,.45)}
 </style>
 </head>
 <body>
@@ -678,11 +685,17 @@ var R=D.races.length;               // race count is always derived from the rac
 var st={n:R,tab:'tower',all:false,view:'all',vopen:false,tk:'pts',trev:false,ps:'rating',lx:{},ropen:false,bt:'bracket',pe:null};
 var byCar={};D.drivers.forEach(function(d){byCar[d.car]=d;});
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+var PAINT={"9": "#f2f4f8", "54": "#f26a10", "88": "#14204f", "97": "#0d0d0f", "21": "#1fa34a", "51": "#f2f4f8", "19": "#cc1f2a", "11": "#cc1f2a", "27": "#6f1a2c", "69": "#d6232b", "15": "#1c3e96", "78": "#0d0d0f", "24": "#f6d90b", "6": "#d6232b", "5": "#0d0d0f", "3": "#2b5fae", "35": "#d8232b", "1": "#8f969f", "73": "#1b2f78", "33": "#8f969f"};
+function paintShade(h,f){var r=parseInt(h.substr(1,2),16),g=parseInt(h.substr(3,2),16),b=parseInt(h.substr(5,2),16);function c(v){return Math.max(0,Math.min(255,Math.round(v*f)))}return 'rgb('+c(r)+','+c(g)+','+c(b)+')';}
+function paintLum(h){var r=parseInt(h.substr(1,2),16),g=parseInt(h.substr(3,2),16),b=parseInt(h.substr(5,2),16);return(0.299*r+0.587*g+0.114*b)/255;}
 function chip(car,size){
-  var d=byCar[car]||{plate:'dark',c1:'#999'};
-  var img=CH[car]?'<img alt="#'+esc(car)+'" src="'+CH[car]+'">':'<span class="fb" style="color:'+(d.plate==='light'?'#15171a':d.c1)+'">'+esc(car)+'</span>';
-  return '<div class="plate dark'+(size?' '+size:'')+'">'+img+'</div>';
+  var d=byCar[car]||{plate:'dark',c1:'#999'}, pc=PAINT[car];
+  var fbc=pc?(paintLum(pc)>0.6?'#111':'#fff'):(d.plate==='light'?'#15171a':d.c1);
+  var img=CH[car]?'<img alt="#'+esc(car)+'" src="'+CH[car]+'">':'<span class="fb" style="color:'+fbc+'">'+esc(car)+'</span>';
+  if(!pc) return '<div class="plate dark'+(size?' '+size:'')+'">'+img+'</div>';
+  return '<div class="plate paint'+(size?' '+size:'')+'" style="background:linear-gradient(180deg,'+paintShade(pc,1.18)+','+pc+' 55%,'+paintShade(pc,.66)+')">'+img+'</div>';
 }
+function hdrBg(car,d,a){var pc=PAINT[car]||d.c1,al=paintLum(pc)>0.6?'44':a;return 'linear-gradient(135deg,'+pc+al+','+(PAINT[car]?paintShade(pc,.16):d.c2)+' 70%)';}
 function dispName(d){return d.name;}
 function teamFull(a){return (D.teamNames&&D.teamNames[a])||a;}
 function teamMfr(a){return (D.teamMfr&&D.teamMfr[a])||'';}
@@ -1547,11 +1560,11 @@ function detail(car){
   var N=ovw()?R:st.n;
   var L=C.standings(D,N), x=L.filter(function(y){return y.car===car;})[0], d=byCar[car];
   if(!x){
-    document.getElementById('sheet').innerHTML='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'55,'+d.c2+')"><button class="x" id="cx">&times;</button><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+esc(d.tag)+'</div></div></div></div><div class="body"><div class="call" style="margin-top:14px">No starts yet this season.</div></div>';
+    document.getElementById('sheet').innerHTML='<div class="dh" style="background:'+hdrBg(car,d,'55')+'"><button class="x" id="cx">&times;</button><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+esc(d.tag)+'</div></div></div></div><div class="body"><div class="call" style="margin-top:14px">No starts yet this season.</div></div>';
     openSheet();return;
   }
   var tags=[].concat(d.team?[teamFull(d.team)+(teamMfr(d.team)?' ('+teamMfr(d.team)+')':'')]:[]).concat(d.retired?['Done for the year']:[]).concat(Object.keys(D.paintWinners||{}).filter(function(w){return D.paintWinners[w]===car;}).map(function(w){return '\uD83C\uDF36\uFE0F Paint scheme of the week \u00B7 Wk '+w;}));
-  var h='<div class="dh" style="background:linear-gradient(135deg,'+d.c1+'66,'+d.c2+' 70%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+x.rank+'<span>Points rank</span></div><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+platIco(d)+esc(d.tag)+'</div></div></div><div class="tags">'+tags.map(function(t){var pm=/^\uD83C\uDF36.*Wk (\d+)$/.exec(t);var isT=d.team&&t.indexOf(teamFull(d.team))===0;return '<span class="tag"'+(pm?' data-pw="'+pm[1]+'" style="cursor:pointer"':'')+'>'+(isT?mfrIco(d.team,'t'):'')+esc(t)+'</span>';}).join('')+'</div></div><div class="body">';
+  var h='<div class="dh" style="background:'+hdrBg(car,d,'66')+'"><button class="x" id="cx" aria-label="Close">&times;</button><div class="rkb">#'+x.rank+'<span>Points rank</span></div><div class="who">'+chip(car,'lg')+'<div><h2>'+esc(d.name)+'</h2><div class="gt">'+platIco(d)+esc(d.tag)+'</div></div></div><div class="tags">'+tags.map(function(t){var pm=/^\uD83C\uDF36.*Wk (\d+)$/.exec(t);var isT=d.team&&t.indexOf(teamFull(d.team))===0;return '<span class="tag"'+(pm?' data-pw="'+pm[1]+'" style="cursor:pointer"':'')+'>'+(isT?mfrIco(d.team,'t'):'')+esc(t)+'</span>';}).join('')+'</div></div><div class="body">';
   var RK={};
   var bsl=(x.lapRank||[]).filter(function(q){return q>0;});
   var bsv=bsl.length?Math.min.apply(null,bsl):null;
@@ -1736,15 +1749,31 @@ function showPaint(w){
 document.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest('[data-pw]');if(el){e.stopPropagation();e.preventDefault();showPaint(el.getAttribute('data-pw'));}},true);
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(document.getElementById('ov').classList.contains('on'))closeSheet();else closeBracket();}});
 var animNext=true;
+var revIO=null;
 function animateIn(){
-  var els=document.querySelectorAll('#main .row,#main .srow,#main .rr,#main .crow,#main .lcard,#main .card,#main .tb,#main .call,#main .sum div');
-  Array.prototype.forEach.call(els,function(el){el.classList.remove('anim-in');});
+  var els=Array.prototype.slice.call(document.querySelectorAll('#main .row,#main .srow,#main .rr,#main .crow,#main .lcard,#main .card,#main .tb,#main .call,#main .sum div'));
+  if(revIO){revIO.disconnect();revIO=null;}
+  els.forEach(function(el){el.classList.remove('anim-in','reveal-wait');});
   void document.body.offsetWidth;
-  Array.prototype.forEach.call(els,function(el,i){
-    el.style.setProperty('--d',Math.min(i*30,600)+'ms');
+  var vh=window.innerHeight||document.documentElement.clientHeight, first=[], rest=[];
+  els.forEach(function(el){(el.getBoundingClientRect().top<vh*0.98?first:rest).push(el);});
+  function play(el,d){
+    el.style.setProperty('--d',d+'ms');
+    el.classList.remove('reveal-wait');
     el.classList.add('anim-in');
     el.addEventListener('animationend',function f(){el.classList.remove('anim-in');el.removeEventListener('animationend',f);});
-  });
+  }
+  first.forEach(function(el,i){play(el,Math.min(i*30,450));});
+  if(!rest.length) return;
+  if(!('IntersectionObserver' in window)){rest.forEach(function(el,i){play(el,Math.min(i*30,600));});return;}
+  rest.forEach(function(el){el.classList.add('reveal-wait');});
+  revIO=new IntersectionObserver(function(entries){
+    var n=0;
+    entries.forEach(function(en){
+      if(en.isIntersecting){revIO.unobserve(en.target);play(en.target,n*45);n++;}
+    });
+  },{rootMargin:'0px 0px -6% 0px',threshold:0.01});
+  rest.forEach(function(el){revIO.observe(el);});
 }
 function render(){
   hdr();
