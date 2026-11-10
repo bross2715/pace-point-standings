@@ -341,6 +341,16 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 header{background:linear-gradient(180deg,rgba(16,18,22,.55),rgba(7,8,10,0))}
 nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 </style>
+<style id="pace-inseason-green">
+/* In-Season Tournament color: green. Scoped to tournament-only elements so Chase and wins stay gold. */
+.tb,.bk,.od,.or,.sb,.ol,.lb,.sc,.tp,.tcol,.mw,.pickbar,.bkb,.pnote{--gold:#22d36b}
+.tb{background:linear-gradient(135deg,#0a1a10,#0e1013 60%);border-color:#14472a}
+.bk .champ{border-color:#22d36b;background:linear-gradient(180deg,#0b1a10,#0e1013)}
+.od div{background:#07120b;border-color:#14472a}
+.tcol.ch .mc{box-shadow:0 0 0 1px rgba(34,211,107,.25)}
+.sb .sbar i,.or .bar i{background:linear-gradient(90deg,#14804a,#22d36b)}
+.pickbar button.on,.bkb button.gold{color:#04140a}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -352,7 +362,6 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
     <button data-t="tower" class="on">Tower</button>
     <button data-t="pace">Pace</button>
     <button data-t="results">Results</button>
-    <button data-t="chase">Chase</button>
     <button data-t="teams">Teams</button>
     <button data-t="leaders">Leaders</button>
     <button data-t="stage">Stage</button>
