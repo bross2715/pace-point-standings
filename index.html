@@ -203,6 +203,38 @@ td.r,th.r{text-align:right}
 .champ .na{font-size:12px;color:var(--mut)}
 .bk .elig{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--mut);line-height:1.5}
 .bk .elig b{color:var(--txt)}
+
+.tp .pm{flex:none;color:var(--gold);font-size:13px;line-height:1}
+.mc{cursor:pointer}
+.mw .mc.pk1{border-color:#5a4a16}
+.bk .how{font-size:12px;color:var(--mut);margin:-2px 0 12px;line-height:1.45}
+.bk .how b{color:var(--gold)}
+.hh{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px}
+.hh .dr{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center;min-width:0;cursor:pointer}
+.hh .dr .nm{font-family:var(--hd);font-weight:800;font-size:22px;text-transform:uppercase;line-height:1;margin-top:8px;overflow:hidden;text-overflow:ellipsis}
+.hh .dr .sm{font-size:11px;color:var(--mut);margin-top:3px}
+.hh .dr .plate{margin:0 auto}
+.hh .dr.w{border-color:var(--green);background:rgba(34,211,107,.08)}
+.hh .dr.l{opacity:.5}
+.pickbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px 0}
+.pickbar button{min-height:46px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font-family:var(--hd);font-weight:800;letter-spacing:.8px;font-size:15px;text-transform:uppercase;cursor:pointer}
+.pickbar button.on{background:var(--gold);color:#1a1300;border-color:var(--gold)}
+.pickbar button:disabled{opacity:.45;cursor:default}
+.pnote{padding:8px 14px 0;font-size:12px;color:var(--mut);text-align:center}
+.pnote b{color:var(--gold)}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px 0}
+.sg .col{display:grid;gap:8px;align-content:start;min-width:0}
+.sb{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+.sb .sk{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.sb .sk b{font-family:var(--hd);font-weight:700;font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut)}
+.sb .sk span{font-family:var(--hd);font-weight:800;font-size:20px;line-height:1}
+.sb .sbar{height:6px;border-radius:4px;background:#1b1f25;margin:7px 0 5px;overflow:hidden}
+.sb .sbar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--brand),var(--gold))}
+.sb .sd{font-size:11px;color:var(--mut);line-height:1.35;text-align:left;width:auto}
+.sb .sd em{font-style:normal;color:var(--txt);font-weight:600}
+.sh{padding:16px 14px 0;font-family:var(--hd);font-weight:800;font-style:italic;font-size:20px;text-transform:uppercase}
+.sh small{display:block;font-family:var(--bd);font-style:normal;font-weight:400;font-size:12px;color:var(--mut);text-transform:none}
+.sh .x2{float:right;width:40px;height:40px;border:0;border-radius:50%;background:var(--panel);color:var(--txt);font-size:20px;cursor:pointer;margin-top:-6px}
 </style>
 </head>
 <body>
@@ -624,21 +656,90 @@ function tbanner(){
   if(idx===0&&byes.length) h+='<div class="bye">First-round bye: '+esc(byes.join(', '))+'</div>';
   return h+'</button>';
 }
-function bracketView(){
+
+var PKEY='pace_tb_picks_s'+(D.season||1);
+function getPicks(){try{return JSON.parse(localStorage.getItem(PKEY)||'{}')||{};}catch(e){return {};}}
+function setPick(k,c){try{var p=getPicks();if(p[k]===c)delete p[k];else p[k]=c;localStorage.setItem(PKEY,JSON.stringify(p));return true;}catch(e){return false;}}
+var _mem={};
+var TSTATS=[
+ ['Points','pts',true,function(v){return String(v);},'Total points on the season',function(v){return v>0;}],
+ ['Driver Rating','rating',true,function(v){return v.toFixed(0);},'Finishing, speed, spots gained and stage points rolled together',function(v){return v>0;}],
+ ['Wins','wins',true,function(v){return String(v);},'Races won this season',function(v){return v>0;}],
+ ['Top 5s','t5',true,function(v){return String(v);},'Finishes inside the top five',function(v){return v>0;}],
+ ['Avg Finish','avg',false,function(v){return v.toFixed(1);},'Average finishing spot in races started',function(v){return v>0;}],
+ ['Stage Points','sp',true,function(v){return String(v);},'Points earned from stage finishes',function(v){return v>0;}],
+ ['Avg Start','avgQ',false,function(v){return v.toFixed(1);},'Average starting spot on the grid',function(v){return v>0;}],
+ ['Spots Gained','gain',true,function(v){return (v>0?'+':'')+v.toFixed(1);},'Average positions gained from start to finish',function(v){return v>0;}],
+ ['Fastest Laps','fl',true,function(v){return String(v);},'Races where he set the fastest lap',function(v){return v>0;}],
+ ['Poles','poles',true,function(v){return String(v);},'Qualifying poles',function(v){return v>0;}],
+ ['Speed Rank','avgPaceRank',false,function(v){return v.toFixed(1);},'Average rank for raw lap speed (lower is quicker)',function(v){return v>0;}]
+];
+function topStats(car,T){
+  var S=C.standings(D,R), by={}; S.forEach(function(x){by[x.car]=x;});
+  var cars=T.elig.map(function(x){return x.car;}), me=by[car], N=cars.length, out=[];
+  TSTATS.forEach(function(s){
+    var v=me&&me[s[1]]; if(v==null||isNaN(v)||!s[5](v)) return;
+    var better=0; cars.forEach(function(c){var o=by[c]&&by[c][s[1]]; if(o==null||isNaN(o)||c===car) return; if(s[2]?o>v:o<v) better++;});
+    out.push({label:s[0],val:s[3](v),rank:better+1,n:N,desc:s[4]});
+  });
+  out.sort(function(a,b){return a.rank-b.rank;});
+  return out.slice(0,3);
+}
+function matchSheet(r,i){
+  var T=tourney(); if(!T) return; var rd=T.rounds[r], m=rd.ms[i]; if(!m) return;
+  var key='r'+r+'m'+i, picks=getPicks(), mine=picks[key], ready=m.a&&m.b&&m.a!=='?'&&m.b!=='?'&&!m.bye;
+  var done=m.st==='done';
+  function dr(car,fp){
+    if(!car||car==='?') return '<div class="dr"><div class="nm" style="color:var(--mut)">TBD</div><div class="sm">Awaiting earlier round</div></div>';
+    var cl=done?(m.w===car?' w':' l'):'';
+    return '<div class="dr'+cl+'" data-car2="'+esc(car)+'">'+chip(car,'lg')+'<div class="nm">'+esc(byCar[car].name)+'</div><div class="sm">#'+T.seed[car]+' seed'+(fp!=null?' &middot; finished P'+fp:'')+'</div></div>';
+  }
+  var h='<div class="sh"><button class="x2" id="mx" aria-label="Close">&times;</button>'+esc(rd.name)+'<small>Race '+rd.race+(rd.track?' &middot; '+esc(rd.track):'')+(done?' &middot; final':'')+'</small></div>';
+  if(m.bye) h+='<div class="pnote" style="padding-top:14px"><b>First-round bye.</b> '+esc(byCar[m.w].name)+' moves straight to the next round.</div>';
+  h+='<div class="hh" style="margin-top:12px">'+dr(m.a,m.fa)+dr(m.b,m.fb)+'</div>';
+  if(ready){
+    h+='<div class="pickbar">'+[m.a,m.b].map(function(c){return '<button data-pick="'+esc(c)+'"'+(mine===c?' class="on"':'')+(done?' disabled':'')+'>'+(mine===c?'&#9733; ':'')+'Pick '+esc(byCar[c].name)+'</button>';}).join('')+'</div>';
+    var note=done?(mine?(mine===m.w?'<b>You called it.</b> Your pick advanced.':'Your pick went out. Better luck next round.'):'Picks were closed when the race was run.'):(mine?'Your pick is saved. Tap it again to clear.':'Tap a driver to pick the winner. Just for fun, nothing is tied to it.');
+    h+='<div class="pnote">'+note+'</div>';
+    h+='<div class="sg">'+[m.a,m.b].map(function(c){
+      return '<div class="col">'+topStats(c,T).map(function(s){return '<div class="sb"><div class="sk"><b>'+esc(s.label)+'</b><span>'+esc(s.val)+'</span></div><div class="sbar"><i style="width:'+Math.max(6,Math.round((s.n-s.rank+1)/s.n*100))+'%"></i></div><div class="sd"><em>#'+s.rank+' of '+s.n+'</em> &middot; '+esc(s.desc)+'</div></div>';}).join('')+'</div>';
+    }).join('')+'</div>';
+  }
+  var sh=document.getElementById('sheet'); sh.innerHTML=h; sh.scrollTop=0;
+  document.getElementById('mx').onclick=closeSheet;
+  Array.prototype.forEach.call(sh.querySelectorAll('[data-car2]'),function(el){el.addEventListener('click',function(){detail(el.getAttribute('data-car2'));});});
+  Array.prototype.forEach.call(sh.querySelectorAll('[data-pick]'),function(b){b.addEventListener('click',function(){
+    if(!setPick(key,b.getAttribute('data-pick'))) { _mem[key]=b.getAttribute('data-pick'); }
+    bracketView(true); matchSheet(r,i);
+  });});
+  openSheet();
+}
+function pickRecord(T,picks){
+  var w=0,l=0,open=0;
+  T.rounds.forEach(function(rd,r){rd.ms.forEach(function(m,i){
+    var p=picks['r'+r+'m'+i]; if(!p) return;
+    if(m.st==='done'&&m.w){ if(p===m.w) w++; else l++; } else open++;
+  });});
+  return {w:w,l:l,open:open};
+}
+function bracketView(keep){
   var T=tourney(); if(!T) return;
-  var pay=TD.payout;
+  var pay=TD.payout, picks=getPicks(), pr=pickRecord(T,picks), pos0=null;
+  if(keep){var sb=document.querySelector('#bk .bs'),sc=document.getElementById('tsc'); if(sb&&sc) pos0=[sb.scrollTop,sc.scrollLeft];}
   var h='<div class="bh"><h2>PACE <b>In-Season</b> Tournament<small>Single elimination &middot; higher finish advances &middot; seeded by points after Race '+TD.seedAfter+'</small></h2><button class="bx" id="bkx" aria-label="Close">&times;</button></div><div class="bs">';
   h+='<div class="pay"><span>Champion <b>+'+pay[0]+'</b></span><span>Runner-up <b>+'+pay[1]+'</b></span><span>Semis <b>+'+pay[2]+'</b></span><span>Quarters <b>+'+pay[3]+'</b></span><span>First round <b>+'+pay[4]+'</b></span></div>';
-  h+='<div style="overflow-x:auto;margin:0 -14px;padding:0 14px 6px"><div class="tree">';
+  h+='<div class="how"><b>Make your picks.</b> Tap any matchup to compare the two drivers and pick a winner. Picks are just for fun, nothing is tied to them, and they are saved on this device.'+(pr.w+pr.l?' <b>Your record: '+pr.w+'-'+pr.l+'</b>':'')+'</div>';
+  h+='<div id="tsc" style="overflow-x:auto;margin:0 -14px;padding:0 14px 6px"><div class="tree">';
   function side(car,m,fp,isW,isL){
     if(car===null) return '<div class="tp by">'+(m.st==='tbd'?'TBD':'Bye')+'</div>';
     if(car===undefined) return '';
     var d=byCar[car];
-    return '<div class="tp'+(isW?' w':'')+(isL?' l':'')+'" data-car="'+esc(car)+'"><span class="sd">'+T.seed[car]+'</span>'+chip(car,'sm')+'<span class="nn">'+esc(d.name)+'</span>'+(fp!=null?'<span class="fp">P'+fp+'</span>':(isL&&T.earn[car]?'<span class="fp">+'+T.earn[car]+'</span>':''))+'</div>';
+    return '<div class="tp'+(isW?' w':'')+(isL?' l':'')+'"><span class="sd">'+T.seed[car]+'</span>'+chip(car,'sm')+'<span class="nn">'+esc(d.name)+'</span>'+(picks['r'+m.__r+'m'+m.__i]===car?'<span class="pm">&#9733;</span>':'')+(fp!=null?'<span class="fp">P'+fp+'</span>':(isL&&T.earn[car]?'<span class="fp">+'+T.earn[car]+'</span>':''))+'</div>';
   }
   T.rounds.forEach(function(rd,r){
     h+='<div class="tcol'+(r===3?' ch':'')+'"><div class="rh"><b>'+rd.name+'</b><span>Race '+rd.race+(rd.track?' &middot; '+esc(rd.track):'')+'</span></div><div class="ms">';
     rd.ms.forEach(function(m,i){
+      m.__r=r;m.__i=i;
       var pos=r===3?'':(i%2===0?'t':'b');
       var tbd=function(x){return x===null&&m.st!=='bye'&&m.st!=='done';};
       function pk(car,fp){
@@ -647,7 +748,7 @@ function bracketView(){
         }
         return side(car,m,fp,m.w===car&&m.st!=='pending',m.w&&m.w!==car&&m.st==='done');
       }
-      h+='<div class="mw '+pos+'"><div class="mc">'+pk(m.a,m.fa)+pk(m.b,m.fb)+'</div></div>';
+      h+='<div class="mw '+pos+'"><div class="mc" data-m="'+r+'-'+i+'">'+pk(m.a,m.fa)+pk(m.b,m.fb)+'</div></div>';
     });
     h+='</div></div>';
   });
@@ -662,8 +763,8 @@ function bracketView(){
   h+='</div></div>';
   var bk=document.getElementById('bk'); bk.innerHTML=h; bk.classList.add('on'); document.body.style.overflow='hidden';
   document.getElementById('bkx').onclick=closeBracket;
-  Array.prototype.forEach.call(bk.querySelectorAll('[data-car]'),function(el){el.addEventListener('click',function(){detail(el.getAttribute('data-car'));});});
-  bk.querySelector('.bs').scrollTop=0;
+  Array.prototype.forEach.call(bk.querySelectorAll('[data-m]'),function(el){el.addEventListener('click',function(){var p=el.getAttribute('data-m').split('-');matchSheet(parseInt(p[0],10),parseInt(p[1],10));});});
+  if(pos0){bk.querySelector('.bs').scrollTop=pos0[0];document.getElementById('tsc').scrollLeft=pos0[1];}else bk.querySelector('.bs').scrollTop=0;
 }
 function closeBracket(){document.getElementById('bk').classList.remove('on');document.body.style.overflow='';}
 function tower(L){
