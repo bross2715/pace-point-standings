@@ -319,7 +319,7 @@ td.r,th.r{text-align:right}
 .pp .plate{width:30px;height:19px}.pp .plate img{max-width:22px;max-height:13px}
 .pp.w{border-color:var(--green);color:var(--green);background:rgba(34,211,107,.1)}
 .pp.l{opacity:.5;text-decoration:line-through}
-.more[disabled]{opacity:.6;cursor:default}.leg{font-size:11px;color:#6d747d;margin:-2px 4px 8px;line-height:1.4}.pt span.ah{color:#aab1bb;margin-top:1px;white-space:nowrap}.upd{margin-top:14px;color:#9aa1ab}.upd b{color:var(--txt)}.upd .ok{color:var(--green)}.upd .bad,.dt .bad{color:var(--red)}.dt{margin-top:8px}.dt summary{cursor:pointer;color:#9aa1ab;font-weight:600}.dt ul{margin:6px 0 0;padding-left:18px}.dt li{margin-bottom:3px}.dt li b{color:var(--txt)}
+.more[disabled]{opacity:.6;cursor:default}.leg{font-size:11px;color:#6d747d;margin:-2px 4px 8px;line-height:1.4}.pt span.ah b{color:#d3d8df;font-weight:700;font-size:inherit;line-height:inherit;font-family:inherit;display:inline;letter-spacing:0}.pt span.ah i{font-style:italic}.leg b{color:#aab1bb}.leg i{font-style:italic}.pt span.ah{color:#aab1bb;margin-top:1px;white-space:nowrap}.upd{margin-top:14px;color:#9aa1ab}.upd b{color:var(--txt)}.upd .ok{color:var(--green)}.upd .bad,.dt .bad{color:var(--red)}.dt{margin-top:8px}.dt summary{cursor:pointer;color:#9aa1ab;font-weight:600}.dt ul{margin:6px 0 0;padding-left:18px}.dt li{margin-bottom:3px}.dt li b{color:var(--txt)}
 </style>
 </head>
 <body>
@@ -912,6 +912,8 @@ function tbanner(){
 }
 
 var PKEY='pace_tb_picks_s'+(D.season||1);
+function isLocked(){try{return !!localStorage.getItem(PKEY+'_lock');}catch(e){return false;}}
+function lockPicks(code){try{localStorage.setItem(PKEY+'_lock',JSON.stringify({code:code,at:new Date().toISOString().slice(0,10)}));}catch(e){}}
 function getPicks(){try{return JSON.parse(localStorage.getItem(PKEY)||'{}')||{};}catch(e){return {};}}
 function setPick(k,c){try{var p=getPicks();if(p[k]===c)delete p[k];else p[k]=c;localStorage.setItem(PKEY,JSON.stringify(p));return true;}catch(e){return false;}}
 var _mem={};
@@ -953,6 +955,7 @@ function cleanPicks(T,p){
   return p;
 }
 function setPick(T,r,i,c){
+  if(isLocked()) return false;
   try{var p=getPicks(),k='r'+r+'m'+i; if(p[k]===c) delete p[k]; else p[k]=c; cleanPicks(T,p); localStorage.setItem(PKEY,JSON.stringify(p)); return true;}catch(e){return false;}
 }
 function codeOf(T,p){var a=[]; for(var r=0;r<4;r++) T.rounds[r].ms.forEach(function(m,i){a.push(pickedW(T,p,r,i)||'-');}); return a.join(',');}
@@ -983,8 +986,8 @@ function matchSheet(r,i){
   if(m.st==='bye') h+='<div class="pnote" style="padding-top:14px"><b>First-round bye.</b> '+esc(byCar[m.w].name)+' moves straight to the next round.</div>';
   h+='<div class="hh" style="margin-top:12px">'+dr(a,done?m.fa:null)+dr(b,done?m.fb:null)+'</div>';
   if(ready){
-    h+='<div class="pickbar">'+[a,b].map(function(c){return '<button data-pick="'+esc(c)+'"'+(mine===c?' class="on"':'')+(done?' disabled':'')+'>'+(mine===c?'&#9733; ':'')+'Pick '+esc(byCar[c].name)+'</button>';}).join('')+'</div>';
-    var note=done?(mine?(mine===m.w?'<b>You called it.</b> Your pick advanced.':'Your pick went out. Better luck next round.'):'Picks were closed when the race was run.'):(mine?'Your pick is saved. Tap it again to clear.':'Tap a driver to pick the winner. Picks carry through your bracket. Just for fun, nothing is tied to it.');
+    h+='<div class="pickbar">'+[a,b].map(function(c){return '<button data-pick="'+esc(c)+'"'+(mine===c?' class="on"':'')+(done||isLocked()?' disabled':'')+'>'+(mine===c?'&#9733; ':'')+'Pick '+esc(byCar[c].name)+'</button>';}).join('')+'</div>';
+    var note=done?(mine?(mine===m.w?'<b>You called it.</b> Your pick advanced.':'Your pick went out. Better luck next round.'):'Picks were closed when the race was run.'):(isLocked()?(mine?'Locked in. Your bracket was sent, so picks can\'t be changed.':'Locked in. Your bracket was sent, so picks can\'t be changed.'):mine?'Your pick is saved. Tap it again to clear.':'Tap a driver to pick the winner. Picks carry through your bracket. Just for fun, nothing is tied to it.');
     h+='<div class="pnote">'+note+'</div>';
     var OD=oddsModel(T), pa=OD.win(a,b,r), pb=1-pa;
     h+='<div class="od"><div'+(pa>=.5?' class="fav"':'')+'><small>Pace odds</small><b>'+ml(pa)+'</b><span>'+pct(pa)+'</span></div><div'+(pb>pa?' class="fav"':'')+'><small>Pace odds</small><b>'+ml(pb)+'</b><span>'+pct(pb)+'</span></div></div>';
@@ -1047,8 +1050,10 @@ function bracketView(keep){
   h+='<div class="how"><b>Fill out your bracket.</b> Tap any matchup to compare the drivers and pick a winner. Your pick moves on to the next round, so you can call the whole bracket, champion included. Score 1 point per correct first-round pick, 2 in the quarters, 4 in the semis and 8 for the champion. Just for fun, nothing is tied to it, and picks are saved on this device.</div>';
   h+='<div class="sc"><div><b>'+npk+'/15</b><small>Picks made</small></div><div><b>'+sc.pts+'<span style="font-size:13px;color:var(--mut)">/'+sc.max+'</span></b><small>Bracket score</small></div><div class="'+(sc.perfect?'perf':'')+'"><b>'+(sc.dec?(sc.perfect?'PERFECT SO FAR':sc.ok+'-'+sc.bad):'&ndash;')+'</b><small>'+(sc.dec?'Right-wrong':'Waiting on Race '+TD.startRace)+'</small></div></div>';
   var myname=''; try{myname=localStorage.getItem(PKEY+'_name')||'';}catch(e){}
-  h+='<input class="bnm" id="bname" maxlength="24" placeholder="Your name" value="'+esc(myname)+'">';
-  h+='<div class="bkb"><button id="bshare" class="gold">Send my bracket</button><button id="bclr">Clear my picks</button></div><div id="bshout"></div>';
+  var LK=isLocked();
+  if(LK) h+='<div class="pnote" style="text-align:left;padding:0 0 8px"><b>&#128274; Locked in.</b> You sent your bracket, so your picks can\'t be changed. Tap Send my bracket to copy it again.</div>';
+  h+='<input class="bnm" id="bname" maxlength="24" placeholder="Your name" value="'+esc(myname)+'"'+(LK?' readonly':'')+'>';
+  h+='<div class="bkb"><button id="bshare" class="gold">'+(LK?'Send my bracket again':'Send my bracket')+'</button>'+(LK?'':'<button id="bclr">Clear my picks</button>')+'</div>'+(LK?'':'<div class="pnote" style="text-align:left;padding:0 0 8px">Heads up: tapping Send my bracket locks your picks.</div>')+'<div id="bshout"></div>';
   h+='<div id="tsc" style="overflow-x:auto;margin:0 -14px;padding:0 14px 6px"><div class="tree">';
   function side(car,m,fp,isW,isL){
     if(car===null) return '<div class="tp by">'+(m.st==='tbd'?'TBD':'Bye')+'</div>';
@@ -1100,9 +1105,10 @@ function bracketView(keep){
     if(npk<15){out.innerHTML='<div class="pnote" style="padding:0 0 10px;text-align:left">Pick a winner in every matchup first. You have '+npk+' of 15 done.</div>';return;}
     if(!nm){out.innerHTML='<div class="pnote" style="padding:0 0 10px;text-align:left">Type your name above first.</div>';return;}
     try{localStorage.setItem(PKEY+'_name',nm);}catch(e){}
+    var wasLocked=isLocked(); lockPicks(mycode);
     var cp=mycode.split(','), champ=byCar[cp[14]]?byCar[cp[14]].name:'?';
     var txt=nm+"'s PACE bracket. Champion: "+champ+". Code: "+mycode;
-    var show=function(ok){out.innerHTML='<div class="cp">'+esc(txt)+'</div><div class="pnote" style="padding:6px 0 10px;text-align:left">'+(ok?'<b>Copied.</b> Now paste it in the group chat or text it to the commissioner.':'Press and hold the box above to copy it, then paste it in the group chat or text it to the commissioner.')+'</div>';};
+    var show=function(ok){out.innerHTML='<div class="cp">'+esc(txt)+'</div><div class="pnote" style="padding:6px 0 10px;text-align:left">'+(wasLocked?'':'<b>&#128274; Locked in.</b> Your picks can\'t be changed now. ')+(ok?'<b>Copied.</b> Now paste it in the group chat or text it to the commissioner.':'Press and hold the box above to copy it, then paste it in the group chat or text it to the commissioner.')+'</div>';};
     try{navigator.clipboard.writeText(txt).then(function(){show(true);},function(){show(false);});}catch(e){show(false);}
   };
   var bcl=document.getElementById('bclr'); if(bcl) bcl.onclick=function(){try{localStorage.removeItem(PKEY);}catch(e){} bracketView(true);};
@@ -1128,9 +1134,9 @@ function tower(L){
   h+=tbanner();
   var cut=D.scoring.cutline, show=st.all?L:L.slice(0,Math.max(cut,16));
   h+='<div class="sec">Standings</div>';
-  h+='<div class="leg">Red is points behind the leader. The small "to P4" line is points needed to catch the driver ahead.</div>';
+  h+='<div class="leg">Red is points behind the leader. The small gray line, like <b>&minus;2</b> <i>to P4</i>, is points behind the driver ahead.</div>';
   show.forEach(function(x,ix){
-    var ah=''; if(ix>1){var up=show[ix-1], dd=up.pts-x.pts; ah='<span class="ah">'+(dd?dd+' to P'+up.rank:'TIE P'+up.rank)+'</span>';}
+    var ah=''; if(ix>1){var up=show[ix-1], dd=up.pts-x.pts; ah='<span class="ah">'+(dd?'<b>&minus;'+dd+'</b> <i>to P'+up.rank+'</i>':'<b>TIE</b> <i>P'+up.rank+'</i>')+'</span>';}
     h+='<div class="row'+(x.inChase?' in':'')+'" data-car="'+esc(x.car)+'">'+
       '<div class="rk">'+x.rank+'</div>'+delta(x)+chip(x.car)+
       '<div><div class="n1">'+esc(dispName(x.d))+stars(x)+pepper(x.d.car)+'</div><div class="n2 tgl"><span class="tg">'+esc(x.d.tag)+'</span>'+team(x.d)+'</div></div>'+
