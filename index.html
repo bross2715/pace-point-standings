@@ -1640,6 +1640,12 @@ function bindFlip(map){
   Array.prototype.forEach.call(document.querySelectorAll('#sheet .g[data-k]'),function(el){
     el.addEventListener('click',function(){
       var k=el.getAttribute('data-k');
+      if(el.getAttribute('data-open')!=='1'){
+        Array.prototype.forEach.call(document.querySelectorAll('#sheet .g[data-open="1"]'),function(o){
+          if(o===el) return;
+          o.innerHTML=o.getAttribute('data-front');o.removeAttribute('data-open');o.style.gridColumn='';
+        });
+      }
       if(el.getAttribute('data-open')==='1'){
         el.innerHTML=el.getAttribute('data-front');
         el.removeAttribute('data-open');
@@ -1800,6 +1806,9 @@ var rp_=document.getElementById('replay');
 if(rp_) rp_.addEventListener('click',function(){rp_.classList.remove('spin');void rp_.offsetWidth;rp_.classList.add('spin');animateIn();});
 render();
 })();
+</script>
+<script>
+document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=='DETAILS'||!d.open)return;Array.prototype.forEach.call(document.querySelectorAll('details[open]'),function(o){if(o!==d&&!o.contains(d)&&!d.contains(o))o.open=false;});},true);
 </script>
 </body>
 </html>
