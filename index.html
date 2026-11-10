@@ -326,6 +326,21 @@ td.r,th.r{text-align:right}
 .pp.l{opacity:.5;text-decoration:line-through}
 .more[disabled]{opacity:.6;cursor:default}.leg{font-size:11px;color:#6d747d;margin:-2px 4px 8px;line-height:1.4}.pt span.ah b{color:#d3d8df;font-weight:700;font-size:inherit;line-height:inherit;font-family:inherit;display:inline;letter-spacing:0}.pt span.ah i{font-style:italic}.leg b{color:#aab1bb}.leg i{font-style:italic}.pt span.ah{color:#aab1bb;margin-top:1px;white-space:nowrap}.upd{margin-top:14px;color:#9aa1ab}.upd b{color:var(--txt)}.upd .ok{color:var(--green)}.upd .bad,.dt .bad{color:var(--red)}.dt{margin-top:8px}.dt summary{cursor:pointer;color:#9aa1ab;font-weight:600}.dt ul{margin:6px 0 0;padding-left:18px}.dt li{margin-bottom:3px}.dt li b{color:var(--txt)}
 </style>
+<style id="pace-bg">
+/* Background: dark steel gradient with a faint red band. No fine patterns. */
+:root{--panel:rgba(14,16,19,.80);--panel2:rgba(22,25,30,.86)}
+html{background:#07080a}
+body{background:transparent;position:relative}
+body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+ background:
+  linear-gradient(115deg,transparent 0 52%,rgba(181,34,58,.26) 52% 70%,transparent 70%),
+  radial-gradient(ellipse at 75% 6%,rgba(255,255,255,.06),transparent 55%),
+  linear-gradient(180deg,#252e38 0%,#151b22 28%,#0b0e12 58%,#07080a 100%)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+ background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.5))}
+header{background:linear-gradient(180deg,rgba(16,18,22,.55),rgba(7,8,10,0))}
+nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+</style>
 </head>
 <body>
 <div class="wrap">
