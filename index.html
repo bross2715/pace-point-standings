@@ -111,9 +111,9 @@ main{padding:14px 12px}
 .sum small{display:block;font-family:var(--hd);font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;color:var(--mut)}
 .sum b{display:block;font-family:var(--hd);font-weight:800;font-size:17px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .rating{font-family:var(--hd);font-weight:800;font-size:24px}
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:20;display:none;align-items:flex-end;justify-content:center}
+.ov{position:fixed;inset:0;height:100vh;height:100dvh;background:rgba(0,0,0,.66);z-index:20;display:none;align-items:flex-end;justify-content:center}
 .ov.on{display:flex}
-.sheet{width:100%;max-width:560px;max-height:92vh;overflow:auto;background:var(--bg);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;animation:up .22s ease-out;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.sheet{width:100%;max-width:560px;max-height:calc(100vh - 56px - env(safe-area-inset-top));max-height:calc(100dvh - 56px - env(safe-area-inset-top));overscroll-behavior:contain;overflow:auto;background:var(--bg);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;animation:up .22s ease-out;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
 @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
 .dh{padding:18px 16px 16px;position:relative;border-radius:18px 18px 0 0}
 .dh .x{position:absolute;right:10px;top:10px;width:44px;height:44px;border:0;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:20px;cursor:pointer}
@@ -1687,7 +1687,7 @@ document.getElementById('ov').addEventListener('click',function(e){if(e.target==
 function showPaint(w){
   var img=(D.paintImg||{})[w], car=(D.paintWinners||{})[w]; if(!img||!car) return;
   var z=document.getElementById('pz'); if(!z){z=document.createElement('div');z.id='pz';z.style.cssText='position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;cursor:pointer';z.addEventListener('click',function(){z.style.display='none';});document.body.appendChild(z);}
-  z.innerHTML='<div style="font-family:var(--hd);font-weight:800;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mut)">&#127798;&#65039; Paint scheme of the week &middot; Wk '+esc(w)+'</div><img src="'+img+'" alt="" style="max-width:100%;max-height:68vh;border-radius:12px;border:1px solid #30343b">'+chip(car,'sm')+'<div style="font-family:var(--hd);font-weight:800;font-size:22px;text-transform:uppercase">'+esc(nameOf(car))+'</div><div style="font-size:12px;color:var(--mut)">Tap anywhere to close</div>';
+  z.innerHTML='<div style="font-family:var(--hd);font-weight:800;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mut)">&#127798;&#65039; Paint scheme of the week &middot; Wk '+esc(w)+'</div><img src="'+img+'" alt="" style="max-width:100%;max-height:60vh;max-height:60dvh;border-radius:12px;border:1px solid #30343b">'+chip(car,'sm')+'<div style="font-family:var(--hd);font-weight:800;font-size:22px;text-transform:uppercase">'+esc(nameOf(car))+'</div><div style="font-size:12px;color:var(--mut)">Tap anywhere to close</div>';
   z.style.display='flex';
 }
 document.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest('[data-pw]');if(el){e.stopPropagation();e.preventDefault();showPaint(el.getAttribute('data-pw'));}},true);
