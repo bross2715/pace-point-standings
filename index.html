@@ -664,7 +664,7 @@ var _mem={};
 var TSTATS=[
  ['Points','pts',true,function(v){return String(v);},'Total points on the season',function(v){return v>0;}],
  ['Driver Rating','rating',true,function(v){return v.toFixed(0);},'Finishing, speed, spots gained and stage points rolled together',function(v){return v>0;}],
- ['Wins','wins',true,function(v){return String(v);},'Races won this season',function(v){return v>0;}],
+ ['Wins','wins',true,function(v){return String(v);},'Races won this season',function(v){return true;}],
  ['Top 5s','t5',true,function(v){return String(v);},'Finishes inside the top five',function(v){return v>0;}],
  ['Avg Finish','avg',false,function(v){return v.toFixed(1);},'Average finishing spot in races started',function(v){return v>0;}],
  ['Stage Points','sp',true,function(v){return String(v);},'Points earned from stage finishes',function(v){return v>0;}],
@@ -675,15 +675,16 @@ var TSTATS=[
  ['Speed Rank','avgPaceRank',false,function(v){return v.toFixed(1);},'Average rank for raw lap speed (lower is quicker)',function(v){return v>0;}]
 ];
 function topStats(car,T){
-  var S=C.standings(D,R), by={}; S.forEach(function(x){by[x.car]=x;});
-  var cars=T.elig.map(function(x){return x.car;}), me=by[car], N=cars.length, out=[];
-  TSTATS.forEach(function(s){
-    var v=me&&me[s[1]]; if(v==null||isNaN(v)||!s[5](v)) return;
-    var better=0; cars.forEach(function(c){var o=by[c]&&by[c][s[1]]; if(o==null||isNaN(o)||c===car) return; if(s[2]?o>v:o<v) better++;});
-    out.push({label:s[0],val:s[3](v),rank:better+1,n:N,desc:s[4]});
+  // same three stats for every driver, ranked against the whole league (the stats that best describe the points leader)
+  var S=C.standings(D,R).filter(function(x){return x.starts>0;}), by={}; S.forEach(function(x){by[x.car]=x;});
+  var me=by[car], N=S.length, keys=['rating','wins','avg'], out=[];
+  keys.forEach(function(k){
+    var s=TSTATS.filter(function(z){return z[1]===k;})[0], v=me?me[k]:null;
+    if(v==null||isNaN(v)) { out.push({label:s[0],val:'N/A',rank:N,n:N,desc:s[4]}); return; }
+    var better=0,tie=false; S.forEach(function(o){ if(o.car===car||o[k]==null||isNaN(o[k])) return; if(s[2]?o[k]>v:o[k]<v) better++; else if(o[k]===v) tie=true; });
+    out.push({label:s[0],val:s[3](v),rank:better+1,n:N,desc:s[4],tie:tie,zero:(k==='wins'&&v===0)});
   });
-  out.sort(function(a,b){return a.rank-b.rank;});
-  return out.slice(0,3);
+  return out;
 }
 function matchSheet(r,i){
   var T=tourney(); if(!T) return; var rd=T.rounds[r], m=rd.ms[i]; if(!m) return;
@@ -702,7 +703,7 @@ function matchSheet(r,i){
     var note=done?(mine?(mine===m.w?'<b>You called it.</b> Your pick advanced.':'Your pick went out. Better luck next round.'):'Picks were closed when the race was run.'):(mine?'Your pick is saved. Tap it again to clear.':'Tap a driver to pick the winner. Just for fun, nothing is tied to it.');
     h+='<div class="pnote">'+note+'</div>';
     h+='<div class="sg">'+[m.a,m.b].map(function(c){
-      return '<div class="col">'+topStats(c,T).map(function(s){return '<div class="sb"><div class="sk"><b>'+esc(s.label)+'</b><span>'+esc(s.val)+'</span></div><div class="sbar"><i style="width:'+Math.max(6,Math.round((s.n-s.rank+1)/s.n*100))+'%"></i></div><div class="sd"><em>#'+s.rank+' of '+s.n+'</em> &middot; '+esc(s.desc)+'</div></div>';}).join('')+'</div>';
+      return '<div class="col">'+topStats(c,T).map(function(s){return '<div class="sb"><div class="sk"><b>'+esc(s.label)+'</b><span>'+esc(s.val)+'</span></div><div class="sbar"><i style="width:'+(s.zero?3:Math.max(6,Math.round((s.n-s.rank+1)/s.n*100)))+'%"></i></div><div class="sd"><em>'+(s.tie?'T-':'')+'#'+s.rank+' of '+s.n+'</em> &middot; '+esc(s.desc)+'</div></div>';}).join('')+'</div>';
     }).join('')+'</div>';
   }
   var sh=document.getElementById('sheet'); sh.innerHTML=h; sh.scrollTop=0;
