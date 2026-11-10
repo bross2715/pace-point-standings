@@ -784,13 +784,9 @@ function recap(){
     cv.toBlob(function(blob){
       var url=URL.createObjectURL(blob),name='pace-race-'+d.n+'-'+d.track.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.png',file=null;
       try{file=new File([blob],name,{type:'image/png'});}catch(e){}
-      document.getElementById('sheet').innerHTML='<div class="dh" style="background:linear-gradient(135deg,#b5223a55,#07080a 70%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="who"><div><h2>Race '+d.n+' recap</h2><div class="gt">Press and hold the picture to save it, or use the buttons.</div></div></div></div>'+
+      document.getElementById('sheet').innerHTML='<div class="dh" style="background:linear-gradient(135deg,#b5223a55,#07080a 70%)"><button class="x" id="cx" aria-label="Close">&times;</button><div class="who"><div><h2>Race '+d.n+' recap</h2><div class="gt">Screenshot it to share.</div></div></div></div>'+
         '<div class="body"><img src="'+url+'" alt="Race '+d.n+' recap" style="width:100%;display:block;border-radius:12px;margin:14px 0 10px">'+
-        '<button class="more" id="rshare">Share</button>'+
-        '<a class="more" id="rsave" download="'+name+'" href="'+url+'" style="text-align:center;text-decoration:none;margin-top:8px">Save image</a></div>';
-      var sh=document.getElementById('rshare');
-      if(file&&navigator.canShare&&navigator.canShare({files:[file]})){sh.onclick=function(){navigator.share({files:[file],title:'PACE Race '+d.n+' recap'}).catch(function(){});};}
-      else if(sh){sh.parentNode.removeChild(sh);}
+        '</div>';
       openSheet();
       if(btn){btn.disabled=false;btn.textContent='Make recap image';}
     },'image/png');
