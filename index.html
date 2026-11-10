@@ -375,7 +375,7 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 </style>
 <style id="pace-inseason-green">
 /* In-Season Tournament color: green. Scoped to tournament-only elements so Chase and wins stay gold. */
-.tb,.bk,.od,.or,.sb,.ol,.lb,.sc,.tp,.tcol,.mw,.pickbar,.bkb,.pnote{--gold:#22d36b}
+.tb,.bk,.od,.or,.sb,.ol,.lb,.sc,.tp,.tpn,.tcol,.mw,.pickbar,.bkb,.pnote{--gold:#22d36b}
 .tb{background:linear-gradient(135deg,#0a1a10,#0e1013 60%);border-color:#14472a}
 .bk .champ{border-color:#22d36b;background:linear-gradient(180deg,#0b1a10,#0e1013)}
 .od div{background:#07120b;border-color:#14472a}
@@ -406,7 +406,7 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 .tabs{display:flex;gap:4px;position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 14px 0;border-bottom:1px solid var(--line);overflow-x:auto}
 .tabs button{flex:1;min-width:max-content;font-family:var(--hd);font-weight:700;letter-spacing:1.3px;font-size:13px;text-transform:uppercase;color:var(--mut);background:none;border:0;border-bottom:3px solid transparent;padding:9px 8px 8px;cursor:pointer}
 .tabs button.on{color:#fff;border-bottom-color:var(--pc,#d6232b)}
-.tp{display:none;padding:2px 14px 14px}.tp.on{display:block;animation:tpIn .25s ease both}
+.tpn{display:none;padding:2px 14px 14px}.tpn.on{display:block;animation:tpIn .25s ease both}
 @keyframes tpIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .ovr{display:flex;align-items:center;gap:12px;margin:12px 14px 0}
 .ovr .big{font-family:var(--hd);font-weight:800;font-size:54px;line-height:.9;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.5)}
@@ -445,7 +445,8 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 .tyt{display:flex;align-items:center;gap:10px;padding:5px 4px;border-radius:8px}.tyt:active{background:rgba(255,255,255,.07)}.tyt svg.th{width:64px;height:38px;flex:none}.tyt b{display:block;color:#fff;font-family:var(--hd);letter-spacing:.8px;text-transform:uppercase;font-size:13px}.tyt span{font-size:10px;color:var(--mut)}.tyt em{margin-left:auto;font-style:normal;font-size:11px;color:#fff;text-align:right}
 .rban{border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
 .rb-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.rb-top small{font-family:var(--hd);letter-spacing:1.4px;text-transform:uppercase;font-size:12px;color:#22d36b;font-weight:700}
+.rban .trace{filter:drop-shadow(0 0 2px rgba(255,59,59,.8))}
+.rb-top small{font-family:var(--hd);letter-spacing:1.4px;text-transform:uppercase;font-size:12px;color:#ff3b3b;font-weight:700}
 .rb-top h3{margin:2px 0;font-family:var(--hd);font-style:italic;font-weight:800;font-size:30px;line-height:1;text-transform:uppercase;color:#fff}
 .rb-top span{font-size:12px;color:var(--mut)}
 .rb-trk{width:46%;max-width:190px;flex:none}.rb-trk svg{width:100%;display:block;filter:drop-shadow(0 0 6px rgba(34,211,107,.35))}
@@ -863,7 +864,7 @@ function drawTrack(ctx,name,x,y,w,h){
   var P=new Path2D(p); ctx.lineJoin='round'; ctx.lineCap='round';
   ctx.strokeStyle='rgba(0,0,0,.65)';ctx.lineWidth=6;ctx.stroke(P);
   ctx.strokeStyle='#3a4048';ctx.lineWidth=3.4;ctx.stroke(P);
-  ctx.save();ctx.shadowColor='rgba(34,211,107,.9)';ctx.shadowBlur=8;ctx.strokeStyle='#22d36b';ctx.lineWidth=3.4;ctx.stroke(P);ctx.restore();
+  ctx.save();ctx.shadowColor='rgba(255,59,59,.9)';ctx.shadowBlur=8;ctx.strokeStyle='#ff3b3b';ctx.lineWidth=3.4;ctx.stroke(P);ctx.restore();
   var f=FL[name]; if(f){var L=4.4,ax=f[0]-f[2]*L,ay=f[1]-f[3]*L,bx=f[0]+f[2]*L,by=f[1]+f[3]*L;
     ctx.lineCap='butt';ctx.strokeStyle='#111';ctx.lineWidth=2.6;ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();
     ctx.strokeStyle='#fff';ctx.setLineDash([1.1,1.1]);ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();ctx.setLineDash([]);}
@@ -889,7 +890,7 @@ function recapDraw(d,imgs){
   ctx.fillStyle='#f3f5f7';ctx.fillText(a3,x,112);
   ctx.fillStyle='#8b929c';ctx.font='700 34px '+RF;
   ctx.fillText(('Season '+D.season+'  ·  Race '+d.n+'  ·  '+d.track+(d.date?'  ·  '+d.date:'')).toUpperCase(),60,166);
-  ctx.fillStyle='#22d36b';ctx.font='800 26px '+RF;ctx.fillText((d.type+(TLEN[d.track]?'  ·  '+TLEN[d.track]+' MI':'')).toUpperCase(),60,194);
+  ctx.fillStyle='#ff3b3b';ctx.font='800 26px '+RF;ctx.fillText((d.type+(TLEN[d.track]?'  ·  '+TLEN[d.track]+' MI':'')).toUpperCase(),60,194);
   drawTrack(ctx,d.track,740,34,300,180);
   // winner
   var w0=d.rows[0];
@@ -1389,7 +1390,7 @@ function resultsTab(L){
   var mover=null; rows0.forEach(function(r){if(r.start&&r.start-r.fin>0&&(!mover||r.start-r.fin>mover.g))mover={car:r.car,g:r.start-r.fin};});
   function hl(label,car,sub,col){return '<div class="hl" '+(car?'data-car="'+esc(car)+'"':'')+'>'+(car?chip(car):'<div class="plate dark"><span class="fb">&ndash;</span></div>')+'<div><small style="color:'+(col||'var(--mut)')+'">'+label+'</small><b>'+esc(car?nameOf(car):'N/A')+'</b>'+(sub?'<span>'+sub+'</span>':'')+'</div></div>';}
   var pcw=win&&PAINT[win.car]?PAINT[win.car]:'#22d36b';
-  h+='<div class="rban" style="background:'+(win?hdrBg(win.car,win.d,'55'):'var(--panel)')+'"><div class="rb-top"><div><small>Race '+(i+1)+(typeOf(trk)?' · '+esc(typeOf(trk)):'')+'</small><h3>'+esc(trk)+'</h3><span>'+(TLEN[trk]?TLEN[trk]+' mi':'')+(dateOf(i)?' · '+esc(dateOf(i)):'')+'</span><div class="hlw">'+hl('\uD83C\uDFC1 Winner',win&&win.car,win?'+'+win.pts+' pts':'','#ffc83d')+'</div></div><div class="rb-trk">'+trkSvg(trk,'#22d36b',true,false)+'</div></div>'+
+  h+='<div class="rban" style="background:'+(win?hdrBg(win.car,win.d,'55'):'var(--panel)')+'"><div class="rb-top"><div><small>Race '+(i+1)+(typeOf(trk)?' · '+esc(typeOf(trk)):'')+'</small><h3>'+esc(trk)+'</h3><span>'+(TLEN[trk]?TLEN[trk]+' mi':'')+(dateOf(i)?' · '+esc(dateOf(i)):'')+'</span><div class="hlw">'+hl('\uD83C\uDFC1 Winner',win&&win.car,win?'+'+win.pts+' pts':'','#ffc83d')+'</div></div><div class="rb-trk">'+trkSvg(trk,'#ff3b3b',true,false,'#ff3b3b')+'</div></div>'+
     '<div class="rb-hl">'+
     hl('\uD83C\uDFAF Pole',pole,'Started P1')+
     hl('1\uFE0F\u20E3 Stage 1',s1,'')+hl('2\uFE0F\u20E3 Stage 2',s2,'')+
@@ -1863,9 +1864,9 @@ TRK["Homestead"]="M55.8 49.1L64.9 49.0L71.7 48.8L76.3 48.4L78.5 48.0L80.8 47.3L8
 TRK["The Rock"]="M57.0 50.8L57.8 50.4L59.0 50.1L60.7 49.7L62.8 49.4L65.1 49.0L67.7 48.4L70.5 47.7L73.6 47.0L76.1 46.2L78.3 45.6L79.9 45.0L81.2 44.5L82.3 43.9L83.3 43.4L84.3 42.8L85.2 42.2L86.0 41.5L86.9 40.8L87.8 40.0L88.6 39.1L89.5 38.2L90.2 37.3L90.9 36.4L91.5 35.4L92.0 34.4L92.5 33.4L92.9 32.4L93.3 31.4L93.5 30.2L93.8 28.9L93.9 27.5L94.0 25.9L94.0 24.4L93.8 23.0L93.6 21.6L93.3 20.3L92.8 19.1L92.4 17.9L91.8 16.8L91.2 15.8L90.6 14.8L89.9 13.9L89.3 13.2L88.6 12.5L87.7 11.8L86.8 11.1L85.7 10.4L84.5 9.7L83.3 9.1L82.3 8.6L81.3 8.3L80.5 8.0L79.6 7.7L78.6 7.5L77.6 7.3L76.6 7.2L72.8 7.0L66.3 6.9L57.0 6.9L45.0 6.9L35.8 6.9L29.3 7.0L25.6 7.0L24.7 7.1L23.6 7.3L22.5 7.5L21.3 7.8L20.0 8.1L18.8 8.5L17.7 8.9L16.7 9.3L15.8 9.7L15.0 10.2L14.2 10.7L13.5 11.2L12.8 11.7L12.0 12.4L11.2 13.3L10.3 14.4L9.3 15.7L8.5 16.9L7.9 18.1L7.4 19.1L7.0 20.0L6.7 21.1L6.5 22.2L6.3 23.4L6.1 24.7L6.0 26.0L6.0 27.3L6.1 28.6L6.3 30.0L6.5 31.3L6.9 32.5L7.3 33.8L7.8 34.9L8.3 36.0L8.8 36.9L9.3 37.7L9.7 38.3L10.3 38.9L11.0 39.7L11.9 40.5L13.0 41.4L14.0 42.2L15.2 42.9L16.4 43.6L17.6 44.2L18.7 44.7L19.9 45.2L21.0 45.6L22.0 46.0L23.6 46.4L25.7 46.9L28.3 47.5L31.4 48.2L34.1 48.8L36.2 49.2L37.9 49.5L39.1 49.7L40.8 49.8L42.8 50.0L45.2 50.0L48.0 50.1L50.2 50.2L51.8 50.3L52.8 50.5L53.1 50.8L53.4 51.1L53.6 51.5L53.7 51.9L53.8 52.4L53.9 52.7L54.3 53.0L54.7 53.1L55.3 53.1L55.8 53.0L56.1 52.8L56.2 52.6L56.2 52.2L56.3 51.9L56.4 51.5L56.7 51.2Z";
 var TLEN={'Daytona':2.5,'Atlanta':1.54,'COTA':2.4,'Phoenix':1.0,'Las Vegas':1.5,'Darlington':1.366,'Martinsville':0.526,'Bristol':0.533,'Kansas':1.5,'Texas':1.5,'Watkins Glen':2.45,'Dover':1.0,'Charlotte':1.5,'Michigan':2.0,'San Diego':3.4,'Chicagoland':1.5,'Indianapolis':2.5,'Iowa':0.875,'Richmond':0.75,'Homestead':1.5,'The Rock':1.017};
 function lapMs(t){var L=TLEN[t]||1.5;return Math.round((1.4+1.2*L)*1000);}
-function trkSvg(name,col,fill,anim){
+function trkSvg(name,col,fill,anim,tc){
   var p=TRK[name]||TRK.Texas;
-  return '<svg viewBox="0 0 100 60" aria-hidden="true"><path d="'+p+'" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="6" stroke-linejoin="round"/><path d="'+p+'" fill="none" stroke="#3a4048" stroke-width="3.4" stroke-linejoin="round"/>'+(fill?'<path class="trace'+(anim?' go':'')+'" d="'+p+'" pathLength="1" fill="none" stroke="#22d36b" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"'+(anim?'':' style="stroke-dashoffset:0"')+'/>':'')+flMark(name)+'</svg>';
+  return '<svg viewBox="0 0 100 60" aria-hidden="true"><path d="'+p+'" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="6" stroke-linejoin="round"/><path d="'+p+'" fill="none" stroke="#3a4048" stroke-width="3.4" stroke-linejoin="round"/>'+(fill?'<path class="trace'+(anim?' go':'')+'" d="'+p+'" pathLength="1" fill="none" stroke="'+(tc||'#22d36b')+'" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"'+(anim?'':' style="stroke-dashoffset:0"')+'/>':'')+flMark(name)+'</svg>';
 }
 function fmtLap(v){return v&&v>0?v.toFixed(3):'–';}
 function buildTabs(car,x,d,N,pOv,pRaces,paintCol){
@@ -1949,13 +1950,13 @@ function buildTabs(car,x,d,N,pOv,pRaces,paintCol){
    (bl?rec('Quickest lap rank',ord(bl.v),bl.k):'')+
    rec('Wins / Poles / Fastest laps',x.wins+' / '+x.poles+' / '+x.fl,null)+rec('Stage wins',x.sw,null);
   var bar='<div class="tabs" id="ctabs"><button class="on" data-t="ov">Overview</button><button data-t="tk">Tracks</button><button data-t="ty">Types</button><button data-t="rc">Races</button><button data-t="rd">Records</button></div>';
-  return bar+'<div class="tp on" data-p="ov">'+pOv+'</div><div class="tp" data-p="tk">'+tr+'</div><div class="tp" data-p="ty">'+ty+'</div><div class="tp" data-p="rc">'+pRaces+'</div><div class="tp" data-p="rd">'+rc+'</div>';
+  return bar+'<div class="tpn on" data-p="ov">'+pOv+'</div><div class="tpn" data-p="tk">'+tr+'</div><div class="tpn" data-p="ty">'+ty+'</div><div class="tpn" data-p="rc">'+pRaces+'</div><div class="tpn" data-p="rd">'+rc+'</div>';
 }
 function bindTabs(){
   var tb=document.getElementById('ctabs'); if(!tb) return;
   Array.prototype.forEach.call(tb.querySelectorAll('button'),function(b){b.addEventListener('click',function(){
     Array.prototype.forEach.call(tb.querySelectorAll('button'),function(z){z.classList.toggle('on',z===b);});
-    Array.prototype.forEach.call(document.querySelectorAll('#sheet .tp'),function(p){p.classList.toggle('on',p.getAttribute('data-p')===b.getAttribute('data-t'));});
+    Array.prototype.forEach.call(document.querySelectorAll('#sheet .tpn'),function(p){p.classList.toggle('on',p.getAttribute('data-p')===b.getAttribute('data-t'));});
     LASTTAB=b.getAttribute('data-t');Array.prototype.forEach.call(document.querySelectorAll('#sheet .tt.open'),function(o){o.classList.remove('open');});document.getElementById('sheet').scrollTop=0;
   });});
   Array.prototype.forEach.call(document.querySelectorAll('#sheet .tyrow[data-ty]'),function(r){r.addEventListener('click',function(){var op=!r.classList.contains('open');Array.prototype.forEach.call(document.querySelectorAll('#sheet .tyrow.open'),function(o){o.classList.remove('open');});r.classList.toggle('open',op);});});
