@@ -1130,7 +1130,7 @@ function tower(L){
   h+='<div class="sec">Standings</div>';
   h+='<div class="leg">Red is points behind the leader. The small "to P4" line is points needed to catch the driver ahead.</div>';
   show.forEach(function(x,ix){
-    var ah=''; if(ix>0){var up=show[ix-1], dd=up.pts-x.pts; ah='<span class="ah">'+(dd?dd+' to P'+up.rank:'TIE P'+up.rank)+'</span>';}
+    var ah=''; if(ix>1){var up=show[ix-1], dd=up.pts-x.pts; ah='<span class="ah">'+(dd?dd+' to P'+up.rank:'TIE P'+up.rank)+'</span>';}
     h+='<div class="row'+(x.inChase?' in':'')+'" data-car="'+esc(x.car)+'">'+
       '<div class="rk">'+x.rank+'</div>'+delta(x)+chip(x.car)+
       '<div><div class="n1">'+esc(dispName(x.d))+stars(x)+pepper(x.d.car)+'</div><div class="n2 tgl"><span class="tg">'+esc(x.d.tag)+'</span>'+team(x.d)+'</div></div>'+
