@@ -351,11 +351,23 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 .sb .sbar i,.or .bar i{background:linear-gradient(90deg,#14804a,#22d36b)}
 .pickbar button.on,.bkb button.gold{color:#04140a}
 </style>
+<style id="pace-motion">
+/* Load-in animation: rows slide in from the left, top to bottom. Plays on first load, on tab change, and from the replay button. */
+@keyframes paceIn{from{transform:translateX(-46px);opacity:0}to{transform:none;opacity:1}}
+.anim-in{animation:paceIn .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d,0ms)}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#replay{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--mut);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+#replay:active{background:rgba(255,255,255,.12);color:var(--txt)}
+#replay svg{width:22px;height:22px;display:block}
+#replay.spin svg{animation:paceSpin .6s cubic-bezier(.4,.1,.2,1)}
+@keyframes paceSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.anim-in,#replay.spin svg{animation:none}}
+</style>
 </head>
 <body>
 <div class="wrap">
 <header>
-  <div class="brand">Pace <b>Point</b> Standings</div>
+  <div class="brand"><span>Pace <b>Point</b> Standings</span><button id="replay" type="button" aria-label="Replay animation" title="Replay animation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.5-4.4M4 5v3.6h3.6"/><path d="M4 13a8 8 0 0 0 14.5 4.4M20 19v-3.6h-3.6"/></svg></button></div>
   <div class="sub" id="sub"></div>
   <div class="next" id="next"></div>
   <nav id="tabs">
@@ -1723,6 +1735,17 @@ function showPaint(w){
 }
 document.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest('[data-pw]');if(el){e.stopPropagation();e.preventDefault();showPaint(el.getAttribute('data-pw'));}},true);
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(document.getElementById('ov').classList.contains('on'))closeSheet();else closeBracket();}});
+var animNext=true;
+function animateIn(){
+  var els=document.querySelectorAll('#main .row,#main .srow,#main .rr,#main .crow,#main .lcard,#main .card,#main .tb,#main .call,#main .sum div');
+  Array.prototype.forEach.call(els,function(el){el.classList.remove('anim-in');});
+  void document.body.offsetWidth;
+  Array.prototype.forEach.call(els,function(el,i){
+    el.style.setProperty('--d',Math.min(i*30,600)+'ms');
+    el.classList.add('anim-in');
+    el.addEventListener('animationend',function f(){el.classList.remove('anim-in');el.removeEventListener('animationend',f);});
+  });
+}
 function render(){
   hdr();
   var L=C.standings(D,st.n), m=document.getElementById('main');
@@ -1741,8 +1764,11 @@ function render(){
   var vt=document.getElementById('vtog'); if(vt) vt.addEventListener('click',function(){st.vopen=!st.vopen;render();});
   var mo=document.getElementById('more'); if(mo) mo.addEventListener('click',function(){st.all=!st.all;render();});
   Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.toggle('on',b.getAttribute('data-t')===st.tab);});
+  if(animNext){animNext=false;animateIn();}
 }
-Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.addEventListener('click',function(){st.tab=b.getAttribute('data-t');st.view='all';st.vopen=false;render();window.scrollTo(0,0);});});
+Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.addEventListener('click',function(){st.tab=b.getAttribute('data-t');st.view='all';st.vopen=false;animNext=true;render();window.scrollTo(0,0);});});
+var rp_=document.getElementById('replay');
+if(rp_) rp_.addEventListener('click',function(){rp_.classList.remove('spin');void rp_.offsetWidth;rp_.classList.add('spin');animateIn();});
 render();
 })();
 </script>
