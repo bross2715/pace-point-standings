@@ -1053,7 +1053,7 @@ function bracketView(keep){
   var LK=isLocked();
   if(LK) h+='<div class="pnote" style="text-align:left;padding:0 0 8px"><b>&#128274; Locked in.</b> You sent your bracket, so your picks can\'t be changed. Tap Send my bracket to copy it again.</div>';
   h+='<input class="bnm" id="bname" maxlength="24" placeholder="Your name" value="'+esc(myname)+'"'+(LK?' readonly':'')+'>';
-  h+='<div class="bkb"><button id="bshare" class="gold">'+(LK?'Send my bracket again':'Send my bracket')+'</button>'+(LK?'':'<button id="bclr">Clear my picks</button>')+'</div>'+(LK?'':'<div class="pnote" style="text-align:left;padding:0 0 8px">Heads up: tapping Send my bracket locks your picks.</div>')+'<div id="bshout"></div>';
+  h+='<div class="bkb"><button id="bshare" class="gold">'+(LK?'Send my bracket again':'Send my bracket')+'</button>'+'</div>'+(LK?'':'<div class="pnote" style="text-align:left;padding:0 0 8px">Heads up: tapping Send my bracket locks your picks.</div>')+'<div id="bshout"></div>';
   h+='<div id="tsc" style="overflow-x:auto;margin:0 -14px;padding:0 14px 6px"><div class="tree">';
   function side(car,m,fp,isW,isL){
     if(car===null) return '<div class="tp by">'+(m.st==='tbd'?'TBD':'Bye')+'</div>';
