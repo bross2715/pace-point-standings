@@ -163,7 +163,7 @@ td.r,th.r{text-align:right}
 .hg span{display:block;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut)}
 .hg b{display:block;font-family:var(--hd);font-weight:800;font-size:34px;line-height:1.05;margin-top:2px}
 .hg em{display:block;font-style:normal;font:700 11px/1 'Barlow',sans-serif;margin-top:4px;letter-spacing:.3px}
-.cstrip{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.cstrip{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.cstrip.c4{grid-template-columns:repeat(4,1fr)}
 .cs{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 2px 7px;text-align:center;cursor:pointer}
 .cs b{display:block;font-family:var(--hd);font-weight:800;font-size:24px;line-height:1}
 .cs span{display:block;margin-top:4px;font-size:8.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);white-space:nowrap}
@@ -436,7 +436,7 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 .ovr .big{font-family:var(--hd);font-weight:800;font-size:54px;line-height:.9;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.5)}
 .ovr .big small{display:block;font-size:11px;letter-spacing:1.6px;color:var(--mut);font-weight:700;margin-bottom:3px}
 .ovr .atts{flex:1;display:grid;gap:5px}
-.att{display:grid;grid-template-columns:62px 1fr 26px;align-items:center;gap:7px;font-family:var(--hd);font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--mut)}
+.att{display:grid;grid-template-columns:62px 1fr 34px;align-items:center;gap:7px;font-family:var(--hd);font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--mut)}
 .att i{display:block;height:7px;background:#1a1d22;border-radius:4px;overflow:hidden}.att i u{display:block;height:100%;border-radius:4px}
 .att b{color:#fff;text-align:right;font-size:12px}
 .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -1799,12 +1799,7 @@ var DESCS={
 var TITLES=['Leader of the pack','Hot on the trail','Podium chasers','Knocking on the door','Top five and climbing','Right in the mix','Solid midfield','Still in it','Middle of the pack','Quietly grinding','Hanging around','Chase line','Need a spark','Bubble trouble','Right on the cut','Below the line','Bottom feeder','Dog pound','Kennel club','Dog pound VIP'];
 function titleOf(r){return TITLES[r-1]||'Dog pound';}
 function ord(n){var t=n%100;var suf=(t>=11&&t<=13)?'th':({1:'st',2:'nd',3:'rd'})[n%10]||'th';return n+'<sup>'+suf+'</sup>';}
-function ptColor(p){
-  var lo=[255,59,59], mid=[255,200,61], hi=[34,211,107], from, to, t;
-  if(p<=0.5){from=lo;to=mid;t=p/0.5;}else{from=mid;to=hi;t=(p-0.5)/0.5;}
-  function m(i){return Math.round(from[i]+(to[i]-from[i])*t);}
-  return 'rgb('+m(0)+','+m(1)+','+m(2)+')';
-}
+function ptColor(p){p=Math.max(0,Math.min(1,p));var h=p<.5?p*2*52:52+(p-.5)*2*80;return 'hsl('+Math.round(h)+',100%,'+(p<.5?54:50)+'%)';}
 function mfrIco(a,cls){var m=teamMfr(a),im=(D.mfrImg||{})[m];return im?'<img class="pl mf'+(cls?' '+cls:'')+'" alt="'+m+'" src="'+im+'">':'';}
 function platIco(d,sm){var im=(D.platImg||{})[d.plat];return im?'<img class="pl'+(sm?' s':'')+'" alt="'+(d.plat=='XB'?'Xbox':'PlayStation')+'" src="'+im+'">':'';}
 function detail(car){
@@ -1848,9 +1843,9 @@ function detail(car){
   function g(v,l,k,extra){return '<div class="g"'+(k?' data-k="'+k+'"':'')+'><b>'+v+'</b><span>'+l+'</span>'+(extra||'')+'</div>';}
   function sg(v){return v==null?'N/A':(v>0?'+':'')+(Math.round(v*10)/10);}
   var paintCol=(PAINT&&PAINT[car])||d.c1;var _h=paintCol.replace('#','');if(_h.length===6&&(parseInt(_h.substr(0,2),16)*.3+parseInt(_h.substr(2,2),16)*.59+parseInt(_h.substr(4,2),16)*.11)<60)paintCol='#9aa3ad';
-  function att(l,k){var i=RK[k]&&RK[k][car];if(!i)return '';var p=i.n>1?(i.n-i.rank)/(i.n-1):1;var v=Math.round(40+p*59);return '<div class="att" data-lb="'+k+'" style="cursor:pointer"><span>'+l+'</span><i><u style="width:'+v+'%;background:'+ptColor(p)+'"></u></i><b>'+v+'</b></div>';}
+  function att(l,k){var i=RK[k]&&RK[k][car];if(!i)return '';var p=i.n>1?(i.n-i.rank)/(i.n-1):1;var v=Math.round(40+p*59);return '<div class="att" data-lb="'+k+'" style="cursor:pointer"><span>'+l+'</span><i><u style="width:'+v+'%;background:'+ptColor(p)+'"></u></i><b style="color:'+ptColor(p)+'">'+ord(i.rank)+'</b></div>';}
   var ovrV=x.rating==null?'--':Math.round(x.rating);
-  h+='<div class="ovr"><div class="big" data-lb="rating" style="cursor:pointer"><small>RATING</small>'+ovrV+'</div><div class="atts">'+att('Pace','pace')+att('Finish','avg')+att('Start','avgQ')+att('Racecraft','gain')+att('Speed','speed')+'</div></div>';
+  h+='<div class="ovr"><div class="big" data-lb="rating" style="cursor:pointer"><small>RATING</small>'+ovrV+'</div><div class="atts">'+att('Pace','pace')+att('Speed','speed')+att('Racecraft','gain')+att('Stage','stg')+'</div></div>';
   var hHead=h; h='<div class="body" style="padding:0">';
   function rnkOf(k){var i=RK[k]&&RK[k][car];if(!i)return null;var p=i.n>1?(i.n-i.rank)/(i.n-1):1;return {r:i.rank,p:p,c:ptColor(p)};}
   function hero(v,l,k,sub){var q=k&&rnkOf(k);return '<div class="hg"'+(k?' data-k="'+k+'"':'')+'><span>'+l+'</span><b>'+v+'</b>'+(q?'<em style="color:'+q.c+'">'+ord(q.r)+' in field</em>':'<em>'+(sub||'')+'</em>')+'</div>';}
