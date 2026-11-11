@@ -487,7 +487,8 @@ html[data-mv] .tpn.on{animation:none}
 .mv-pre{opacity:0}
 .mv-go,.anim-in{animation-name:mvF;animation-duration:.9s;animation-timing-function:cubic-bezier(.22,.61,.36,1);animation-fill-mode:both;animation-delay:var(--d,0ms)}
 .mv-bar{transition:width 1.2s cubic-bezier(.22,.61,.36,1) var(--bd,0ms),left 1.2s cubic-bezier(.22,.61,.36,1) var(--bd,0ms)}
-@media (prefers-reduced-motion:reduce){.mv-pre{opacity:1}.mv-go,.anim-in{animation:none}.mv-bar{transition:none}}
+.mv-line{transition:stroke-dashoffset 1.8s cubic-bezier(.45,.05,.25,1) var(--ld,0ms)}.mv-dot{transition:opacity .6s ease var(--dd,0ms)}
+@media (prefers-reduced-motion:reduce){.mv-line{transition:none}.mv-dot{transition:none}.mv-pre{opacity:1}.mv-go,.anim-in{animation:none}.mv-bar{transition:none}}
 </style>
 </head>
 <body>
@@ -2406,8 +2407,13 @@ var CURSH=null, NAV={idx:0,max:0,busy:false,key:null};
     return out;
   }
   function bars(u){return [].slice.call(u.querySelectorAll('i > u, i.rb, i.ra, .hcb i'));}
+  function charts(u){return [].slice.call(u.querySelectorAll('svg[aria-label$="by race"]'));}
   function hide(u){
     u.classList.remove('mv-go');u.classList.add('mv-pre');
+    charts(u).forEach(function(sv){
+      [].forEach.call(sv.querySelectorAll('path[fill="none"]'),function(pa){pa.setAttribute('pathLength','1');pa.classList.remove('mv-line');pa.style.strokeDasharray='1';pa.style.strokeDashoffset='1';});
+      [].forEach.call(sv.querySelectorAll('circle'),function(c){c.classList.remove('mv-dot');c.style.opacity='0';});
+    });
     bars(u).forEach(function(b){
       if(!b.dataset.w){b.dataset.w=b.style.width||'';b.dataset.l=b.style.left||'';}
       b.classList.add('mv-bar');b.classList.remove('lit');
@@ -2433,6 +2439,11 @@ var CURSH=null, NAV={idx:0,max:0,busy:false,key:null};
     u.style.setProperty('--d',d+'ms');
     u.classList.toggle('odd',i%2===1);
     u.classList.remove('mv-pre');u.classList.add('mv-go');
+    charts(u).forEach(function(sv){
+      var cs=[].slice.call(sv.querySelectorAll('circle')),xs=cs.map(function(c){return parseFloat(c.getAttribute('cx'));}),x0=Math.min.apply(null,xs),x1=Math.max.apply(null,xs),span=(x1-x0)||1;
+      [].forEach.call(sv.querySelectorAll('path[fill="none"]'),function(pa){pa.style.setProperty('--ld',(d+250)+'ms');pa.classList.add('mv-line');requestAnimationFrame(function(){requestAnimationFrame(function(){pa.style.strokeDashoffset='0';});});});
+      cs.forEach(function(c,i){c.style.setProperty('--dd',(d+250+((xs[i]-x0)/span)*1500)+'ms');c.classList.add('mv-dot');requestAnimationFrame(function(){requestAnimationFrame(function(){c.style.opacity='1';});});});
+    });
     bars(u).forEach(function(b,j){
       b.style.setProperty('--bd',(d+200+j*60)+'ms');
       requestAnimationFrame(function(){requestAnimationFrame(function(){
@@ -2445,7 +2456,7 @@ var CURSH=null, NAV={idx:0,max:0,busy:false,key:null};
     var sh=document.getElementById('sheet');if(!sh||!document.getElementById('ov').classList.contains('on'))return;
     if(io){io.disconnect();io=null;}
     var all=units(sh,0);
-    all.forEach(function(u){u.classList.remove('mv-go','mv-pre');bars(u).forEach(function(b){if(b.dataset.w!==undefined){b.style.width=b.dataset.w;if(b.dataset.l)b.style.left=b.dataset.l;}});});
+    all.forEach(function(u){charts(u).forEach(function(sv){[].forEach.call(sv.querySelectorAll('path[fill="none"]'),function(pa){pa.style.strokeDashoffset='0';pa.classList.remove('mv-line');});[].forEach.call(sv.querySelectorAll('circle'),function(c){c.style.opacity='1';c.classList.remove('mv-dot');});});u.classList.remove('mv-go','mv-pre');bars(u).forEach(function(b){if(b.dataset.w!==undefined){b.style.width=b.dataset.w;if(b.dataset.l)b.style.left=b.dataset.l;}});});
     if(!on())return;
     var pane=sh.querySelector('.tpn.on');var list=all.filter(function(u){return !sh.querySelector('.tpn:not(.on)')||!([].slice.call(sh.querySelectorAll('.tpn:not(.on)')).some(function(p){return p.contains(u);}));});
     list.forEach(hide);
