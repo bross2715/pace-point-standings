@@ -2023,8 +2023,9 @@ function buildTabs(car,x,d,N,pOv,pRaces,paintCol){
     if(ri<0){ tr+='<div class="tt up">'+trkSvg(t,'#5b626c',false)+'<h4>'+esc(t)+'</h4><div class="ty">'+esc(ty)+' · upcoming</div></div>'; return; }
     var f=x.fin[ri], q=D.races[ri].qual&&D.races[ri].qual[car], ql=D.races[ri].qlap&&D.races[ri].qlap[car];
     var fl=f?'P'+f:(x.fre[ri]?'FREE':'DNS');
-    tr+='<div class="tt" data-tt="1" data-trk="'+esc(t)+'"><div class="fp" style="color:'+(f?fc(f):'var(--mut)')+'">'+fl+'</div>'+trkSvg(t,paintCol,true)+'<h4>'+esc(t)+' <span style="color:var(--mut);font-size:11px">R'+(ri+1)+'</span></h4><div class="ty">'+esc(ty)+'</div>'+
-     '<div class="mini"><span>Start <b>'+(q?'P'+q:'–')+'</b></span><span>Pts <b>'+x.r[ri]+'</b></span></div>'+
+    var rr=raceRating(ri), tp=rr==null?null:Math.max(0,Math.min(1,(rr-25)/70));
+    tr+='<div class="tt" data-tt="1" data-trk="'+esc(t)+'"><div class="fp" style="color:'+(f?fc(f):'var(--mut)')+'">'+fl+'</div>'+trkSvg(t,paintCol,true,false,tp==null?paintCol:ptColor(tp))+'<h4>'+esc(t)+' <span style="color:var(--mut);font-size:11px">R'+(ri+1)+'</span></h4><div class="ty">'+esc(ty)+'</div>'+
+     '<div class="mini"><span>Start <b>'+(q?'P'+q:'–')+'</b></span><span>Pts <b>'+x.r[ri]+'</b></span><span>Rating <b>'+(rr==null?'\u2013':Math.round(rr))+'</b></span></div>'+
      '<div class="st">'+
       '<div data-rl="'+ri+':qual" class="lk"><span>Qualifying position</span><b>'+(q?'P'+q:'–')+'</b></div>'+
       '<div data-rl="'+ri+':qlap" class="lk"><span>Qualifying lap</span><b>'+(ql?(+ql).toFixed(3):'–')+'</b></div>'+
@@ -2039,7 +2040,7 @@ function buildTabs(car,x,d,N,pOv,pRaces,paintCol){
       '<div data-rl="'+ri+':rating" class="lk"><span>Driver rating here</span><b>'+(raceRating(ri)==null?'\u2013':raceRating(ri).toFixed(1))+'</b></div>'+
      '</div></div>';
   });
-  tr+='</div><div class="call" style="margin-top:10px;font-size:11px">Track outlines are simplified drawings, not exact maps. Tap a track for the full breakdown.</div>';
+  tr+='</div><div class="call" style="margin-top:10px;font-size:11px">Track outlines are simplified drawings, not exact maps. The outline color shows how well he ran there (driver rating). Tap a track for the full breakdown.</div>';
   // TYPES tab
   var types={};
   for(var k=0;k<N;k++){ var t=D.races[k].track, tyn=(D.trackTypes||{})[t]||'Other'; if(!x.fin[k]) continue;
@@ -2098,10 +2099,7 @@ function bindTabs(){
       var tr=t.querySelector('.trace'), op=!t.classList.contains('open');
       if(op) Array.prototype.forEach.call(document.querySelectorAll('#sheet .tt.open'),function(o){o.classList.remove('open');var ot=o.querySelector('.trace');if(ot){ot.classList.remove('go');ot.removeAttribute('style');ot.style.strokeDashoffset='0';}});
       t.classList.toggle('open',op);
-      if(!tr) return;
-      tr.classList.remove('go'); tr.removeAttribute('style');
-      if(op){ tr.style.animationDuration=_lap+'ms'; void tr.getBoundingClientRect(); tr.classList.add('go'); }
-      else tr.style.strokeDashoffset='0';
+      return;
     });
   });
   Array.prototype.forEach.call(document.querySelectorAll('#sheet .trace'),function(tr){tr.style.strokeDashoffset='0';});
