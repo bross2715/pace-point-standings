@@ -2268,6 +2268,7 @@ Object.keys(LBNOTE).forEach(function(k){if(DESCS[k])DESCS[k][1]=LBNOTE[k].replac
 function showRLB(car,k,key){
   var N=ovw()?R:st.n, L=C.standings(D,N), race=D.races[k], fs=D.fieldSize||18;
   var T={qual:['Starting position',0,function(v){return 'P'+v;}],qlap:['Qualifying lap',0,function(v){return v.toFixed(3);}],lap:['Best race lap',0,function(v){return v.toFixed(3);}],speed:['Speed rank',0,function(v){return ord(v);}],fin:['Finish',0,function(v){return 'P'+v;}],pts:['Points',1],rating:['Driver rating',1,function(v){return v.toFixed(1);}]}[key];
+  var RN={qual:'<b>Starting position</b> is the spot a driver lined up in for this race. 1st is the pole.',qlap:'<b>Qualifying lap</b> is the single lap that set the starting order. Lower is faster.',lap:'<b>Best race lap</b> is each driver\'s quickest lap during the race itself. Lower is faster.',speed:'<b>Speed rank</b> lines every driver up by their best race lap. 1st had the quickest lap of this race.',fin:'<b>Finish</b> is where each driver ended this race.',pts:'<b>Points</b> are the points each driver earned in this race: finishing points, stage points and fastest lap.',rating:'<b>Driver rating</b> for this race: one score from 0 to 100 that mixes the finish, how fast the car was, how the finish compared with the start, and stage points.'};
   var rows=[];
   L.forEach(function(v){
     var q=null, f=v.fin[k];
@@ -2281,7 +2282,7 @@ function showRLB(car,k,key){
     if(q!=null) rows.push({car:v.car,v:q});
   });
   rows.sort(function(a,b){return T[1]?b.v-a.v:a.v-b.v;});
-  lbView(car,T[0]+' · '+race.track,'Race '+(k+1)+' · '+((D.trackTypes||{})[race.track]||''),rows,T[2]);
+  lbView(car,T[0]+' · '+race.track,'Race '+(k+1)+' · '+((D.trackTypes||{})[race.track]||''),rows,T[2],RN[key]);
 }
 function raceRatingFor(x,k,fs){
   var f=x.fin[k]; if(!f) return null; var q=D.races[k].qual&&D.races[k].qual[x.car];
@@ -2322,31 +2323,31 @@ function bindFlip(map){
   });
 }
 var TDESC={
-  rank:['Team rank','Position in the team standings by team points. Ties go to wins, then team name.'],
-  pts:['Team points','Each race, the three best point scorers on the team count. This is those counted points added up over every race.'],
-  wins:['Wins','Race wins by any driver on the team.'],
-  starts:['Starts','Race starts by all team drivers added together. Freebies do not count.'],
-  avg:['Avg finish','Average finishing position across every race result from the team drivers. Lower is better.'],
-  best:['Best finish','The best finishing position any team driver got in any race.'],
-  worst:['Worst finish','The worst finishing position any team driver got in any race.'],
-  t5:['Top 5','Top five finishes by team drivers, added together across races.'],
-  t10:['Top 10','Top ten finishes by team drivers, added together across races.'],
-  sw:['Stage wins','Stage 1 or stage 2 wins by team drivers.'],
-  sp:['Stage points','Stage points earned by every driver on the team, all season.'],
-  fl:['Fastest laps','Races where a team driver set the fastest lap.'],
-  avgQ:['Avg start','Average starting spot across every start by team drivers. Lower is better.'],
-  poles:['Poles','Races where a team driver started on the pole.'],
-  drv:['Drivers','Drivers on the team roster.'],
-  rating:['Driver Rating','The average Driver Rating of the team drivers, 0 to 100. Higher is better.'],
-  pace:['Pace','The average of every team driver race pace score (0 to 100). Each score is half qualifying and half race best lap rank. Higher is better.'],
-  speed:['Avg speed rank','Each race ranks all cars by best race lap, 1 being quickest. This averages the ranks of every team driver across races. Lower is better.'],
-  pct:['Off fastest','How far each team driver best lap was off the fastest lap of the race, as a percentage, averaged. Lower is better.'],
-  bspeed:['Best speed rank','The best spot any team driver got in the lap time line up of a race. 1st means a team driver had the quickest lap. Lower is better.'],
-  vs:['Vs speed','Speed rank minus finishing position, averaged over every team result. Positive means finishing better than the best lap suggested. Higher is better.'],
-  gain:['Spots gained','Starting spot minus finishing spot, averaged over every team result. Positive means gaining spots. Higher is better.'],
-  rc:['Racecraft','How well the team manages races given where it starts. Each result compares the running spot (Stage 1, Stage 2 and finish) with what the field typically runs from the same starting spot. Higher is better.'],
-  cb:['Best comeback','The biggest comeback by any team driver: worst stage position minus finish, in races with full stage data. Higher is better.'],
-  stg:['Avg stage pos','Average position across both stages, over every team result. Lower is better.']
+  rank:["Team rank","Where the team sits in the team standings, based on team points. Ties go to wins, then team name."],
+  pts:["Team points","Each race, the three best point scorers on the team count. This is those points added up over every race."],
+  wins:["Wins","How many races a driver on the team has won."],
+  starts:["Starts","How many races the team drivers started, added together. Freebies do not count."],
+  avg:["Avg finish","The spot the team drivers usually finish in, across every result. Lower is better."],
+  best:["Best finish","The best spot any driver on the team has finished in a race."],
+  worst:["Worst finish","The worst spot any driver on the team has finished in a race."],
+  t5:["Top 5","How many finishes in the top five the team drivers have, added together."],
+  t10:["Top 10","How many finishes in the top ten the team drivers have, added together."],
+  sw:["Stage wins","How many times a team driver was first at the end of Stage 1 or Stage 2."],
+  sp:["Stage points","Bonus points for being in the top five at the end of a stage, added up for the whole team."],
+  fl:["Fastest laps","How many races a team driver turned the quickest lap of the whole field."],
+  avgQ:["Avg start","Where the team drivers usually line up on the grid. Lower means starting closer to the front."],
+  poles:["Poles","How many races a team driver started from the front spot."],
+  drv:["Drivers","The drivers on the team roster."],
+  rating:["Driver Rating","The average Driver Rating of the team drivers, from 0 to 100. Higher is better."],
+  pace:["Pace","How fast the team is, scored 0 to 100. It mixes qualifying with how the best race laps rank. Higher is quicker. Pace says how fast. Vs speed says whether that speed turns into finishes."],
+  speed:["Avg speed rank","After each race we rank every driver by their fastest lap, 1st being quickest. This averages those ranks for the team. Lower is faster."],
+  pct:["Off fastest","How far the team drivers best laps were from the quickest lap of the race, as a percent. Lower is better."],
+  bspeed:["Best speed rank","The best spot any team driver got when we ranked the fastest laps in a race. 1st means a team driver had the quickest lap."],
+  vs:["Vs speed","Checks if the team finishes where its speed says it should. Speed rank minus finishing spot, averaged. Plus means finishing ahead of the speed, so the team gets more out of its cars. Minus means a fast car without the results."],
+  gain:["Spots gained","Starting spot minus finishing spot, averaged over every team result. Plus means moving up from the start to the finish."],
+  rc:["Racecraft","How well the team runs races given where it starts. Teams that start in back can move up and teams that start in front usually slip, so each result is compared with what the whole field usually does from that same starting spot. Plus is better than usual."],
+  cb:["Best comeback","The biggest climb by any team driver from the worst running spot in a stage to the finish."],
+  stg:["Avg stage pos","The spot the team drivers usually hold at the end of Stage 1 and Stage 2. Lower is better."]
 };
 function teamDetail(name){
   var N=st.n, L=C.standings(D,N), T=C.teams(D,L);
