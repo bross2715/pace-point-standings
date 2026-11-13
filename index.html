@@ -816,6 +816,8 @@ html[data-mv] .tpn.on{animation:none}
         if (!dnf) { const real = !!(rr.ft && rr.ft[o.car]); o.fullT[i] = real ? rr.ft[o.car] : (dn > 0 ? tsec[i] + dn * tsec[i] / L : mine); o.fullEst[i] = !real && !(pos === 1 && !test[i]); } if (test[i]) es++;
       }
       o.lapsRun = lp; o.secsRun = sc; o.estRun = es;
+      var gs = 0, gn = 0; for (let i = 0; i < n; i++) { if (o.fullT[i] > 0 && tsec[i] > 0) { gs += (o.fullT[i] / tsec[i] - 1) * 100; gn++; } }
+      o.gapw = gn >= 3 ? gs / gn : null; o.gapN = gn;
     });
     return out;
   }
@@ -1990,8 +1992,9 @@ var DESCS={
   cons:['Consistency','Steady and good. It is the driver\'s average finish plus how much finishes swing, so it shows where a bad day usually lands. A driver who is steady but slow scores poorly. Lower is better.'],
   t5r:['Top 5 rate','Share of races started that ended in the top five.'],
   t10r:['Top 10 rate','Share of races started that ended in the top ten.'],
-  secs:['Time on track','Estimated total time the driver has spent racing this season. Lead-lap and lapped cars that ran to the end get the full race time. Higher means more time driven.'],
-  lapsrun:['Laps driven','Total laps the driver has turned in races started: race laps minus laps down, added up. Higher means more driven.'],
+  secs:['Time on track','Estimated total time the driver has spent racing this season. Workload only, not ranked. More time means more races run, not better results.'],
+ gapw:['Time behind winner','How far behind the winner a driver finishes, on average, as a percent of race time. Lower is better. Needs 3 finishes.'],
+  lapsrun:['Laps driven','Total laps the driver has turned in races started: race laps minus laps down, added up. Workload only, not ranked.'],
   pps:['Points per start','Points earned in races started, divided by races started. Freebies do not count.'],
   rc:['Racecraft','How well a driver manages the race given the starting spot. Each race compares the driver\'s average running spot at Stage 1, Stage 2 and the finish with what the field typically runs from that same starting spot, in spots. Plus means better than typical for that start. Back starters get no free credit for moving up, and front starters are not punished for slipping back like most of the field does.'],
   cb:['Best comeback','Biggest comeback: worst stage position minus finish, in races with full stage data. Higher is better.'],
@@ -2029,8 +2032,7 @@ function detail(car){
   RK.t5r=rankIdx(L,function(v){return v.t5r;},true);
   RK.t10r=rankIdx(L,function(v){return v.t10r;},true);
   RK.pps=rankIdx(L,function(v){return v.pps;},true);
-  RK.secs=rankIdx(L,function(v){return v.secsRun>0?v.secsRun:null;},true);
-  RK.lapsrun=rankIdx(L,function(v){return v.lapsRun>0?v.lapsRun:null;},true);
+  RK.gapw=rankIdx(L,function(v){return v.gapw;},false);
   RK.cb=rankIdx(L,function(v){return v.cb>0?v.cb:null;},true);
   RK.stg=rankIdx(L,function(v){return v.avgStg;},false);
   RK.rank=rankIdx(L,function(v){return v.rank;},false);
@@ -2082,8 +2084,9 @@ function detail(car){
     srow('Top 10 rate',x.t10r==null?'N/A':Math.round(x.t10r)+'%','t10r')+
     srow('Points per start',x.pps==null?'N/A':x.pps.toFixed(1),'pps')+'</div>';
   h+='<div class="sec">Time on track</div><div class="srows">'+
-    srow('Time on track',x.secsRun>0?hms(x.secsRun):'N/A','secs',x.estRun?'includes '+x.estRun+' estimated race'+(x.estRun>1?'s':''):'')+
-    srow('Laps driven',x.lapsRun>0?x.lapsRun:'N/A','lapsrun')+'</div>';
+    srow('Time behind winner',x.gapw==null?'N/A':'+'+x.gapw.toFixed(2)+'%','gapw',x.gapw==null?'needs 3 finishes':'avg per finish, lower is better')+
+    '<div class="sr"><span>Time on track'+(x.estRun?'<small>includes '+x.estRun+' estimated race'+(x.estRun>1?'s':'')+'</small>':'')+'</span><i></i><b>'+(x.secsRun>0?hms(x.secsRun):'N/A')+'</b><em></em></div>'+
+    '<div class="sr"><span>Laps driven</span><i></i><b>'+(x.lapsRun>0?x.lapsRun:'N/A')+'</b><em></em></div></div>';
   // trend
   var W=320,H=120,pl=26,pr=10,pt=10,pb=18,maxP=Math.max(D.fieldSize,x.worst||1,1);
   var pts=[];
@@ -2238,7 +2241,7 @@ function buildTabs(car,x,d,N,pOv,pRaces,paintCol){
     var f=x.fin[ri], q=D.races[ri].qual&&D.races[ri].qual[car], ql=D.races[ri].qlap&&D.races[ri].qlap[car];
     var fl=f?'P'+f:(x.fre[ri]?'FREE':'DNS');
     var rr=raceRating(ri), tp=rr==null?null:Math.max(0,Math.min(1,(rr-25)/70));
-    tr+='<div class="tt" data-tt="1" data-trk="'+esc(t)+'"><div class="fp" style="color:'+(f?fc(f):'var(--mut)')+'">'+fl+'</div>'+trkSvg(t,paintCol,true,false,tp==null?paintCol:ptColor(tp))+'<h4>'+esc(t)+' <span style="color:var(--mut);font-size:11px">R'+(ri+1)+'</span></h4><div class="ty">'+esc(ty)+'</div>'+
+    tr+='<div class="tt" data-tt="1" data-trk="'+esc(t)+'"><div class="fp" style="color:'+(f?fc(f):'var(--mut)')+'">'+fl+'</div>'+(f?trkSvg(t,paintCol,true,false,tp==null?paintCol:ptColor(tp)):trkSvg(t,'#5b626c',true,false,'#5b626c'))+'<h4>'+esc(t)+' <span style="color:var(--mut);font-size:11px">R'+(ri+1)+'</span></h4><div class="ty">'+esc(ty)+'</div>'+
      '<div class="mini"><span>Start <b>'+(q?'P'+q:'–')+'</b></span><span>Pts <b>'+x.r[ri]+'</b></span><span>Rating <b>'+(rr==null?'\u2013':Math.round(rr))+'</b></span></div>'+
      '<div class="st">'+
       '<div data-rl="'+ri+':qual" class="lk"><span>Qualifying position</span><b>'+(q?'P'+q:'–')+'</b></div>'+
@@ -2327,8 +2330,7 @@ var LBD={
  t5r:['Top 5 rate',function(v){return v.t5r;},1,function(v){return Math.round(v)+'%';}],
  t10r:['Top 10 rate',function(v){return v.t10r;},1,function(v){return Math.round(v)+'%';}],
  pps:['Points per start',function(v){return v.pps;},1,function(v){return v.toFixed(1);}],
- secs:['Time on track',function(v){return v.secsRun>0?v.secsRun:null;},1,function(v){return hms(v);}],
- lapsrun:['Laps driven',function(v){return v.lapsRun>0?v.lapsRun:null;},1],
+ gapw:['Time behind winner',function(v){return v.gapw;},0,function(v){return '+'+v.toFixed(2)+'%';}],
  rank:['Points rank',function(v){return v.rank;},0,function(v){return '#'+v;}],
  pts:['Points',function(v){return v.pts;},1],
  avg:['Avg finish',function(v){return v.avg;},0,function(v){return v.toFixed(1);}],
@@ -2406,8 +2408,7 @@ var LBNOTE={
  "cons": "<b>Consistency</b> only counts if you are also good. We take a driver's average finish and add how much their finishes bounce around. The result is where a bad day usually lands. Someone who finishes 8th every week lands near 8th. Someone who bounces between 2nd and 10th lands near 9th. Steady but slow does not score well, and fast but wild does not either. Lower is better, and it needs 3 starts.",
  "t5r": "<b>Top 5 rate</b> is the share of races started that ended in the top five.",
  "t10r": "<b>Top 10 rate</b> is the share of races started that ended in the top ten.",
- "secs": "<b>Time on track</b> is how long a driver has spent racing this season. Everyone who runs to the end of a race is out there for the whole race, so it uses their own finish time, which is why drivers who finish a few seconds apart end up a few seconds apart here. Cars that DNF get a share based on the laps they ran. Skipped races and freebies add nothing. Races marked estimated do not have a full set of real times yet, so those are close but not exact.",
- "lapsrun": "<b>Laps driven</b> is every lap a driver has turned in races they started. A driver who finishes 5 laps down in a 175 lap race drove 170 laps. Skipped races and freebies add nothing.",
+ "gapw": "<b>Time behind winner</b> is how far back a driver finishes, on average, as a percent of the race time. +0.50% on a 90 minute race is about 27 seconds. Lower is better, and it only counts drivers with at least 3 finishes, so a driver who has barely raced cannot sit on top. Drivers who did not finish are left out.",
  "pps": "<b>Points per start</b> is points earned in races started, divided by races started. Freebies do not count, so part-timers compare fairly."
 };
 var LBCALC={
@@ -2440,8 +2441,7 @@ var LBCALC={
  cons:"Average finish plus the standard deviation of finishes (the typical swing around that average). The driver needs at least 3 starts. Example: finishes of 7, 8, 8, 9 average 8.0 and swing about 0.7, so the score is P8.7.",
  t5r:"Races finished in the top 5 divided by races started, times 100.",
  t10r:"Races finished in the top 10 divided by races started, times 100.",
- secs:"Per race, a driver who runs to the end gets their own real finish time when it is on record. When it is not, we take the winner's time plus a gap of about a few seconds per finishing spot (the average gap per spot from the real finish times, never more than one lap). A race with no winning time at all is estimated: race laps times the fastest lap of the race times the average ratio of real time to laps-times-fastest-lap from the races with real times (about 1.08). A driver who did not finish (DNF) gets the race time times laps driven divided by race laps. Races with no DNF list use a guess: more than 10% of the race laps down counts as a DNF. The driver's season time is the sum over races started.",
- lapsrun:"For each race started: race laps minus laps down. Added up over the season.",
+ gapw:"For each race a driver finished: their full-distance time divided by the winner's time, minus 1, times 100. Their own real finish time is used when on record, otherwise the winner time plus a gap per spot (lead lap) or plus laps down times the average lap (lapped). Averaged over all finishes, needs 3. Races with estimated times are included and starred on the race page. Lower is better.",
  pps:"Total points in races started divided by races started. Freebie points are left out."
 };
 Object.keys(LBCALC).forEach(function(k){if(LBNOTE[k])LBNOTE[k]+=' <div class="calcx"><b>How it is calculated</b>'+LBCALC[k]+'</div>';});
