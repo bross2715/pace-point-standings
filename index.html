@@ -393,6 +393,8 @@ header{background:radial-gradient(ellipse 60% 140% at 12% 0%,rgba(225,29,46,.22)
 .brand .nxr u{display:block;text-decoration:none;font-weight:600;font-size:11px;letter-spacing:1px;color:var(--mut);margin-top:2px;white-space:nowrap}
 .chkline{height:12px;margin:14px -16px 0;background:repeating-conic-gradient(#f2f2f2 0 25%,#0a0b0d 0 50%) 0 0/12px 12px;border-top:2px solid var(--brand);opacity:.92}
 @media(max-width:360px){.brand .hubt{font-size:26px}.brand .nxr b{font-size:16px}}
+.calcx{display:block;margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1);color:var(--mut)}
+.calcx b{display:block;font-family:var(--hd);font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--brand);margin-bottom:3px}
 </style>
 <style id="pace-bg">
 /* Background: dark steel gradient with a faint red band. No fine patterns. */
@@ -723,6 +725,7 @@ html[data-mv] .tpn.on{animation:none}
       const sfn = o.fin.filter(function (p) { return p > 0; });
       const mfn = sfn.length ? avg(sfn) : 0;
       o.cons = sfn.length >= 3 ? Math.sqrt(avg(sfn.map(function (p) { return (p - mfn) * (p - mfn); }))) : null;
+      o.floor = o.cons == null ? null : mfn + o.cons;
       o.t5r = sfn.length ? 100 * sfn.filter(function (p) { return p <= 5; }).length / sfn.length : null;
       o.t10r = sfn.length ? 100 * sfn.filter(function (p) { return p <= 10; }).length / sfn.length : null;
       let ppS = 0, ppN = 0;
@@ -1875,7 +1878,7 @@ var DESCS={
   vs:['Vs speed','Speed rank minus finishing position, averaged. Positive means he finished better than his best lap suggested. Higher is better.'],
   gain:['Spots gained','Starting spot minus finishing spot, averaged over races. Positive means he gained spots. Higher is better.'],
   clutch:['Clutch','Performance in pressure races (In-Season Challenge, All-Star, Chase): finish against the driver\'s own season average, plus half of any comeback from the worst running spot in the stages. Plus means the driver steps up. Needs 3 pressure races.'],
-  cons:['Consistency','How far finishes swing from the driver\'s own average, in spots. Lower is steadier.'],
+  cons:['Consistency','Steady and good. It is the driver\'s average finish plus how much finishes swing, so it shows where a bad day usually lands. A driver who is steady but slow scores poorly. Lower is better.'],
   t5r:['Top 5 rate','Share of races started that ended in the top five.'],
   t10r:['Top 10 rate','Share of races started that ended in the top ten.'],
   pps:['Points per start','Points earned in races started, divided by races started. Freebies do not count.'],
@@ -1911,7 +1914,7 @@ function detail(car){
   RK.gain=rankIdx(L,function(v){return v.gain;},true);
   RK.rc=rankIdx(L,function(v){return v.rc;},true);
   RK.clutch=rankIdx(L,function(v){return v.clutch;},true);
-  RK.cons=rankIdx(L,function(v){return v.cons;},false);
+  RK.cons=rankIdx(L,function(v){return v.floor;},false);
   RK.t5r=rankIdx(L,function(v){return v.t5r;},true);
   RK.t10r=rankIdx(L,function(v){return v.t10r;},true);
   RK.pps=rankIdx(L,function(v){return v.pps;},true);
@@ -1961,7 +1964,7 @@ function detail(car){
     srow('Best speed rank',bsv==null?'N/A':bsv,'bspeed')+'</div>';
   h+='<div class="sec">Clutch &amp; consistency</div><div class="srows">'+
     srow('Clutch',x.clutch==null?'N/A':sg(x.clutch),'clutch',x.clN?x.clN+' pressure races':'needs 3 pressure races')+
-    srow('Consistency',x.cons==null?'N/A':x.cons.toFixed(1),'cons','finish spread, lower is steadier')+
+    srow('Consistency',x.floor==null?'N/A':'P'+x.floor.toFixed(1),'cons','bad-day finish, avg + spread')+
     srow('Top 5 rate',x.t5r==null?'N/A':Math.round(x.t5r)+'%','t5r')+
     srow('Top 10 rate',x.t10r==null?'N/A':Math.round(x.t10r)+'%','t10r')+
     srow('Points per start',x.pps==null?'N/A':x.pps.toFixed(1),'pps')+'</div>';
@@ -2202,7 +2205,7 @@ function bindTabs(){
 
 var LBD={
  clutch:['Clutch',function(v){return v.clutch;},1,function(v){return (v>0?'+':'')+v.toFixed(1);}],
- cons:['Consistency',function(v){return v.cons;},0,function(v){return v.toFixed(1);}],
+ cons:['Consistency',function(v){return v.floor;},0,function(v){return 'P'+v.toFixed(1);}],
  t5r:['Top 5 rate',function(v){return v.t5r;},1,function(v){return Math.round(v)+'%';}],
  t10r:['Top 10 rate',function(v){return v.t10r;},1,function(v){return Math.round(v)+'%';}],
  pps:['Points per start',function(v){return v.pps;},1,function(v){return v.toFixed(1);}],
@@ -2280,12 +2283,45 @@ var LBNOTE={
  "cb": "<b>Best comeback</b> is the biggest climb from a driver's worst running spot in a stage to the finish. Running 15th and finishing 2nd is a +13 comeback.",
  "stg": "<b>Avg stage position</b> is the spot a driver usually holds at the end of Stage 1 and Stage 2. Lower is better.",
  "clutch": "<b>Clutch</b> is how a driver does when it counts. It only uses pressure races: the In-Season Challenge, the All-Star race and the Chase. Each one compares the finish with the driver's own season average, plus a bonus for coming back from a bad running spot. Plus means the driver steps up. It needs 3 pressure races.",
- "cons": "<b>Consistency</b> is how much a driver's finishes bounce around from their own average, in spots. Lower means steadier.",
+ "cons": "<b>Consistency</b> only counts if you are also good. We take a driver's average finish and add how much their finishes bounce around. The result is where a bad day usually lands. Someone who finishes 8th every week lands near 8th. Someone who bounces between 2nd and 10th lands near 9th. Steady but slow does not score well, and fast but wild does not either. Lower is better, and it needs 3 starts.",
  "t5r": "<b>Top 5 rate</b> is the share of races started that ended in the top five.",
  "t10r": "<b>Top 10 rate</b> is the share of races started that ended in the top ten.",
  "pps": "<b>Points per start</b> is points earned in races started, divided by races started. Freebies do not count, so part-timers compare fairly."
 };
-Object.keys(LBNOTE).forEach(function(k){if(DESCS[k])DESCS[k][1]=LBNOTE[k].replace(/<[^>]+>/g,'');});
+var LBCALC={
+ rank:"Drivers are sorted by season points. Ties go to most wins, then most stage wins, then best average finish, then the better most recent finish.",
+ pts:"Finish points: 1st gets "+D.scoring.win+", 2nd gets "+D.scoring.second+", and every spot after that is "+D.scoring.step+" less (never below 1). Add stage points (top 5 at the end of each stage get "+D.scoring.stage.join(', ')+") and "+D.scoring.fastestLap+" point for the fastest lap. A freebie pays the points of one spot behind the full field.",
+ avg:"Add up the finishing spot of every race started and divide by the number of starts. Freebies and skipped races are left out.",
+ best:"The smallest finishing number the driver has had in a race they started.",
+ worst:"The biggest finishing number the driver has had in a race they started.",
+ starts:"Count of races where the driver has a finishing spot. Freebies and skipped races do not count.",
+ t5:"Count of races started that ended in a finish of 5th or better.",
+ t10:"Count of races started that ended in a finish of 10th or better.",
+ poles:"Count of races where the driver's starting spot was 1st.",
+ sw:"Count of stage ends (Stage 1 and Stage 2) where the driver was running 1st.",
+ sp:"Stage points added up: the top 5 at the end of each stage get "+D.scoring.stage.join(', ')+" points.",
+ free:"Count of races marked as a freebie for the driver.",
+ wins:"Count of races where the finishing spot was 1st.",
+ fl:"Count of races where the driver turned the single quickest lap of the whole field.",
+ avgQ:"Add up the starting spot of every race started and divide by the number of starts.",
+ rating:"100 times a weighted average of four scores, each from 0 to 1. Finish score (35%) = 1 minus (average finish minus 1) divided by (field size minus 1). Pace score (30%) = the driver's average race pace, explained under Pace. Racecraft score (15%) = 0.5 plus racecraft divided by twice (field size minus 1), kept between 0 and 1. Stage score (20%) = stage points per start divided by 20, kept at 1 or below. If a part has no data its weight is dropped and the rest are scaled up to fill 100%.",
+ pace:"For each race, two scores from 0 to 1. Race lap score = 1 minus (race lap rank minus 1) divided by (cars with a lap minus 1). Qualifying score = the same formula using qualifying lap rank, or the starting spot when no qualifying lap was recorded. Races that were set by the Daytona Duels skip the qualifying score. Race pace is the average of the scores available. Season pace is the average of the race paces times 100.",
+ speed:"After every race, every driver is ranked by their single fastest race lap, 1 being quickest. This is the average of those ranks across the races the driver has a lap time.",
+ pct:"For each race: (driver's best lap minus the fastest lap of the race) divided by the fastest lap, times 100. This is the average of those percents.",
+ bspeed:"The smallest speed rank (best spot in the fastest lap ranking) the driver has ever had in a race.",
+ vs:"For each race: speed rank minus finishing spot. This is the average of those numbers. Speed rank 8 with a 3rd place finish is +5.",
+ rc:"Step 1, what is normal: using every driver in every race, we fit a straight line of average running spot against starting spot (both scaled 0 to 1). Step 2, for each race: expected running spot comes from that line using the driver's starting spot. Actual running spot is the average of the Stage 1 spot, Stage 2 spot and finishing spot. Racecraft for the race = expected minus actual, in spots. The stat is the average across races with a starting spot. Plus means better than normal for that start.",
+ gain:"For each race: starting spot minus finishing spot. This is the average over races with a known start. Starting 8th and finishing 3rd is +5.",
+ cb:"For each race with full stage data: the driver's worst spot at a stage end minus the finishing spot. This is the biggest one all season. Running 15th and finishing 2nd is +13.",
+ stg:"Average of the driver's Stage 1 and Stage 2 positions across all races with stage data.",
+ clutch:"Only pressure races count: the In-Season Challenge, the All-Star race and the Chase. For each one: (driver's season average finish minus the finish in that race) plus half of the comeback, where comeback = worst stage spot minus finish (never below 0). Clutch is the average of those and needs at least 3 pressure races.",
+ cons:"Average finish plus the standard deviation of finishes (the typical swing around that average). The driver needs at least 3 starts. Example: finishes of 7, 8, 8, 9 average 8.0 and swing about 0.7, so the score is P8.7.",
+ t5r:"Races finished in the top 5 divided by races started, times 100.",
+ t10r:"Races finished in the top 10 divided by races started, times 100.",
+ pps:"Total points in races started divided by races started. Freebie points are left out."
+};
+Object.keys(LBCALC).forEach(function(k){if(LBNOTE[k])LBNOTE[k]+=' <div class="calcx"><b>How it is calculated</b>'+LBCALC[k]+'</div>';});
+Object.keys(LBNOTE).forEach(function(k){if(DESCS[k])DESCS[k][1]=LBNOTE[k].replace(/<\/b>/g,': ').replace(/<[^>]+>/g,'').replace('How it is calculated: ','How it is calculated: ');});
 function showRLB(car,k,key){
   var N=ovw()?R:st.n, L=C.standings(D,N), race=D.races[k], fs=D.fieldSize||18;
   var T={qual:['Starting position',0,function(v){return 'P'+v;}],qlap:['Qualifying lap',0,function(v){return v.toFixed(3);}],lap:['Best race lap',0,function(v){return v.toFixed(3);}],speed:['Speed rank',0,function(v){return ord(v);}],fin:['Finish',0,function(v){return 'P'+v;}],pts:['Points',1],rating:['Driver rating',1,function(v){return v.toFixed(1);}]}[key];
@@ -2303,7 +2339,8 @@ function showRLB(car,k,key){
     if(q!=null) rows.push({car:v.car,v:q});
   });
   rows.sort(function(a,b){return T[1]?b.v-a.v:a.v-b.v;});
-  lbView(car,T[0]+' · '+race.track,'Race '+(k+1)+' · '+((D.trackTypes||{})[race.track]||''),rows,T[2],RN[key]);
+var RC={qual:' <div class="calcx"><b>How it is calculated</b>The order the field lined up in for this race, 1st being the pole.</div>',qlap:' <div class="calcx"><b>How it is calculated</b>The single lap time that set the starting order. Sorted from quickest to slowest.</div>',lap:' <div class="calcx"><b>How it is calculated</b>Each driver\'s quickest lap during the race itself. Sorted from quickest to slowest.</div>',speed:' <div class="calcx"><b>How it is calculated</b>Every driver is ranked by their best race lap. The quickest lap is 1st, the next is 2nd, and so on.</div>',fin:' <div class="calcx"><b>How it is calculated</b>The official finishing order of the race.</div>',pts:' <div class="calcx"><b>How it is calculated</b>Finish points (1st '+D.scoring.win+', 2nd '+D.scoring.second+', then '+D.scoring.step+' less per spot) plus stage points ('+D.scoring.stage.join(', ')+' for the top 5 at each stage end) plus '+D.scoring.fastestLap+' for the fastest lap.</div>',rating:' <div class="calcx"><b>How it is calculated</b>100 times a weighted average of four scores from 0 to 1: finish score 35% (1 minus (finish minus 1) divided by (field minus 1)), pace score 30% (average of the race lap score and the qualifying score), start-to-finish score 15% (0.5 plus (start minus finish) divided by twice (field minus 1), kept between 0 and 1), and stage score 20% (stage points divided by 20, kept at 1 or below). Missing parts are dropped and the rest scaled up.</div>'};
+  lbView(car,T[0]+' · '+race.track,'Race '+(k+1)+' · '+((D.trackTypes||{})[race.track]||''),rows,T[2],RN[key]+(RC[key]||''));
 }
 function raceRatingFor(x,k,fs){
   var f=x.fin[k]; if(!f) return null; var q=D.races[k].qual&&D.races[k].qual[x.car];
@@ -2370,6 +2407,7 @@ var TDESC={
   cb:["Best comeback","The biggest climb by any team driver from the worst running spot in a stage to the finish."],
   stg:["Avg stage pos","The spot the team drivers usually hold at the end of Stage 1 and Stage 2. Lower is better."]
 };
+Object.keys(TDESC).forEach(function(k){if(LBCALC[k]&&k!=='rank'&&k!=='pts')TDESC[k][1]+=' How it is calculated: '+LBCALC[k]+' For a team, every race result from the team drivers is used together.';});
 function teamDetail(name){
   var N=st.n, L=C.standings(D,N), T=C.teams(D,L);
   T.forEach(function(q){q.m=teamMetrics(q);});
