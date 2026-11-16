@@ -1353,8 +1353,8 @@ function setMe(c){try{if(c)localStorage.setItem(MEKEY,c);else localStorage.remov
 (function(){try{var m=/[?&]me=([^&#]+)/.exec(location.search);if(m){var c=decodeURIComponent(m[1]);if(byCar[c]){setMe(c);}}}catch(e){}})();
 function updateMe(){var el=document.getElementById('mepill');if(!el)return;var c=getMe();if(!c){el.style.display='none';el.innerHTML='';return;}el.style.display='';el.innerHTML='<span class="mst">\u2605</span>'+chip(c,'sm')+'<b>My card</b><small>'+esc(byCar[c].name)+'</small>';el.onclick=function(){detail(c);};}
 function updateMeTeam(){var el=document.getElementById('metpill');if(!el)return;var c=getMe(),t=c&&byCar[c].team;if(!t){el.style.display='none';el.innerHTML='';return;}el.style.display='';el.innerHTML='<span class="mst">\u2605</span><b>My team</b><small>'+esc(t)+'</small>';el.onclick=function(){teamDetail(t);};}
-function isLocked(){try{return !!localStorage.getItem(PKEY+'_lock');}catch(e){return false;}}
-function lockPicks(code){try{localStorage.setItem(PKEY+'_lock',JSON.stringify({code:code,at:new Date().toISOString().slice(0,10)}));}catch(e){}}
+function isLocked(){try{return !!localStorage.getItem(PKEY+'_lock2');}catch(e){return false;}}
+function lockPicks(code){try{localStorage.setItem(PKEY+'_lock2',JSON.stringify({code:code,at:new Date().toISOString().slice(0,10)}));}catch(e){}}
 function getPicks(){try{return JSON.parse(localStorage.getItem(PKEY)||'{}')||{};}catch(e){return {};}}
 function setPick(k,c){try{var p=getPicks();if(p[k]===c)delete p[k];else p[k]=c;localStorage.setItem(PKEY,JSON.stringify(p));return true;}catch(e){return false;}}
 var _mem={};
@@ -1499,6 +1499,7 @@ function bracketView(keep){
   var myname=''; try{myname=localStorage.getItem(PKEY+'_name')||'';}catch(e){} if(!myname&&getMe())myname=byCar[getMe()].name;
   var LK=isLocked();
   if(LK) h+='<div class="pnote" style="text-align:left;padding:0 0 8px"><b>&#128274; Locked in.</b> You sent your bracket, so your picks can\'t be changed. Tap Send my bracket to copy it again.</div>';
+  if(!LK) h+='<div class="pnote" style="text-align:left;padding:0 0 8px"><b>Picks reopened.</b> Chuyy is out, so change what you need and send your bracket again.</div>';
   h+='<input class="bnm" id="bname" maxlength="24" placeholder="Your name" value="'+esc(myname)+'"'+(LK?' readonly':'')+'>';
   h+='<div class="bkb"><button id="bshare" class="gold">'+(LK?'Send my bracket again':'Send my bracket')+'</button>'+'</div>'+(LK?'':'<div class="pnote" style="text-align:left;padding:0 0 8px">Heads up: tapping Send my bracket locks your picks.</div>')+'<div id="bshout"></div>';
   h+='<div id="tsc" style="overflow-x:auto;margin:0 -14px;padding:0 14px 6px"><div class="tree">';
