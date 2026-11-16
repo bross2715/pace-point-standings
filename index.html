@@ -664,7 +664,8 @@ html[data-mv] .tpn.on{animation:none}
   function avg(a) { return a.reduce(function (s, v) { return s + v; }, 0) / a.length; }
 
   // PACE Driver Rating, 0 to 100: 35% finishing, 30% pace,
-  // 20% stage points (per start, 20 is a perfect race). Comeback is a board, not part of the rating.
+  // 20% stage points (per start, 20 is a perfect race), 10% laps led (share of laps led, a quarter of all laps is perfect).
+  // Comeback is a board, not part of the rating.
   function ratingOf(D, o) {
     if (!o.starts) return null;
     const F = o.fieldAvg || D.fieldSize, parts = [], cl = function (v) { return Math.max(0, Math.min(1, v)); };
@@ -672,6 +673,7 @@ html[data-mv] .tpn.on{animation:none}
     const pr = o.pr.filter(function (v) { return v != null; });
     if (pr.length) parts.push([0.30, avg(pr)]);
     parts.push([0.20, cl((o.sp / o.starts) / 20)]);
+    if (o.ledCounted && o.ledPossible) parts.push([0.10, cl((o.ledTot / o.ledPossible) / 0.25)]);
     let w = 0, t = 0;
     parts.forEach(function (p) { w += p[0]; t += p[0] * cl(p[1]); });
     return 100 * t / w;
@@ -1847,7 +1849,7 @@ function chg(d,hi,dec,suf){var v=chgVal(d,hi,dec,suf);return '<div class="chg '+
 function chgS(d,hi,dec){var v=chgVal(d,hi,dec,'');return '<span class="gn '+v.c+'">'+v.s+'</span>';}
 function ratingView(L,race){
   var pm=race==null?prevMap():null;
-  var h='<div class="call"><b>Driver Rating</b> runs 0 to 100: 35% finishing, 30% speed and 20% stage points, scaled to fill 100%. Speed is half qualifying and half race best lap. Qualifying is the pre race lap when recorded, otherwise the starting spot. Daytona counts race best lap only, since the Duels set that order.'+(pm?' The green or red number is the change since the previous race.':'')+'</div>';
+  var h='<div class="call"><b>Driver Rating</b> runs 0 to 100: 35% finishing, 30% speed, 20% stage points and 10% laps led, scaled to fill 100%. Speed is half qualifying and half race best lap. Qualifying is the pre race lap when recorded, otherwise the starting spot. Daytona counts race best lap only, since the Duels set that order.'+(pm?' The green or red number is the change since the previous race.':'')+'</div>';
   var a=L.filter(function(x){return x.rating!=null;}).sort(function(p,q){return (q.rating-p.rating)||(p.rank-q.rank);});
   h+='<div class="sec">Driver Rating'+(race==null?'':': '+esc(trackOf(race)))+'</div>';
   if(!a.length) h+='<div class="empty">No ratings yet.</div>';
@@ -2076,7 +2078,7 @@ var DESCS={
   avgQ:['Avg start','Average starting spot. Daytona uses the duel order.'],
   poles:['Poles','Races started from the pole.'],
   free:['Freebies','Freebies used. They pay last place points and do not count as starts.'],
-  rating:['Driver Rating','0 to 100, scaled so the parts fill 100%. 35% finishing: 1 minus (average finish minus 1) divided by (field size minus 1). 30% speed: season speed averaged. 20% stage points: stage points per start divided by 20. The weighted average times 100.'],
+  rating:['Driver Rating','0 to 100, scaled so the parts fill 100%. 35% finishing: 1 minus (average finish minus 1) divided by (field size minus 1). 30% speed: season speed averaged. 20% stage points: stage points per start divided by 20. 10% laps led: share of laps led, where leading a quarter of all laps is a perfect score. The weighted average times 100.'],
   pace:['Speed','0 to 100 score for overall speed. Each race averages two parts: qualifying (the pre race lap when recorded, otherwise the starting spot, skipped at Daytona) and the race best lap rank. Season pace is the average of those race scores.'],
   speed:['Avg speed rank','Each race ranks every car by best race lap, 1 being quickest. This is the average of those ranks across races. Lower is better.'],
   pct:['Off fastest','How far his best lap was off the fastest lap of each race, as a percentage, averaged across races. Percent works across track lengths, so it stays fair. Lower is better.'],
@@ -2527,7 +2529,7 @@ var LBCALC={
  wins:"Count of races where the finishing spot was 1st.",
  fl:"Count of races where the driver turned the single quickest lap of the whole field.",
  avgQ:"Add up the starting spot of every race started and divide by the number of starts.",
- rating:"100 times a weighted average of three scores, each from 0 to 1. Finish score (35%) = 1 minus (average finish minus 1) divided by (field size minus 1). Speed score (30%) = the driver's average race speed, explained under Speed.  Stage score (20%) = stage points per start divided by 20, kept at 1 or below. If a part has no data its weight is dropped and the rest are scaled up to fill 100%.",
+ rating:"100 times a weighted average of four scores, each from 0 to 1. Finish score (35%) = 1 minus (average finish minus 1) divided by (field size minus 1). Speed score (30%) = the driver's average race speed, explained under Speed.  Stage score (20%) = stage points per start divided by 20, kept at 1 or below. Laps led score (10%) = laps led divided by laps in the races counted, divided by 0.25, kept at 1 or below. If a part has no data its weight is dropped and the rest are scaled up to fill 100%.",
  pace:"For each race, two scores from 0 to 1. Race lap score = 1 minus (race lap rank minus 1) divided by (cars with a lap minus 1). Qualifying score = the same formula using qualifying lap rank, or the starting spot when no qualifying lap was recorded. Races that were set by the Daytona Duels skip the qualifying score. Race pace is the average of the scores available. Season pace is the average of the race paces times 100.",
  speed:"After every race, every driver is ranked by their single fastest race lap, 1 being quickest. This is the average of those ranks across the races the driver has a lap time.",
  pct:"For each race: (driver's best lap minus the fastest lap of the race) divided by the fastest lap, times 100. This is the average of those percents.",
