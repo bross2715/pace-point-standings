@@ -176,6 +176,18 @@ td{padding:9px 4px;font-size:12px;border-bottom:1px solid var(--line)}
 td.r,th.r{text-align:right}
 .foot{margin:22px 4px 0;font-size:11px;color:#6d747d;line-height:1.5}
 .dh{position:relative}
+.hitov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:18px}
+.hitbox{width:100%;max-width:360px;max-height:70vh;overflow:auto;background:#0e1013;border:1px solid #2a2f36;border-radius:16px;padding:14px 14px 10px;box-shadow:0 12px 40px rgba(0,0,0,.7)}
+.hitbox .ht{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.hitbox h3{margin:0;font:800 22px/1.05 'Barlow Condensed',sans-serif;font-style:italic;text-transform:uppercase;color:#f3f5f7}
+.hitbox h3 small{display:block;font:700 12px 'Barlow Condensed',sans-serif;letter-spacing:.12em;color:#8b929c;font-style:normal;margin-top:3px}
+.hitbox .hx{flex:none;width:34px;height:34px;border:0;border-radius:50%;background:#1b1f25;color:#fff;font-size:18px;cursor:pointer}
+.hitbox .hr{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #22262c}
+.hitbox .hr .rn{flex:none;width:34px;font:800 16px 'Barlow Condensed',sans-serif;color:#ff5a66}
+.hitbox .hr .tk{flex:1;min-width:0;font:700 17px 'Barlow Condensed',sans-serif;text-transform:uppercase;color:#f3f5f7}
+.hitbox .hr .tk small{display:block;font:600 12px 'Barlow',sans-serif;color:#9aa3ad;text-transform:none;letter-spacing:0}
+.hitbox .hr .dt{flex:none;font:800 18px 'Barlow Condensed',sans-serif;color:#22d36b;text-align:right}
+.hitbox .em{padding:14px 0;color:#9aa3ad;font:600 14px 'Barlow',sans-serif}
 .dh.dc{padding-bottom:42px;overflow:hidden}
 .dh.dc::after{content:'';position:absolute;left:0;right:0;bottom:0;height:20px;background:conic-gradient(#f3f5f7 25%,#08090b 0 50%,#f3f5f7 0 75%,#08090b 0) 0 0/20px 20px;pointer-events:none}
 .dh.dc::before{content:'';position:absolute;left:0;right:0;bottom:20px;height:4px;background:var(--ac);pointer-events:none}
@@ -2612,8 +2624,42 @@ function raceRatingFor(x,k,fs){
   parts.push([.20,cl((x.sgp[k]||0)/20)]);
   var w=0,t=0; parts.forEach(function(p){w+=p[0];t+=p[0]*cl(p[1]);}); return 100*t/w;
 }
+var CURTEAM=null;
+var HK={wins:'Wins',t5:'Top 5',t10:'Top 10',poles:'Poles',sw:'Stage wins',fl:'Fast laps',led:'Laps led',ledm:'Most laps led',starts:'Starts',sp:'Stage points',free:'Freebies'};
+function showHits(cars,key,who){
+  var rows=[],N=st.n;
+  function lt(v){var m=Math.floor(v/60),s=v-m*60;return (m?m+':'+(s<10?'0':''):'')+s.toFixed(3);}
+  for(var i=0;i<N;i++){var r=D.races[i];if(!r)continue;
+    cars.forEach(function(c){
+      var f=r.fin&&r.fin[c],q=r.qual&&r.qual[c],dt=null,ln=r.ledN&&r.ledN[c]||0;
+      if(key==='wins'){if(f===1)dt='P1';}
+      else if(key==='t5'){if(f>0&&f<=5)dt='P'+f;}
+      else if(key==='t10'){if(f>0&&f<=10)dt='P'+f;}
+      else if(key==='starts'){if(f>0)dt='P'+f;}
+      else if(key==='poles'){if(q===1&&f>0)dt='Pole'+(r.qlap&&r.qlap[c]?' '+lt(r.qlap[c]):'');}
+      else if(key==='sw'){var a=[];if(r.stages&&r.stages[0]&&r.stages[0][0]===c)a.push('Stage 1');if(r.stages&&r.stages[1]&&r.stages[1][0]===c)a.push('Stage 2');if(a.length)dt=a.join(' + ');}
+      else if(key==='fl'){if((r.fl||[]).indexOf(c)>=0)dt=r.lap&&r.lap[c]?lt(r.lap[c]):'Fastest';}
+      else if(key==='led'){if(LED_ON&&ln>0)dt=ln+(ln===1?' lap':' laps');}
+      else if(key==='ledm'){var mx=0;Object.keys(r.ledN||{}).forEach(function(k){if(r.ledN[k]>mx)mx=r.ledN[k];});if(LED_ON&&ln>0&&ln===mx)dt=ln+' laps';}
+      else if(key==='sp'){var p=C.stagePtsFor(D.scoring,r,c);if(p>0)dt='+'+p;}
+      else if(key==='free'){if((r.freebie||[]).indexOf(c)>=0)dt='Freebie';}
+      if(dt!=null)rows.push({n:r.n||i+1,track:r.track,car:c,dt:dt,f:f,q:q});
+    });
+  }
+  var multi=cars.length>1,h='<div class="hitbox"><div class="ht"><h3>'+esc(HK[key])+'<small>'+esc(who)+' · '+rows.length+(rows.length===1?' race':' races')+'</small></h3><button class="hx" aria-label="Close">&times;</button></div>';
+  if(!rows.length)h+='<div class="em">None yet.</div>';
+  rows.forEach(function(x){
+    var sub=(multi?esc(byCar[x.car].name):'')+((key==='t5'||key==='t10'||key==='starts')&&x.q?(multi?' · ':'')+'Started P'+x.q:'');
+    h+='<div class="hr"><div class="rn">R'+x.n+'</div>'+(multi?chip(x.car,'sm'):'')+'<div class="tk">'+esc(x.track)+(sub?'<small>'+sub+'</small>':'')+'</div><div class="dt">'+esc(x.dt)+'</div></div>';
+  });
+  h+='</div>';
+  var ov=document.createElement('div');ov.className='hitov';ov.innerHTML=h;
+  function close(){if(ov.parentNode)ov.parentNode.removeChild(ov);}
+  ov.addEventListener('click',function(e){if(e.target===ov||e.target.classList.contains('hx'))close();});
+  document.body.appendChild(ov);
+}
 function bindLB(car){
-  Array.prototype.forEach.call(document.querySelectorAll('#sheet [data-k]'),function(e){e.addEventListener('click',function(){showLB(car,e.getAttribute('data-k'));});});
+  Array.prototype.forEach.call(document.querySelectorAll('#sheet [data-k]'),function(e){e.addEventListener('click',function(){var k=e.getAttribute('data-k');if(HK[k]){showHits([car],k,byCar[car].name);return;}showLB(car,k);});});
   Array.prototype.forEach.call(document.querySelectorAll('#sheet [data-lb]'),function(e){e.addEventListener('click',function(){showLB(car,e.getAttribute('data-lb'));});});
   Array.prototype.forEach.call(document.querySelectorAll('#sheet [data-rl]'),function(e){e.addEventListener('click',function(ev){ev.stopPropagation();var p=e.getAttribute('data-rl').split(':');showRLB(car,+p[0],p[1]);});});
 }
@@ -2672,7 +2718,7 @@ function teamDetail(name){
   T.forEach(function(q){q.m=teamMetrics(q);});
   var tm=T.filter(function(q){return q.team===name;})[0];
   if(!tm) return;
-  var m=tm.m;
+  var m=tm.m;CURTEAM=tm;
   var BK={avg:['avg',false],avgQ:['avgQ',false],rating:['rating',true],pace:['paceScore',true],speed:['speed',false],pct:['pct',false],bspeed:['bspeed',false],vs:['vs',true],gain:['gain',true],cb:['cb',true],stg:['stg',false]};
   function info(k){
     var b=BK[k]; if(!b||m[b[0]]==null) return null;
@@ -2737,6 +2783,7 @@ function teamDetail(name){
 function bindXp(map){
   Array.prototype.forEach.call(document.querySelectorAll('#sheet [data-k]'),function(el){
     el.addEventListener('click',function(){
+      var hk_=el.getAttribute('data-k');if(HK[hk_]&&CURTEAM&&CURTEAM.members){showHits(CURTEAM.members.map(function(x){return x.car;}),hk_,teamFull(CURTEAM.team));return;}
       var dd=map[el.getAttribute('data-k')]; if(!dd) return;
       var wrap=el.closest('.hrow,.cstrip,.mini,.rng,.srows,.ovr')||el, was=wrap.nextElementSibling&&wrap.nextElementSibling.classList.contains('xp')&&wrap.nextElementSibling.getAttribute('data-for')===el.getAttribute('data-k');
       Array.prototype.forEach.call(document.querySelectorAll('#sheet .xp'),function(o){o.parentNode.removeChild(o);});
