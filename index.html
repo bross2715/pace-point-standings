@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07080a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PACE Race Hub">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Pace Point Standings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1727,7 +1734,7 @@ function winstonTab(){
    +'<div class="wbg wblh"><div></div><div>+/&minus;</div><div></div><div class="l">DRIVER</div><div>MFR</div><div>TEAM</div><div>WINS</div><div>VS LEADER</div><div>POINTS</div></div>'
    +'<div class="wbrows" id="wbrows" style="height:'+(L.length*47)+'px"></div></div></div></div>';
   h+='<button class="wbrp" id="wbrp">Replay the load-in</button>';
-  h+='<div class="call"><b>The Winston.</b> Classic Winston Cup scoring with no stage points: 1st 175, 2nd 170, 3rd 165, 4th 160, 5th 155, 6th 150, 7th 146, 8th 142, 9th 138, 10th 134, 11th 130, 12th 127, then 3 less each spot. Points depend only on where you finish, never on field size. No bonus points. Private view, not shown to the league.</div>';
+  h+='<div class="call"><b>The Winston.</b> Classic Winston Cup scoring with no stage points: 1st 175, 2nd 170, 3rd 165, 4th 160, 5th 155, 6th 150, 7th 146, 8th 142, 9th 138, 10th 134, 11th 130, 12th 127, then 3 less each spot. Points depend only on where you finish, never on field size. Bonus: +5 for leading at least one lap, +5 more for leading the most laps in the race (ties both get it). Private view, not shown to the league.</div>';
   return h;
 }
 function winTab(){
