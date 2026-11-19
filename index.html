@@ -2537,7 +2537,7 @@ function leaders(){
   L.forEach(function(x){var o=POD[x.car]||[0,0,0];x.podN=o[0]+o[1]+o[2];x.podTxt=o.join('-');});
   function top(fn,filter,fmt,asc,name,allf){
     function sortBy(f){return L.filter(f).sort(function(p,q){var d=asc?fn(p)-fn(q):fn(q)-fn(p);return d||(p.rank-q.rank);});}
-    function line(x,rk,v){return '<div class="lr" data-car="'+esc(x.car)+'"><div class="rk">'+rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+fmt(v)+(name==='Podiums'&&x.podN?'<small style="display:block;font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.6px">'+x.podTxt+'</small>':'')+'</div></div>';}
+    function line(x,rk,v){return '<div class="lr" data-car="'+esc(x.car)+'"><div class="rk">'+rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+fmt(v)+(name==='Best Comeback'&&x.cbRace>=0?'<small style="display:block;font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.6px;white-space:nowrap">'+esc(trackOf(x.cbRace))+'</small>':'')+(name==='Podiums'&&x.podN?'<small style="display:block;font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.6px">'+x.podTxt+'</small>':'')+'</div></div>';}
     function listAll(arr){var prev=null,rk=0,s='';arr.forEach(function(x,i){var v=fn(x);if(v!==prev){rk=i+1;prev=v;}s+=line(x,rk,v);});return s;}
     var a=sortBy(filter);
     if(!a.length) return '<div class="empty">No data yet.</div>';
@@ -2961,12 +2961,13 @@ function buildTabs(car,x,d,N,pOv,pRaces,paintCol){
   var bf=null,bs=null,bc=null,bp=null,bl=null;
   for(var k=0;k<N;k++){ var f=x.fin[k]; if(!f) continue; var q=D.races[k].qual&&D.races[k].qual[car];
     if(!bf||f<bf.v)bf={v:f,k:k}; if(q&&(!bs||q<bs.v))bs={v:q,k:k};
-    if(q&&q-f>0&&(!bc||q-f>bc.v))bc={v:q-f,k:k}; if(!bp||x.r[k]>bp.v)bp={v:x.r[k],k:k};
+    if(!bp||x.r[k]>bp.v)bp={v:x.r[k],k:k};
     if(x.lapRank[k]>0&&(!bl||x.lapRank[k]<bl.v))bl={v:x.lapRank[k],k:k}; }
+  if(x.cb>0&&x.cbRace>=0) bc={v:x.cb,k:x.cbRace};
   function rec(l,v,k,sub){return '<div class="rec"><span>'+l+'</span><b>'+v+'<em>'+(k==null?'':esc(trackOf(k))+' · R'+(k+1))+(sub||'')+'</em></b></div>';}
   var rc='<div class="sec">Career bests</div>'+
    (bf?rec('Best finish','P'+bf.v,bf.k):'')+(bs?rec('Best start','P'+bs.v,bs.k):'')+
-   (bc?rec('Best comeback','+'+bc.v+' spots',bc.k):'')+(bp?rec('Most points in a race',bp.v,bp.k):'')+
+   (bc?rec('Best comeback','+'+bc.v+' spots',bc.k,' · from P'+x.cbFrom):'')+(bp?rec('Most points in a race',bp.v,bp.k):'')+
    (bl?rec('Quickest lap rank',ord(bl.v),bl.k):'')+
    rec('Wins / Poles / Fastest laps',x.wins+' / '+x.poles+' / '+x.fl,null)+rec('Stage wins',x.sw,null)+(x.secsRun>0?rec('Time on track',hms(x.secsRun),null,x.estRun?' · includes '+x.estRun+' estimated':''):'')+(x.lapsRun>0?rec('Laps driven',x.lapsRun,null):'');
   var uncL=[];for(var _i=0;_i<N;_i++){if(x.ledFlag&&x.ledFlag[_i]&&(!x.ledN||x.ledN[_i]==null))uncL.push(trackOf(_i));}
@@ -3626,7 +3627,7 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
 <script>
 /* auto-update: compares this page's build stamp to version.json and reloads when a newer build is live */
 (function(){
-  var B='20261119135143',last=0,busy=false;
+  var B='20261119141905',last=0,busy=false;
   function chk(){
     var n=Date.now();if(busy||n-last<20000)return;last=n;busy=true;
     fetch('version.json?t='+n,{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
