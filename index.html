@@ -524,6 +524,10 @@ header{background:radial-gradient(ellipse 60% 140% at 12% 0%,rgba(225,29,46,.22)
 .ahadd img{width:48px;height:48px;border-radius:11px}
 .ahadd .nm{flex:1;font:600 15px 'Barlow',sans-serif;border-bottom:1px solid #444;padding-bottom:5px}
 .ahadd .ab{background:#0a84ff;color:#fff;border-radius:999px;padding:6px 14px;font:700 14px 'Barlow',sans-serif;box-shadow:0 0 0 2px rgba(10,132,255,.35)}
+.ahlk{display:flex;gap:8px;align-items:center;margin-top:10px;background:#0b0d10;border:1px solid #2a2f36;border-radius:11px;padding:6px 6px 6px 12px}
+.ahlk span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 14px 'Barlow',sans-serif;color:#cfd5dc}
+.ahlk button{flex:none;background:#b5223a;color:#fff;border:0;border-radius:8px;padding:9px 14px;font:800 14px 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.ahhow{margin-top:8px!important;font-size:12px!important;color:#7f8791!important}
 .ahact{display:flex;gap:8px;margin-top:6px}
 .ahact button{flex:1;padding:13px 0;border-radius:12px;border:0;font:800 16px 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
 .ahact .p{background:#b5223a;color:#fff}.ahact .g{background:#1b1f25;color:#fff;border:1px solid #2a2f36}
@@ -3101,16 +3105,16 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
   var BK='<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',FW='<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>',BM='<svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18l-6-4-6 4z"/></svg>',TB='<svg viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="13" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v11"/></svg>';
   function step(n,t,d,m){return '<div class="ahst"><div class="ahn">'+n+'</div><div class="aht"><b>'+t+'</b><span>'+d+'</span>'+(m||'')+'</div></div>';}
   function iosHtml(){
-    var w=notSafari?'<div class="ahwarn">You are not in Safari. iPhone only lets Safari add apps to the home screen. Copy the link, open Safari, and paste it there.<br><button id="ahcopy" type="button">Copy link</button></div>':'';
+    var w=notSafari?'<div class="ahwarn">You are not in Safari. iPhone only lets Safari add apps to the home screen. Copy the link below, open Safari, and paste it in the address bar.</div>':'';
     return w
-    +step(1,'Open this page in Safari','Not inside Instagram, Messages or Chrome. Safari only (the blue compass).')
+    +step(1,'Open this page in Safari','Not inside Instagram, Messages or Chrome. Safari only (the blue compass). Already in another app? Copy the link, open Safari, tap the address bar, paste, and go.','<div class="ahlk"><span>'+link()+'</span><button id="ahcopy" type="button">Copy link</button></div>')
     +step(2,'Tap the Share button','It is the square with an arrow pointing up, in the bottom bar of Safari.','<div class="ahmock"><div class="ahbar">'+BK+FW+'<span class="ahring"><span style="display:block;width:26px;height:26px;stroke:#0a84ff">'+SH.replace('<svg','<svg style="stroke:#0a84ff"')+'</span></span>'+BM+TB+'</div></div>')
     +step(3,'Tap "Add to Home Screen"','Scroll down the share menu if you do not see it right away.','<div class="ahmock"><div class="ahrow"><span>Copy</span><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></div><div class="ahrow"><span>Add to Bookmarks</span>'+BM+'</div><div class="ahrow hl"><span>Add to Home Screen</span>'+PL+'</div></div>')
     +step(4,'Tap Add','Leave "Open as Web App" turned on. The name will say '+NAME+'.','<div class="ahmock"><div class="ahadd"><img src="'+ICON+'" alt=""><div class="nm">'+NAME+'</div><div class="ab">Add</div></div></div>')
     +'<div class="ahfoot">Done. PACE Race Hub is now on your home screen like any other app.</div>';
   }
   function andHtml(){
-    return step(1,'Open this page in Chrome','The regular Chrome app on your Android phone.')
+    return step(1,'Open this page in Chrome','The regular Chrome app on your Android phone. Not in Chrome yet? Copy the link and paste it into Chrome.','<div class="ahlk"><span>'+link()+'</span><button id="ahcopy" type="button">Copy link</button></div>')
     +step(2,'Tap the three dots','Top right corner of Chrome.','<div class="ahmock"><div class="ahrow"><span>New tab</span></div><div class="ahrow hl"><span>Install app</span>'+PL+'</div><div class="ahrow"><span>Add to Home screen</span></div></div>')
     +step(3,'Tap Install','You may see "Add to Home screen" instead. Same thing.','<div class="ahmock"><div class="ahadd"><img src="'+ICON+'" alt=""><div class="nm">'+NAME+'</div><div class="ab">Install</div></div></div>')
     +'<div class="ahfoot">Done. It shows up in your apps and on your home screen.</div>';
