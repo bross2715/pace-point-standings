@@ -21,7 +21,7 @@
 html,body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--bd);-webkit-text-size-adjust:100%}
 body{padding-bottom:calc(32px + env(safe-area-inset-bottom))}
 .wrap{max-width:560px;margin:0 auto}
-header{padding:calc(14px + env(safe-area-inset-top)) 16px 0;background:linear-gradient(180deg,#101216,#07080a)}
+header{padding:calc(14px + env(safe-area-inset-top)) 16px 0;background:repeating-linear-gradient(45deg,#ffffff12 0 2px,transparent 2px 6px),linear-gradient(180deg,#0e1013,#07080a)}
 .brand{font-family:var(--hd);font-weight:800;font-style:italic;font-size:30px;letter-spacing:.5px;line-height:1;text-transform:uppercase}
 .brand b{color:var(--brand)}
 .sub{font-family:var(--hd);font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);font-size:14px;margin-top:6px}
@@ -490,6 +490,12 @@ header{background:radial-gradient(ellipse 60% 140% at 12% 0%,rgba(225,29,46,.22)
 /* ---- Get the app (add to home screen) ---- */
 .apppill{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(180deg,#1b1f25,#12151a);border:1px solid #2c323a;color:#fff;border-radius:999px;padding:7px 13px 7px 8px;font:700 13px/1 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
 .apppill img{width:22px;height:22px;border-radius:6px;display:block}
+.apppill img.apl{width:auto;height:15px;border-radius:0;margin-left:2px}
+.apppill{padding:6px 10px 6px 8px;gap:6px;white-space:nowrap;font-size:12px;flex:0 0 auto;margin-left:auto}
+.merow{flex-wrap:nowrap;align-items:center}.merow .mepill{padding:4px 9px 4px 6px!important;gap:5px!important}.merow .mepill b{font-size:12px!important}.merow .mepill{white-space:nowrap;flex:0 0 auto!important;justify-content:center;padding-right:12px!important}.next:empty{display:none}.merow .mepill b{white-space:nowrap}
+.apppill img.apl{height:13px}
+@media(max-width:430px){.apppill .th{display:none}}
+@media(max-width:380px){.apppill img.apl{height:11px}.apppill{padding:6px 8px 6px 7px}#metpill .mst{display:none}.merow{gap:5px}}
 .apppill b{color:#ff5a66;font-weight:800}
 .ahov{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center}
 .ahov.on{display:flex}
@@ -548,7 +554,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.5))}
 .hdtrk{position:fixed;left:50%;top:56%;width:112vw;max-width:600px;aspect-ratio:100/60;transform:translate(-50%,-50%) rotate(-62deg);z-index:-1;pointer-events:none;opacity:0;transition:opacity .5s ease}
 .hdtrk.on{opacity:1}.hdtrk svg{width:100%;height:100%;display:block}
-header{background:linear-gradient(180deg,rgba(16,18,22,.55),rgba(7,8,10,0))}
+header{background:repeating-linear-gradient(45deg,#ffffff08 0 2px,transparent 2px 6px),#08090b}
 nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 </style>
 <style id="pace-inseason-green">
@@ -1387,7 +1393,7 @@ function hdr(){
     var d=dateOf(R),m=/^(\d+)\/(\d+)$/.exec(d),pretty=d;
     if(m){var mo=+m[1],dy=+m[2],yr=mo>=7?2026:2027,dt=new Date(yr,mo-1,dy);pretty=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]+', '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][mo-1]+' '+dy;}
     el.innerHTML='<i>Next &middot; Race '+(R+1)+'</i><b>'+esc(nx)+'</b><u>'+esc(pretty)+'</u>';})();
-  document.getElementById('next').innerHTML=(n===R&&nx)?'Next up: <b>'+(typeOf(nx)?esc(typeOf(nx)):'Race '+(R+1))+'</b>'+(blockOf(R)&&blockOf(R)!=='Regular Season'?' &middot; <b>'+esc(blockOf(R))+'</b>'+roundOf(R):''):(n<R&&!ovw?'Replaying standings. Drag back to Race '+R+' for live.':'');
+  document.getElementById('next').innerHTML=(n===R&&nx)?'':(n<R&&!ovw?'Replaying standings. Drag back to Race '+R+' for live.':'');
   var f=document.getElementById('foot');
   f.innerHTML='Points: 1st '+D.scoring.win+', 2nd '+D.scoring.second+', then minus '+D.scoring.step+' per position. Stage points to the top '+D.scoring.stage.length+' of each stage ('+D.scoring.stage.join('/')+'). Fastest lap +'+D.scoring.fastestLap+'. A freebie (excused race) pays one spot behind the field, '+C.freebiePts(D)+' with a full field, and does not count as a start. Team points add up the top three scorers from each team in every race. Ties broken by wins, stage wins, best average finish, then most recent better finish. Live top '+D.scoring.cutline+' sits above the cutline.'+trust()+'<div style="margin-top:10px;text-align:center;color:#8b929c">Powered by Claude and Grokbot. Laps led carefully calculated by Grokbot. Mistakes are possible, but it is very accurate.</div><div style="margin-top:10px;text-align:center;color:#8b929c">Built by BRAI&trade; (Brandon Ross, Artificial Intelligence). All rights reserved.</div>';
 }
@@ -1507,8 +1513,8 @@ var MEKEY='pace_me';
 function getMe(){try{var c=localStorage.getItem(MEKEY);return c&&byCar[c]?c:null;}catch(e){return null;}}
 function setMe(c){try{if(c)localStorage.setItem(MEKEY,c);else localStorage.removeItem(MEKEY);}catch(e){}}
 (function(){try{var m=/[?&]me=([^&#]+)/.exec(location.search);if(m){var c=decodeURIComponent(m[1]);if(byCar[c]){setMe(c);}}}catch(e){}})();
-function updateMe(){var el=document.getElementById('mepill');if(!el)return;var c=getMe();if(!c){el.style.display='none';el.innerHTML='';return;}el.style.display='';el.innerHTML='<span class="mst">\u2605</span>'+chip(c,'sm')+'<b>My card</b><small>'+esc(byCar[c].name)+'</small>';el.onclick=function(){detail(c);};}
-function updateMeTeam(){var el=document.getElementById('metpill');if(!el)return;var c=getMe(),t=c&&byCar[c].team;if(!t){el.style.display='none';el.innerHTML='';return;}el.style.display='';el.innerHTML='<span class="mst">\u2605</span><b>My team</b><small>'+esc(t)+'</small>';el.onclick=function(){teamDetail(t);};}
+function updateMe(){var el=document.getElementById('mepill');if(!el)return;var c=getMe();if(!c){el.style.display='none';el.innerHTML='';return;}el.style.display='';el.innerHTML='<span class="mst">\u2605</span>'+chip(c,'sm')+'<b>My stats</b>';el.onclick=function(){detail(c);};}
+function updateMeTeam(){var el=document.getElementById('metpill');if(!el)return;var c=getMe(),t=c&&byCar[c].team;if(!t){el.style.display='none';el.innerHTML='';return;}el.style.display='';el.innerHTML='<span class="mst">\u2605</span><b>'+esc(t)+'</b>';el.onclick=function(){teamDetail(t);};}
 function isLocked(){try{return !!localStorage.getItem(PKEY+'_lock3');}catch(e){return false;}}
 function lockPicks(code){try{localStorage.setItem(PKEY+'_lock3',JSON.stringify({code:code,at:new Date().toISOString().slice(0,10)}));}catch(e){}}
 function getPicks(){try{return JSON.parse(localStorage.getItem(PKEY)||'{}')||{};}catch(e){return {};}}
@@ -3199,7 +3205,7 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
   function mount(){
     var row=document.querySelector('.merow');if(!row||document.getElementById('appbtn'))return;
     var b=document.createElement('button');b.type='button';b.id='appbtn';b.className='apppill';
-    b.innerHTML='<img src="'+ICON+'" alt=""><span>Get the <b>app</b></span>';b.addEventListener('click',open);row.appendChild(b);
+    b.innerHTML='<img class="apl" src="icons/logo.png?v=4" alt="PACE"><span>Get <i class="th" style="font-style:normal">the </i><b>app</b></span>';b.addEventListener('click',open);row.appendChild(b);
     var f=document.getElementById('foot');if(f&&!document.getElementById('appfoot')){var d=document.createElement('div');d.id='appfoot';d.className='appfoot';var b2=b.cloneNode(true);b2.id='appbtn2';b2.addEventListener('click',open);d.appendChild(b2);f.parentNode.insertBefore(d,f);}
   }
   mount();window.addEventListener('load',mount);
@@ -3210,7 +3216,7 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
 <script>
 /* auto-update: compares this page's build stamp to version.json and reloads when a newer build is live */
 (function(){
-  var B='20261119053638',last=0,busy=false;
+  var B='20261119054501',last=0,busy=false;
   function chk(){
     var n=Date.now();if(busy||n-last<20000)return;last=n;busy=true;
     fetch('version.json?t='+n,{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
