@@ -486,6 +486,49 @@ header{background:radial-gradient(ellipse 60% 140% at 12% 0%,rgba(225,29,46,.22)
 .wbch{text-align:center;font:800 25px/1 var(--hd);color:#2b2d31}.wbch.nu{color:#6b7078;font-weight:700}
 .wbpts{text-align:center;font:italic 800 32px/1 var(--hd);color:#ffc83d;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 .wbrp{width:100%;min-height:46px;font:700 17px var(--hd);letter-spacing:.08em;text-transform:uppercase;background:#ffc83d;color:#111;border:0;border-radius:9px;cursor:pointer;margin-bottom:10px}
+
+/* ---- Get the app (add to home screen) ---- */
+.apppill{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(180deg,#1b1f25,#12151a);border:1px solid #2c323a;color:#fff;border-radius:999px;padding:7px 13px 7px 8px;font:700 13px/1 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.apppill img{width:22px;height:22px;border-radius:6px;display:block}
+.apppill b{color:#ff5a66;font-weight:800}
+.ahov{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center}
+.ahov.on{display:flex}
+.ahsh{width:100%;max-width:560px;max-height:92vh;max-height:92dvh;overflow:auto;background:#0b0d10;border:1px solid #22262c;border-bottom:0;border-radius:20px 20px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom));animation:ahup .22s ease-out;overscroll-behavior:contain}
+@keyframes ahup{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.ahtop{display:flex;align-items:center;gap:14px}
+.ahicon{flex:none;width:76px;height:76px;border-radius:18px;box-shadow:0 6px 18px rgba(0,0,0,.6),0 0 0 1px #2a2f36}
+.ahtop h2{margin:0;font:800 26px/1 'Barlow Condensed',sans-serif;font-style:italic;text-transform:uppercase;color:#f3f5f7}
+.ahtop p{margin:5px 0 0;font:500 13px/1.3 'Barlow',sans-serif;color:#9aa3ad}
+.ahx{margin-left:auto;flex:none;width:36px;height:36px;border:0;border-radius:50%;background:#1b1f25;color:#fff;font-size:19px;cursor:pointer;align-self:flex-start}
+.ahtabs{display:flex;gap:8px;margin:16px 0 12px}
+.ahtabs button{flex:1;padding:11px 0;border-radius:11px;border:1px solid #2a2f36;background:#12151a;color:#9aa3ad;font:800 15px 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.ahtabs button.on{background:#b5223a;border-color:#b5223a;color:#fff}
+.ahwarn{background:#2a1216;border:1px solid #6a1f2a;color:#ffb3ba;border-radius:12px;padding:11px 13px;font:600 13px/1.35 'Barlow',sans-serif;margin-bottom:12px}
+.ahwarn button{margin-top:8px;background:#ff5a66;color:#12080a;border:0;border-radius:9px;padding:8px 12px;font:800 13px 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.ahst{display:flex;gap:12px;background:#101317;border:1px solid #22262c;border-radius:14px;padding:12px;margin-bottom:10px}
+.ahn{flex:none;width:28px;height:28px;border-radius:50%;background:#b5223a;color:#fff;font:800 16px/28px 'Barlow Condensed',sans-serif;text-align:center}
+.aht{flex:1;min-width:0}
+.aht b{display:block;font:800 18px/1.1 'Barlow Condensed',sans-serif;text-transform:uppercase;color:#f3f5f7}
+.aht span{display:block;margin-top:3px;font:500 13px/1.35 'Barlow',sans-serif;color:#9aa3ad}
+.ahmock{margin-top:10px;background:#1c1c1e;border-radius:12px;padding:10px 12px;color:#fff;font:500 14px 'Barlow',sans-serif;overflow:hidden}
+.ahbar{display:flex;align-items:center;justify-content:space-around}
+.ahbar svg{width:26px;height:26px;stroke:#8e8e93;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ahbar .hl{stroke:#0a84ff;position:relative}
+.ahring{display:inline-flex;padding:7px;border-radius:50%;box-shadow:0 0 0 2px #0a84ff;animation:ahp 1.4s infinite}
+@keyframes ahp{50%{box-shadow:0 0 0 6px rgba(10,132,255,.25)}}
+.ahrow{display:flex;align-items:center;justify-content:space-between;padding:9px 4px;border-top:1px solid #38383a}
+.ahrow:first-child{border-top:0}
+.ahrow.hl{background:rgba(10,132,255,.18);border-radius:8px;box-shadow:0 0 0 2px #0a84ff inset;font-weight:700}
+.ahrow svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ahadd{display:flex;align-items:center;gap:12px}
+.ahadd img{width:48px;height:48px;border-radius:11px}
+.ahadd .nm{flex:1;font:600 15px 'Barlow',sans-serif;border-bottom:1px solid #444;padding-bottom:5px}
+.ahadd .ab{background:#0a84ff;color:#fff;border-radius:999px;padding:6px 14px;font:700 14px 'Barlow',sans-serif;box-shadow:0 0 0 2px rgba(10,132,255,.35)}
+.ahact{display:flex;gap:8px;margin-top:6px}
+.ahact button{flex:1;padding:13px 0;border-radius:12px;border:0;font:800 16px 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.ahact .p{background:#b5223a;color:#fff}.ahact .g{background:#1b1f25;color:#fff;border:1px solid #2a2f36}
+.ahfoot{margin-top:12px;font:500 12px/1.4 'Barlow',sans-serif;color:#7f8791;text-align:center}
+.appfoot{text-align:center;padding:18px 0 4px}
 </style>
 <style id="pace-bg">
 /* Background: dark steel gradient with a faint red band. No fine patterns. */
@@ -3040,6 +3083,66 @@ var _h0=location.hash;NAV.busy=true;render();NAV.busy=false;NAV.init(_h0);
 </script>
 <script>
 document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=='DETAILS'||!d.open)return;Array.prototype.forEach.call(document.querySelectorAll('details[open]'),function(o){if(o!==d&&!o.contains(d)&&!d.contains(o))o.open=false;});},true);
+</script>
+
+<div class="ahov" id="ahov"><div class="ahsh" id="ahsh"></div></div>
+<script>
+(function(){
+  var ICON='icons/icon-192.png?v=3',NAME='PACE Race Hub';
+  var ua=navigator.userAgent||'',IOS=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var inApp=/FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|Twitter|Discord|GSA\//.test(ua);
+  var notSafari=IOS&&(/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)||inApp);
+  var standalone=false;try{standalone=(window.navigator.standalone===true)||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);}catch(e){}
+  if(standalone)return;
+  var dp=null,tab=IOS?'ios':(/Android/.test(ua)?'and':'ios');
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;});
+  var SH='<svg viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
+  var PL='<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>';
+  var BK='<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',FW='<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>',BM='<svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18l-6-4-6 4z"/></svg>',TB='<svg viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="13" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v11"/></svg>';
+  function step(n,t,d,m){return '<div class="ahst"><div class="ahn">'+n+'</div><div class="aht"><b>'+t+'</b><span>'+d+'</span>'+(m||'')+'</div></div>';}
+  function iosHtml(){
+    var w=notSafari?'<div class="ahwarn">You are not in Safari. iPhone only lets Safari add apps to the home screen. Copy the link, open Safari, and paste it there.<br><button id="ahcopy" type="button">Copy link</button></div>':'';
+    return w
+    +step(1,'Open this page in Safari','Not inside Instagram, Messages or Chrome. Safari only (the blue compass).')
+    +step(2,'Tap the Share button','It is the square with an arrow pointing up, in the bottom bar of Safari.','<div class="ahmock"><div class="ahbar">'+BK+FW+'<span class="ahring"><span style="display:block;width:26px;height:26px;stroke:#0a84ff">'+SH.replace('<svg','<svg style="stroke:#0a84ff"')+'</span></span>'+BM+TB+'</div></div>')
+    +step(3,'Tap "Add to Home Screen"','Scroll down the share menu if you do not see it right away.','<div class="ahmock"><div class="ahrow"><span>Copy</span><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></div><div class="ahrow"><span>Add to Bookmarks</span>'+BM+'</div><div class="ahrow hl"><span>Add to Home Screen</span>'+PL+'</div></div>')
+    +step(4,'Tap Add','Leave "Open as Web App" turned on. The name will say '+NAME+'.','<div class="ahmock"><div class="ahadd"><img src="'+ICON+'" alt=""><div class="nm">'+NAME+'</div><div class="ab">Add</div></div></div>')
+    +'<div class="ahfoot">Done. PACE Race Hub is now on your home screen like any other app.</div>';
+  }
+  function andHtml(){
+    return step(1,'Open this page in Chrome','The regular Chrome app on your Android phone.')
+    +step(2,'Tap the three dots','Top right corner of Chrome.','<div class="ahmock"><div class="ahrow"><span>New tab</span></div><div class="ahrow hl"><span>Install app</span>'+PL+'</div><div class="ahrow"><span>Add to Home screen</span></div></div>')
+    +step(3,'Tap Install','You may see "Add to Home screen" instead. Same thing.','<div class="ahmock"><div class="ahadd"><img src="'+ICON+'" alt=""><div class="nm">'+NAME+'</div><div class="ab">Install</div></div></div>')
+    +'<div class="ahfoot">Done. It shows up in your apps and on your home screen.</div>';
+  }
+  function draw(){
+    var sh=document.getElementById('ahsh');
+    sh.innerHTML='<div class="ahtop"><img class="ahicon" src="'+ICON+'" alt=""><div><h2>Get the app</h2><p>Put '+NAME+' on your home screen. Opens full screen, no browser bar.</p></div><button class="ahx" type="button" aria-label="Close">&times;</button></div>'
+    +'<div class="ahtabs"><button type="button" data-p="ios" class="'+(tab==='ios'?'on':'')+'">iPhone</button><button type="button" data-p="and" class="'+(tab==='and'?'on':'')+'">Android</button></div>'
+    +(tab==='ios'?iosHtml():andHtml())
+    +'<div class="ahact">'+(tab==='and'&&dp?'<button class="p" id="ahins" type="button">Install now</button>':'')+'<button class="g" id="ahshare" type="button">Send the link</button></div>';
+  }
+  function link(){return location.href.split('#')[0].split('?')[0];}
+  function open(){draw();document.getElementById('ahov').classList.add('on');document.body.style.overflow='hidden';}
+  function close(){document.getElementById('ahov').classList.remove('on');document.body.style.overflow='';}
+  function copy(btn){var u=link();function ok(){btn.textContent='Copied';}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(u).then(ok,function(){prompt('Copy this link',u);});}else prompt('Copy this link',u);}
+  document.getElementById('ahov').addEventListener('click',function(e){
+    var t=e.target;
+    if(t.id==='ahov'||t.classList.contains('ahx'))return close();
+    if(t.getAttribute('data-p')){tab=t.getAttribute('data-p');return draw();}
+    if(t.id==='ahcopy')return copy(t);
+    if(t.id==='ahins'&&dp){dp.prompt();dp.userChoice&&dp.userChoice.then(function(){dp=null;close();});return;}
+    if(t.id==='ahshare'){var u=link();if(navigator.share){navigator.share({title:NAME,text:'Add the PACE Race Hub to your home screen',url:u}).catch(function(){});}else copy(t);}
+  });
+  function mount(){
+    var row=document.querySelector('.merow');if(!row||document.getElementById('appbtn'))return;
+    var b=document.createElement('button');b.type='button';b.id='appbtn';b.className='apppill';
+    b.innerHTML='<img src="'+ICON+'" alt=""><span>Get the <b>app</b></span>';b.addEventListener('click',open);row.appendChild(b);
+    var f=document.getElementById('foot');if(f&&!document.getElementById('appfoot')){var d=document.createElement('div');d.id='appfoot';d.className='appfoot';var b2=b.cloneNode(true);b2.id='appbtn2';b2.addEventListener('click',open);d.appendChild(b2);f.parentNode.insertBefore(d,f);}
+  }
+  mount();window.addEventListener('load',mount);
+  window.PACE_openApp=open;
+})();
 </script>
 </body>
 </html>
