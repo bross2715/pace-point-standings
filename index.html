@@ -661,6 +661,31 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 #f1ledsh .ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-family:var(--hd);font-size:16px;letter-spacing:1.2px;text-transform:uppercase;color:#fff}
 #f1ledsh .ph button{background:none;border:0;color:#fff;font-size:26px;line-height:1;padding:0 6px;cursor:pointer}
 #f1ledsh .nt{margin-top:8px;font-size:11px;color:var(--mut)}
+.f1sc{margin:0 0 4px}
+.f1sc .f1nx{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(181,34,58,.22),rgba(14,16,19,.85))}
+.f1sc .f1nx>div:first-child{flex:1;min-width:0}
+.f1sc .f1nx small{font-family:var(--hd);font-weight:700;letter-spacing:1.4px;text-transform:uppercase;font-size:12px;color:#ff6b84}
+.f1sc .f1nx h3{margin:2px 0;font-family:var(--hd);font-style:italic;font-weight:800;font-size:28px;line-height:1;text-transform:uppercase;color:#fff}
+.f1sc .f1nx span{font-size:12px;color:var(--mut)}
+.f1sc .f1nx em{display:inline-block;margin-top:6px;font-style:normal;font-family:var(--hd);font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
+.f1sc .f1nx .f1tk{width:40%;max-width:150px;flex:none}.f1sc .f1nx .f1tk svg{width:100%;display:block}
+.f1sc .f1sw{width:100%;margin:8px 0 0;display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:#fff;font-family:var(--hd);font-weight:700;font-size:14px;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer}
+.f1sc .f1sw span:last-child{color:var(--mut);font-size:12px}
+.f1sc .f1sl{margin-top:8px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--panel)}
+.f1sc .f1bh{padding:6px 12px;font-family:var(--hd);font-weight:800;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);background:rgba(255,255,255,.05)}
+.f1sc .f1bh.f1ch{color:#22d36b;background:rgba(34,211,107,.1)}.f1sc .f1bh.f1cs{color:var(--gold);background:rgba(255,200,61,.1)}.f1sc .f1bh.f1as{color:#7cc4ff;background:rgba(124,196,255,.1)}
+.f1sc .f1sr{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:8px;padding:6px 12px;min-height:46px;border-top:1px solid rgba(255,255,255,.05)}
+.f1sc .f1sr.f1dn{cursor:pointer}.f1sc .f1sr.f1dn:active{background:rgba(255,255,255,.08)}
+.f1sc .f1sr.f1sel{background:rgba(255,255,255,.06);box-shadow:inset 3px 0 0 var(--gold)}
+.f1sc .f1sr .f1no{font-family:var(--hd);font-weight:800;font-size:16px;color:var(--mut);text-align:center}
+.f1sc .f1sr .f1tx b{display:block;font-family:var(--hd);font-weight:800;font-size:17px;letter-spacing:.8px;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1sc .f1sr .f1tx span{font-size:11px;color:var(--mut)}
+.f1sc .f1sr .f1rs{display:flex;align-items:center;gap:2px}
+.f1sc .f1sr .f1rs .plate{transform:scale(.8);transform-origin:right center;margin:0 -4px 0 -6px}
+.f1sc .f1sr .f1rs b{font-family:var(--hd);font-weight:800;font-size:15px;letter-spacing:.8px;text-transform:uppercase;color:#fff;margin-left:2px}
+.f1sc .f1sr .f1mu{font-family:var(--hd);font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mut)}
+.f1sc .f1sr .f1pill{font-family:var(--hd);font-weight:800;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:#111;background:var(--gold);border-radius:999px;padding:3px 10px}
+.f1sc .f1sr.f1nxt{background:rgba(255,200,61,.07)}
 </style>
 <style id="pace-motion2">
 @keyframes mvF{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -781,7 +806,7 @@ html[data-mv] .tpn.on{animation:none}
   <nav id="tabs">
     <button data-t="tower" class="on">Tower</button>
     <button data-t="pace">Pace</button>
-    <button data-t="results">Results</button>
+    <button data-t="results">Schedule</button>
     <button data-t="teams">Teams</button>
     <button data-t="leaders">Leaders</button>
     <button data-t="stage">Stage</button>
@@ -1983,7 +2008,7 @@ function nameOf(car){return byCar[car]?byCar[car].name:car;}
 function gainCell(g){return g==null||g===0?'<span class="gn z">0</span>':g>0?'<span class="gn up">+'+g+'</span>':'<span class="gn dn">'+g+'</span>';}
 function blockLogo(i){var b=blockOf(i),k=/challenge/i.test(b)?'chal':/all-star/i.test(b)?'allstar':/chase/i.test(b)?'chase':null;return k?'<div style="text-align:center;margin:2px 0 12px"><img class="lg" src="'+LOGOS[k]+'" style="height:'+(k==='allstar'?'46px':'74px')+';width:auto;max-width:100%;margin:0 auto" alt="'+esc(b)+'"></div>':'';}
 function resultsTab(L){
-  var i=st.n-1, rt=C.raceTable(D,i), race=D.races[i], h=scrub();
+  var i=st.n-1, rt=C.raceTable(D,i), race=D.races[i], h=f1Sched()+scrub();
   h+=blockLogo(i);
   var pole=null; Object.keys(race.qual||{}).forEach(function(c){if(race.qual[c]===1&&race.fin[c])pole=c;});
   var fl=(race.fl||[]).map(nameOf).join(', ');
@@ -2049,6 +2074,35 @@ function f1Qual(i){
   if(!Object.keys(ql).length) h+='<div class="call" style="margin-top:10px">No qualifying laps were recorded for this race, so only the starting spots show.</div>';
   return h;
 }
+function f1D(md){var m=String(md||'').split('/'),N=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m.length===2&&N[+m[0]-1]?N[+m[0]-1]+' '+(+m[1]):String(md||'');}
+function f1Winner(i){var r=D.races[i];if(!r||!r.fin)return null;var w=null;Object.keys(r.fin).forEach(function(c){if(r.fin[c]===1)w=c;});return w;}
+function f1Sched(){
+  var N=D.schedule.length, h='<div class="f1sc" id="f1sc">';
+  if(R<N){
+    var trk=D.schedule[R], blk=esc(blockOf(R))+roundOf(R);
+    h+='<div class="f1nx"><div><small>Up next &middot; Race '+(R+1)+' of '+N+'</small><h3>'+esc(trk)+'</h3><span>'+esc(f1D(dateOf(R)))+(typeOf(trk)?' &middot; '+esc(typeOf(trk)):'')+(TLEN[trk]?' &middot; '+TLEN[trk]+' mi':'')+'</span>'+(blk?'<em>'+blk+'</em>':'')+'</div><div class="f1tk">'+trkSvg(trk,'#b5223a',true,false,'#b5223a')+'</div></div>';
+  } else h+='<div class="f1nx"><div><small>Season complete</small><h3>'+N+' of '+N+' races</h3></div></div>';
+  h+='<button type="button" class="f1sw" data-f1sch="1" aria-expanded="'+(st.f1sch?'true':'false')+'"><span>Full schedule</span><span>'+R+' of '+N+' done '+(st.f1sch?'&#9650;':'&#9660;')+'</span></button>';
+  if(st.f1sch){
+    h+='<div class="f1sl">';
+    var last='';
+    for(var i=0;i<N;i++){
+      var b=blockOf(i), bk=b+'|'+(((D.scheduleBlocks||[]).filter(function(x){return i+1>=x.from&&i+1<=x.to;})[0]||{}).from);
+      if(bk!==last){last=bk;h+='<div class="f1bh '+(/challenge/i.test(b)?'f1ch':/chase/i.test(b)?'f1cs':/all-star/i.test(b)?'f1as':'')+'">'+esc(b||'Season')+'</div>';}
+      var trk=D.schedule[i], done=i<R, w=done?f1Winner(i):null, next=i===R;
+      h+='<div class="f1sr'+(done?' f1dn':'')+(i===st.n-1&&done?' f1sel':'')+(next?' f1nxt':'')+'"'+(done?' data-f1pick="'+(i+1)+'"':'')+'><div class="f1no">'+(i+1)+'</div><div class="f1tx"><b>'+esc(trk)+'</b><span>'+esc(f1D(dateOf(i)))+(typeOf(trk)?' &middot; '+esc(typeOf(trk)):'')+'</span></div><div class="f1rs">'+
+        (w?chip(w,'sm')+'<b>'+esc(nameOf(w))+'</b>':(done?'<span class="f1mu">&ndash;</span>':(next?'<span class="f1pill">Next</span>':'<span class="f1mu">Upcoming</span>')))+'</div></div>';
+    }
+    h+='</div>';
+  }
+  return h+'</div><div id="f1res"></div>';
+}
+document.addEventListener('click',function(e){
+  var t=e.target&&e.target.closest?e.target.closest('[data-f1sch],[data-f1pick]'):null; if(!t) return;
+  if(t.hasAttribute('data-f1sch')){st.f1sch=!st.f1sch;render();return;}
+  st.n=parseInt(t.getAttribute('data-f1pick'),10);st.f1sch=false;st.rsub='res';st.ropen=false;render();
+  var a=document.getElementById('f1res'); if(a) window.scrollTo(0,a.getBoundingClientRect().top+window.scrollY-60);
+});
 function f1Gap(race,r,win){
   var c=r.car;
   if(r.fin===1) return {t:'Leader',k:''};
