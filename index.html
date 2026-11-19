@@ -645,16 +645,22 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 .hl b{display:block;font-family:var(--hd);font-weight:800;font-size:15px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:clip}
 .hl span{font-size:11px;color:var(--mut)}
 .rr.pod .rk{font-weight:800;font-size:19px}.rr.p1 .rk{color:#ffc83d}.rr.p2 .rk{color:#cfd5dc}.rr.p3 .rk{color:#d08a4a}
-.f1led{margin:0 0 12px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,200,61,.35);background:linear-gradient(90deg,rgba(255,200,61,.14),rgba(14,16,19,.85))}
-.f1led h5{margin:0 0 6px;font-family:var(--hd);font-weight:800;font-size:15px;letter-spacing:1.4px;text-transform:uppercase;color:#fff}
-.f1led .lr{display:grid;grid-template-columns:44px 84px minmax(0,1fr) 34px;align-items:center;gap:8px;padding:3px 0;cursor:pointer}
-.f1led .lr .plate{transform:scale(.72);transform-origin:left center}
-.f1led .lr b{font-family:var(--hd);font-weight:800;font-size:16px;letter-spacing:.8px;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden}
-.f1led .lr i{display:block;height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
-.f1led .lr i u{display:block;height:100%;border-radius:4px}
-.f1led .lr em{font-style:normal;font-family:var(--hd);font-weight:800;font-size:17px;color:#fff;text-align:right}
-.f1led .lr.top b,.f1led .lr.top em{color:var(--gold)}
-.f1led .nt{margin-top:6px;font-size:11px;color:var(--mut)}
+.f1lc{margin:0 0 12px;padding:8px 12px 6px;border-radius:12px;border:1px solid rgba(255,200,61,.35);background:linear-gradient(90deg,rgba(255,200,61,.14),rgba(14,16,19,.85));cursor:pointer}
+.f1lc .hd{display:flex;justify-content:space-between;align-items:center;font-family:var(--hd);font-weight:800;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;color:#fff}
+.f1lc .hd u{text-decoration:none;font-size:12px;color:var(--gold);letter-spacing:1px}
+.lr{display:grid;grid-template-columns:44px 78px minmax(0,1fr) 66px;align-items:center;gap:8px;padding:3px 0}
+.lr .plate{transform:scale(.8);transform-origin:left center}
+.lr b{font-family:var(--hd);font-weight:800;font-size:16px;letter-spacing:.8px;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden}
+.lr i{display:block;height:8px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+.lr i u{display:block;height:100%;border-radius:4px}
+.lr em{font-style:normal;font-family:var(--hd);font-weight:800;font-size:17px;color:#fff;text-align:right;white-space:nowrap}
+.lr em small{font-size:11px;font-weight:700;color:var(--mut)}
+#f1ledsh{position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center}
+#f1ledsh .bd{position:absolute;inset:0;background:rgba(0,0,0,.65)}
+#f1ledsh .pn{position:relative;width:100%;max-width:520px;max-height:78vh;overflow:auto;background:#0e1013;border:1px solid var(--line);border-radius:16px 16px 0 0;padding:12px 14px calc(16px + env(safe-area-inset-bottom));animation:tpIn .25s ease both}
+#f1ledsh .ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-family:var(--hd);font-size:16px;letter-spacing:1.2px;text-transform:uppercase;color:#fff}
+#f1ledsh .ph button{background:none;border:0;color:#fff;font-size:26px;line-height:1;padding:0 6px;cursor:pointer}
+#f1ledsh .nt{margin-top:8px;font-size:11px;color:var(--mut)}
 </style>
 <style id="pace-motion2">
 @keyframes mvF{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -1992,9 +1998,9 @@ function resultsTab(L){
   h+='<button class="more" id="recapbtn" style="margin-bottom:12px">Make recap image</button>';
   h+='<div class="vb" style="margin-bottom:12px"><button data-rsub="res" class="'+(st.rsub!=='qual'?'on':'')+'">Results</button><button data-rsub="qual" class="'+(st.rsub==='qual'?'on':'')+'">Qualifying</button></div>';
   if(st.rsub==='qual') return h+qualGrid(i);
-  h+=(/[?&]f1=0/.test(location.search)?ledCall(i):f1Led(D.races[i]));
+  h+=(/[?&]f1=0/.test(location.search)?ledCall(i):'');
   h+='<div class="sec">'+esc(trackOf(i))+' results</div>';
-  if(!/[?&]f1=0/.test(location.search)){h+=f1Podium(rt,race)+f1Strip(rt,race)+f1Table(rt,race);}
+  if(!/[?&]f1=0/.test(location.search)){h+=f1Podium(rt,race)+f1Strip(rt,race)+f1LedCard(race)+f1Table(rt,race);}
   else {
   rt.rows.forEach(function(r){
     var gain=r.start?r.start-r.fin:null;
@@ -2051,18 +2057,38 @@ function f1Table(rt,race){
   });
   return h+'</div>';
 }
-function f1Led(race){
-  if(!race||!race.ledN) return '';
+function f1LedData(race){
+  if(!race||!race.ledN) return null;
   var ks=Object.keys(race.ledN).sort(function(a,b){return race.ledN[b]-race.ledN[a];});
-  if(!ks.length) return '';
-  var mx=race.ledN[ks[0]];
-  var h='<div class="f1led"><h5>Most laps led</h5>';
-  ks.forEach(function(c,ix){
-    var d=byCar[c], ac=d?accentOf(c,d):'#888', n=race.ledN[c];
-    h+='<div class="lr'+(race.ledN[c]===mx?' top':'')+'" data-car="'+esc(c)+'">'+chip(c)+'<b>'+esc(nameOf(c))+'</b><i><u style="width:'+Math.max(4,Math.round(n/mx*100))+'%;background:'+ac+'"></u></i><em>'+n+'</em></div>';
-  });
-  return h+'<div class="nt">'+esc(race.ledNote||'')+'</div></div>';
+  if(!ks.length) return null;
+  var tot=race.laps>0?race.laps:ks.reduce(function(a,c){return a+race.ledN[c];},0);
+  return {ks:ks,tot:tot,exact:race.laps>0};
 }
+function f1LedRow(race,c,tot){
+  var d=byCar[c], ac=d?accentOf(c,d):'#888', n=race.ledN[c];
+  return '<div class="lr">'+chip(c,'sm')+'<b>'+esc(nameOf(c))+'</b><i><u style="width:'+Math.max(2,Math.min(100,n/tot*100)).toFixed(1)+'%;background:'+ac+'"></u></i><em>'+n+'<small> / '+tot+'</small></em></div>';
+}
+function f1LedCard(race){
+  var L=f1LedData(race); if(!L) return '';
+  var top=L.ks.filter(function(c){return race.ledN[c]===race.ledN[L.ks[0]];});
+  return '<div class="f1lc" data-f1led="1"><div class="hd"><span>Most laps led</span><u>All drivers &rsaquo;</u></div>'+top.map(function(c){return f1LedRow(race,c,L.tot);}).join('')+'</div>';
+}
+function f1LedSheet(race){
+  var L=f1LedData(race); if(!L) return;
+  var old=document.getElementById('f1ledsh'); if(old) old.remove();
+  var el=document.createElement('div'); el.id='f1ledsh';
+  el.innerHTML='<div class="bd"></div><div class="pn"><div class="ph"><b>Laps led &middot; '+esc(race.track)+'</b><button type="button" aria-label="Close">&times;</button></div>'+L.ks.map(function(c){return f1LedRow(race,c,L.tot);}).join('')+'<div class="nt">'+(L.exact?'':'Race length not recorded, bars are scaled to total laps led. ')+esc(race.ledNote||'')+'</div></div>';
+  function close(){el.remove();document.removeEventListener('keydown',key);}
+  function key(e){if(e.key==='Escape')close();}
+  el.querySelector('.bd').addEventListener('click',close);
+  el.querySelector('button').addEventListener('click',close);
+  document.addEventListener('keydown',key);
+  document.body.appendChild(el);
+}
+document.addEventListener('click',function(e){
+  var t=e.target&&e.target.closest?e.target.closest('[data-f1led]'):null;
+  if(t) f1LedSheet(D.races[st.n-1]);
+});
 function ledCall(i){
   var r=D.races[i]; if(!r||!r.ledN) return '';
   var ks=Object.keys(r.ledN).sort(function(a,b){return r.ledN[b]-r.ledN[a];});
