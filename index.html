@@ -645,6 +645,16 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 .hl b{display:block;font-family:var(--hd);font-weight:800;font-size:15px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:clip}
 .hl span{font-size:11px;color:var(--mut)}
 .rr.pod .rk{font-weight:800;font-size:19px}.rr.p1 .rk{color:#ffc83d}.rr.p2 .rk{color:#cfd5dc}.rr.p3 .rk{color:#d08a4a}
+.f1led{margin:0 0 12px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,200,61,.35);background:linear-gradient(90deg,rgba(255,200,61,.14),rgba(14,16,19,.85))}
+.f1led h5{margin:0 0 6px;font-family:var(--hd);font-weight:800;font-size:15px;letter-spacing:1.4px;text-transform:uppercase;color:#fff}
+.f1led .lr{display:grid;grid-template-columns:44px 84px minmax(0,1fr) 34px;align-items:center;gap:8px;padding:3px 0;cursor:pointer}
+.f1led .lr .plate{transform:scale(.72);transform-origin:left center}
+.f1led .lr b{font-family:var(--hd);font-weight:800;font-size:16px;letter-spacing:.8px;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden}
+.f1led .lr i{display:block;height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+.f1led .lr i u{display:block;height:100%;border-radius:4px}
+.f1led .lr em{font-style:normal;font-family:var(--hd);font-weight:800;font-size:17px;color:#fff;text-align:right}
+.f1led .lr.top b,.f1led .lr.top em{color:var(--gold)}
+.f1led .nt{margin-top:6px;font-size:11px;color:var(--mut)}
 </style>
 <style id="pace-motion2">
 @keyframes mvF{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -1982,7 +1992,7 @@ function resultsTab(L){
   h+='<button class="more" id="recapbtn" style="margin-bottom:12px">Make recap image</button>';
   h+='<div class="vb" style="margin-bottom:12px"><button data-rsub="res" class="'+(st.rsub!=='qual'?'on':'')+'">Results</button><button data-rsub="qual" class="'+(st.rsub==='qual'?'on':'')+'">Qualifying</button></div>';
   if(st.rsub==='qual') return h+qualGrid(i);
-  h+=ledCall(i);
+  h+=(/[?&]f1=0/.test(location.search)?ledCall(i):f1Led(D.races[i]));
   h+='<div class="sec">'+esc(trackOf(i))+' results</div>';
   if(!/[?&]f1=0/.test(location.search)){h+=f1Podium(rt,race)+f1Strip(rt,race)+f1Table(rt,race);}
   else {
@@ -2027,7 +2037,6 @@ function f1Strip(rt,race){
   var bits=[];
   if(fa) bits.push('<span>Lap<b>'+esc(lapFmt(fa.lap))+'</b></span><span>Driver<b>'+chip(fa.car,'sm')+esc(dispName(fa.d))+'</b></span>');
   if(pole) bits.push('<span>Pole<b>'+chip(pole,'sm')+esc(nameOf(pole))+'</b></span>');
-  if(lead) bits.push('<span>Most led<b>'+chip(lead,'sm')+esc(nameOf(lead))+' '+race.ledN[lead]+'</b></span>');
   if(race.cautions!=null) bits.push('<span>Cautions<b>'+race.cautions+'</b></span>');
   if(!bits.length) return '';
   return '<div class="f1fl"><h5>Fastest lap</h5>'+bits.join('')+'</div>';
@@ -2041,6 +2050,18 @@ function f1Table(rt,race){
     h+='<div class="f1r'+(r.fin<=3?' t'+r.fin:'')+'" style="--rc:'+pc+'" data-car="'+esc(r.car)+'"><div class="ps">'+r.fin+'</div><div class="dv">'+chip(r.car)+'<b>'+esc(dispName(r.d))+'</b><em>'+esc(r.d.team||'')+'</em>'+(rt.pace[0]&&rt.pace[0].car===r.car?'<span class="fl" title="Fastest lap"></span>':'')+'</div><div class="gp '+g.k+'">'+esc(g.t)+'</div></div>';
   });
   return h+'</div>';
+}
+function f1Led(race){
+  if(!race||!race.ledN) return '';
+  var ks=Object.keys(race.ledN).sort(function(a,b){return race.ledN[b]-race.ledN[a];});
+  if(!ks.length) return '';
+  var mx=race.ledN[ks[0]];
+  var h='<div class="f1led"><h5>Most laps led</h5>';
+  ks.forEach(function(c,ix){
+    var d=byCar[c], ac=d?accentOf(c,d):'#888', n=race.ledN[c];
+    h+='<div class="lr'+(race.ledN[c]===mx?' top':'')+'" data-car="'+esc(c)+'">'+chip(c)+'<b>'+esc(nameOf(c))+'</b><i><u style="width:'+Math.max(4,Math.round(n/mx*100))+'%;background:'+ac+'"></u></i><em>'+n+'</em></div>';
+  });
+  return h+'<div class="nt">'+esc(race.ledNote||'')+'</div></div>';
 }
 function ledCall(i){
   var r=D.races[i]; if(!r||!r.ledN) return '';
