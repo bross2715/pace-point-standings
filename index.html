@@ -683,10 +683,16 @@ html[data-mv] .tpn.on{animation:none}
 .f1c .bar{position:absolute;left:6px;right:6px;bottom:6px;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:3px 10px;font-family:var(--hd);font-weight:800;font-size:13px;letter-spacing:.6px;color:#fff}
 .f1c .bar i{font-style:normal;color:rgba(255,255,255,.75);font-weight:700}
 .f1c.p1 .bar b{color:var(--gold)}
-.f1fl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 0 12px;padding:9px 12px;border-radius:10px;border:1px solid rgba(160,90,255,.35);background:linear-gradient(90deg,rgba(120,60,200,.28),rgba(14,16,19,.8))}
-.f1fl h5{margin:0;font-family:var(--hd);font-weight:800;font-size:15px;letter-spacing:1.4px;text-transform:uppercase;color:#fff;width:100%}
-.f1fl span{font-family:var(--hd);font-weight:700;font-size:13px;letter-spacing:.8px;color:#cdb8ff;text-transform:uppercase;white-space:nowrap}
-.f1fl span b{color:#fff;font-weight:800;margin-left:3px;display:inline-flex;align-items:center;gap:6px;vertical-align:middle}.f1fl .plate{transform:scale(.8);transform-origin:left center;margin-right:-8px}
+.f1fl{margin:0 0 12px;padding:9px 12px 10px;border-radius:10px;border:1px solid rgba(160,90,255,.35);background:linear-gradient(90deg,rgba(120,60,200,.28),rgba(14,16,19,.8))}
+.f1fl h5{margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;font-family:var(--hd);font-weight:800;font-size:15px;letter-spacing:1.4px;text-transform:uppercase;color:#fff}
+.f1fl h5 em{font-style:normal;font-size:12px;letter-spacing:1px;color:#cdb8ff}.f1fl h5 em b{color:#fff;margin-left:3px}
+.f1fl .fg{display:grid;gap:8px}
+.f1fl .fc{background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:7px 8px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;min-width:0}
+.f1fl .fc small{font-family:var(--hd);font-weight:700;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#cdb8ff}
+.f1fl .who{display:flex;align-items:center;justify-content:center;gap:2px;max-width:100%}
+.f1fl .who .plate{transform:scale(.8);transform-origin:center;margin:0 -4px}
+.f1fl .who b{font-family:var(--hd);font-weight:800;font-size:17px;letter-spacing:.8px;text-transform:uppercase;color:#fff;white-space:nowrap}
+.f1fl .tm{border:0;background:none;padding:0;font-family:var(--hd);font-weight:800;font-size:26px;line-height:1;color:#fff;letter-spacing:.5px}
 .f1t{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--panel)}
 .f1h,.f1r{display:grid;grid-template-columns:34px minmax(0,1fr) 88px;align-items:center;gap:8px;padding:0 10px}
 .f1h{height:30px;background:rgba(255,255,255,.05);font-family:var(--hd);font-weight:700;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mut)}
@@ -701,7 +707,7 @@ html[data-mv] .tpn.on{animation:none}
 .f1r .dv b{font-family:var(--hd);font-weight:800;font-size:17px;letter-spacing:.8px;text-transform:uppercase;color:#fff;white-space:nowrap}
 .f1r .dv em{font-style:normal;font-family:var(--hd);font-weight:700;font-size:11px;letter-spacing:1px;color:var(--mut)}
 .f1r .gp{font-family:var(--hd);font-weight:700;font-size:15px;color:#e6e9ee;white-space:nowrap}
-.f1r .gp.dnf{color:var(--red)}.f1r .gp.mut{color:var(--mut)}
+.f1r .gp small{display:block;font-size:11px;font-weight:700;color:var(--mut);line-height:1.1}.f1r .gp.dnf{color:var(--red)}.f1r .gp.mut{color:var(--mut)}
 .f1r .fl{display:inline-block;width:9px;height:9px;border-radius:50%;background:#a05aff;margin-left:6px;vertical-align:middle}
 </style>
 </head>
@@ -1997,7 +2003,7 @@ function resultsTab(L){
     '</div></div>';
   h+='<button class="more" id="recapbtn" style="margin-bottom:12px">Make recap image</button>';
   h+='<div class="vb" style="margin-bottom:12px"><button data-rsub="res" class="'+(st.rsub!=='qual'?'on':'')+'">Results</button><button data-rsub="qual" class="'+(st.rsub==='qual'?'on':'')+'">Qualifying</button></div>';
-  if(st.rsub==='qual') return h+qualGrid(i);
+  if(st.rsub==='qual') return h+(/[?&]f1=0/.test(location.search)?qualGrid(i):f1Qual(i));
   h+=(/[?&]f1=0/.test(location.search)?ledCall(i):'');
   h+='<div class="sec">'+esc(trackOf(i))+' results</div>';
   if(!/[?&]f1=0/.test(location.search)){h+=f1Podium(rt,race)+f1Strip(rt,race)+f1LedCard(race)+f1Table(rt,race);}
@@ -2013,6 +2019,34 @@ function resultsTab(L){
   }
   if(rt.free.length) h+='<div class="sec">Freebies</div>'+rt.free.map(function(o){return '<div class="rr" data-car="'+esc(o.car)+'"><div class="rk">&ndash;</div>'+chip(o.car)+'<div><div class="n1">'+esc(dispName(o.d))+team(o.d)+'</div><div class="n2">Excused absence</div></div><div class="rt"><b style="color:var(--green)">+'+o.r[i]+'</b><span>FREE</span></div></div>';}).join('');
   h+='<div class="call" style="margin-top:10px">Started is the official starting spot. The green or red number is spots gained or lost from the start. F is finish points, S is stage points, FL is the fastest lap point. Stg is the running position at the end of stage 1 and stage 2 when the order was recorded.</div>';
+  return h;
+}
+function f1Qual(i){
+  var race=D.races[i], q=race.qual||{}, ql=race.qlap||{};
+  var cars=Object.keys(q).filter(function(c){return q[c]>0;}).sort(function(a,b){return q[a]-q[b];});
+  if(!cars.length) return '<div class="call">No starting order recorded for this race.</div>';
+  var pole=cars[0], pl=ql[pole]>0?ql[pole]:null;
+  function gap(c){var l=ql[c]>0?ql[c]:null; if(c===pole) return pl?{t:'Pole',k:''}:{t:'Pole',k:''}; if(l&&pl) return {t:'+'+(l-pl).toFixed(3),k:''}; return {t:'–',k:'mut'};}
+  var h='<div class="sec">'+esc(race.track)+' qualifying</div><div class="f1pod">';
+  cars.slice(0,3).forEach(function(c,ix){
+    var d=byCar[c]; if(!d) return;
+    var ac=accentOf(c,d), tm=d.team||'', mf=teamMfr(tm), wm=(D.mfrImg&&D.mfrImg[mf])||'', g=gap(c);
+    h+='<div class="f1c p'+(ix+1)+'" data-car="'+esc(c)+'" style="--ac:'+ac+'">'+(wm?'<img class="wm" alt="" src="'+wm+'">':'')+'<div class="pl">'+chip(c,'lg')+'</div><div class="nm">'+esc(dispName(d))+'</div><div class="tm">'+esc(tm)+(mf?' &middot; '+esc(mf):'')+'</div><div class="bar"><b>P'+(ix+1)+'</b><i>'+esc(g.t)+'</i></div></div>';
+  });
+  h+='</div>';
+  var laps=cars.filter(function(c){return ql[c]>0;}).map(function(c){return ql[c];});
+  var cells='<div class="fc"><small>Pole lap</small><div class="who">'+chip(pole,'sm')+'<b>'+esc(nameOf(pole))+'</b></div><div class="tm">'+(pl?esc(lapFmt(pl)):'&ndash;')+'</div></div>';
+  var nc=1;
+  if(laps.length>1){nc=2;cells+='<div class="fc"><small>Field spread</small><div class="who"><b>P1 to P'+laps.length+'</b></div><div class="tm">+'+(Math.max.apply(null,laps)-Math.min.apply(null,laps)).toFixed(3)+'</div></div>';}
+  h+='<div class="f1fl"><h5><span>Qualifying</span><em>Cars <b>'+cars.length+'</b></em></h5><div class="fg" style="grid-template-columns:repeat('+nc+',1fr)">'+cells+'</div></div>';
+  h+='<div class="f1t"><div class="f1h"><span>Pos</span><span>Driver</span><span>Lap</span></div>';
+  cars.forEach(function(c){
+    var d=byCar[c]; if(!d) return;
+    var l=ql[c]>0?ql[c]:null, g=gap(c), pc=PAINT[c]&&paintLum(PAINT[c])>0.12?PAINT[c]:'#3a4048', n=q[c];
+    h+='<div class="f1r'+(n<=3?' t'+n:'')+'" style="--rc:'+pc+'" data-car="'+esc(c)+'"><div class="ps">'+n+'</div><div class="dv">'+chip(c)+'<b>'+esc(dispName(d))+'</b><em>'+esc(d.team||'')+'</em></div><div class="gp">'+(l?esc(lapFmt(l)):'&ndash;')+(l&&c!==pole?'<small>'+esc(g.t)+'</small>':'')+'</div></div>';
+  });
+  h+='</div>';
+  if(!Object.keys(ql).length) h+='<div class="call" style="margin-top:10px">No qualifying laps were recorded for this race, so only the starting spots show.</div>';
   return h;
 }
 function f1Gap(race,r,win){
@@ -2037,15 +2071,15 @@ function f1Podium(rt,race){
   return h+'</div>';
 }
 function f1Strip(rt,race){
-  var fa=rt.pace.length?rt.pace[0]:null, lead=null;
-  if(race.ledN){Object.keys(race.ledN).forEach(function(c){if(!lead||race.ledN[c]>race.ledN[lead])lead=c;});}
+  var fa=rt.pace.length?rt.pace[0]:null;
   var pole=null; Object.keys(race.qual||{}).forEach(function(c){if(race.qual[c]===1&&race.fin&&race.fin[c])pole=c;});
-  var bits=[];
-  if(fa) bits.push('<span>Lap<b>'+esc(lapFmt(fa.lap))+'</b></span><span>Driver<b>'+chip(fa.car,'sm')+esc(dispName(fa.d))+'</b></span>');
-  if(pole){var pl=race.qlap&&race.qlap[pole]>0?race.qlap[pole]:null; bits.push('<span>Pole<b>'+chip(pole,'sm')+esc(nameOf(pole))+'</b></span>'+(pl?'<span>Pole lap<b>'+esc(lapFmt(pl))+'</b></span>':''));}
-  if(race.cautions!=null) bits.push('<span>Cautions<b>'+race.cautions+'</b></span>');
-  if(!bits.length) return '';
-  return '<div class="f1fl"><h5>Fastest lap</h5>'+bits.join('')+'</div>';
+  var pl=pole&&race.qlap&&race.qlap[pole]>0?race.qlap[pole]:null;
+  function cell(label,car,t){return '<div class="fc"><small>'+label+'</small><div class="who">'+chip(car,'sm')+'<b>'+esc(nameOf(car))+'</b></div><div class="tm">'+(t>0?esc(lapFmt(t)):'&ndash;')+'</div></div>';}
+  var cells=[];
+  if(fa) cells.push(cell('Fastest lap',fa.car,fa.lap));
+  if(pole) cells.push(cell('Pole lap',pole,pl));
+  if(!cells.length) return '';
+  return '<div class="f1fl"><h5><span>Fastest lap</span>'+(race.cautions!=null?'<em>Cautions <b>'+race.cautions+'</b></em>':'')+'</h5><div class="fg" style="grid-template-columns:repeat('+cells.length+',1fr)">'+cells.join('')+'</div></div>';
 }
 function f1Table(rt,race){
   var win=race.wt!=null?race.wt:null;
