@@ -2042,7 +2042,7 @@ function f1Strip(rt,race){
   var pole=null; Object.keys(race.qual||{}).forEach(function(c){if(race.qual[c]===1&&race.fin&&race.fin[c])pole=c;});
   var bits=[];
   if(fa) bits.push('<span>Lap<b>'+esc(lapFmt(fa.lap))+'</b></span><span>Driver<b>'+chip(fa.car,'sm')+esc(dispName(fa.d))+'</b></span>');
-  if(pole) bits.push('<span>Pole<b>'+chip(pole,'sm')+esc(nameOf(pole))+'</b></span>');
+  if(pole){var pl=race.qlap&&race.qlap[pole]>0?race.qlap[pole]:null; bits.push('<span>Pole<b>'+chip(pole,'sm')+esc(nameOf(pole))+'</b></span>'+(pl?'<span>Pole lap<b>'+esc(lapFmt(pl))+'</b></span>':''));}
   if(race.cautions!=null) bits.push('<span>Cautions<b>'+race.cautions+'</b></span>');
   if(!bits.length) return '';
   return '<div class="f1fl"><h5>Fastest lap</h5>'+bits.join('')+'</div>';
