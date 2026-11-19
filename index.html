@@ -692,8 +692,8 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 .f1sc .f1sr .f1rs .plate{transform:none;zoom:.8;margin:0}
 .f1fl .who{gap:7px}
 .f1fl .who .plate{transform:none;zoom:.8;margin:0}
-.f1lc .lr{grid-template-columns:36px 78px minmax(0,1fr) 66px;gap:8px}
-.f1lc .lr .plate{transform:none;zoom:.8;margin:0}
+.lr{grid-template-columns:36px 78px minmax(0,1fr) 66px;gap:8px}
+.lr .plate{transform:none;zoom:.8;margin:0}
 #f1racesh{position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center}
 #f1racesh .bd{position:absolute;inset:0;background:rgba(0,0,0,.65)}
 #f1racesh .pn{position:relative;width:100%;max-width:520px;max-height:86vh;overflow:auto;background:#0e1013;border:1px solid var(--line);border-radius:16px 16px 0 0;padding:12px 12px calc(16px + env(safe-area-inset-bottom));animation:f1up .22s ease-out}
@@ -741,34 +741,9 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 .f1xc span{font-size:12px;color:var(--mut)}
 </style>
 <style id="pace-f1d">
-.f1g3{grid-template-columns:repeat(3,1fr)!important}
-.f1ex .fg.f1g3>:last-child:nth-child(odd){grid-column:auto}
-.f1g3 .f1xw{flex-direction:column;gap:3px}
-.f1g3 .f1xw b{font-size:15px}
-.f1tw .f1h,.f1tw .f1r{grid-template-columns:36px minmax(0,1fr) 40px 56px;gap:6px}
-.f1tw .f1r{min-height:54px;padding:4px 10px}
-.f1tw .ps{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;font-size:19px}
-.f1tw .ps *{font-size:11px;line-height:1}
-.f1tw .dv{gap:8px}
-.f1tw .dv .plate{transform:none;zoom:.72;margin:0;flex:none}
-.f1tw .nn{min-width:0;display:flex;flex-direction:column;gap:2px}
-.f1tw .nn b{overflow:hidden;text-overflow:ellipsis}
-.f1tw .nn em{display:flex;align-items:center;gap:4px;font-style:normal;white-space:nowrap}
-.f1tw .nn em img.pl.mf{width:14px;height:14px;max-width:14px;border-radius:50%;flex:none;margin:0;object-fit:contain}
-.f1tw .nn em .tm{margin-left:0}
-.f1tw .rc{font-family:var(--hd);font-weight:700;font-size:15px;color:var(--green);text-align:center}
-.f1tw .rc.z{color:var(--mut)}.f1tw .rc small{display:block;font-size:9px;color:var(--mut);letter-spacing:.8px}
-.f1tw .f1pp{text-align:right;line-height:1.1}
-.f1tw .f1pp b{display:block;font-family:var(--hd);font-weight:800;font-size:21px;color:#fff}
-.f1tw .f1pp small{font-family:var(--hd);font-weight:700;font-size:12px;color:var(--mut)}.f1tw .f1pp small.neg{color:#ff6b6b}
-.f1tw .f1h span:nth-child(3){text-align:center}
-.f1tw .f1out{opacity:.78}
-.f1cut{display:flex;align-items:center;padding:3px 10px;background:rgba(181,34,58,.16);border-top:1px solid var(--brand);border-bottom:1px solid var(--brand);font-family:var(--hd);font-weight:800;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:#ff6b84}
-.sec{display:flex;align-items:center;gap:9px;color:#fff;font-size:15px;letter-spacing:1.8px;font-weight:800}
-.sec:before{content:"";width:5px;height:16px;background:var(--brand);transform:skewX(-16deg);border-radius:1px}
-.lcard{border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#101317;position:relative;overflow:hidden}
-.lcard:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--brand),rgba(181,34,58,0) 70%)}
-.lcard h3{color:#fff;font-size:16px;letter-spacing:1.6px;font-style:italic}
+#main[data-tab="leaders"] .lcard{border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#101317;position:relative;overflow:hidden}
+#main[data-tab="leaders"] .lcard:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--brand),rgba(181,34,58,0) 70%)}
+#main[data-tab="leaders"] .lcard h3{color:#fff;font-size:16px;letter-spacing:1.6px;font-style:italic}
 </style>
 <style id="pace-motion2">
 @keyframes mvF{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -1923,32 +1898,6 @@ function bracketView(keep){
   if(pos0){bk.querySelector('.bs').scrollTop=pos0[0];document.getElementById('tsc').scrollLeft=pos0[1];}else bk.querySelector('.bs').scrollTop=0;
 }
 function closeBracket(){document.getElementById('bk').classList.remove('on');document.body.style.overflow='';}
-function f1Cell(label,car,sub){return '<div class="f1xc"'+(car?' data-car="'+esc(car)+'"':'')+'><small>'+label+'</small><div class="f1xw">'+(car?chip(car,'sm')+'<b>'+esc(nameOf(car))+'</b>':'<b class="na">N/A</b>')+'</div>'+(sub?'<span>'+sub+'</span>':'')+'</div>';}
-function f1TowerTop(L,cards,last){
-  var h='<div class="f1pod">';
-  L.slice(0,3).forEach(function(x,k){
-    var d=x.d,ac=accentOf(x.car,d),tm=d.team||'',mf=teamMfr(tm),wm=(D.mfrImg&&D.mfrImg[mf])||'';
-    h+='<div class="f1c p'+(k+1)+'" data-car="'+esc(x.car)+'" style="--ac:'+ac+'">'+(wm?'<img class="wm" alt="" src="'+wm+'">':'')+
-      '<div class="pl">'+chip(x.car,'lg')+'</div><div class="nm">'+esc(dispName(d))+'</div><div class="tm">'+esc(tm)+(mf?' &middot; '+esc(mf):'')+'</div>'+
-      '<div class="bar"><b>P'+x.rank+'</b><i>'+(k?'&minus;'+x.gap:x.pts+' pts')+'</i></div></div>';
-  });
-  h+='</div><div class="f1ex"><h5>After race '+st.n+'</h5><div class="fg f1g3">'+
-    f1Cell('Last winner',last&&last.car,esc(trackOf(st.n-1)))+
-    f1Cell('Biggest mover',cards.up&&cards.up.car,cards.up?'&#9650;'+cards.up.delta+' spots, +'+cards.up.thisRace:'')+
-    f1Cell('Biggest faller',cards.dn&&cards.dn.car,cards.dn?'&#9660;'+Math.abs(cards.dn.delta)+' spots':'')+'</div></div>';
-  return h;
-}
-function f1TowerTable(show){
-  var h='<div class="sec">Standings</div><div class="f1t f1tw"><div class="f1h"><span>Pos</span><span>Driver</span><span>Race</span><span>Pts</span></div>';
-  show.forEach(function(x,ix){
-    if(ix>0&&show[ix-1].inChase&&!x.inChase) h+='<div class="f1cut"><span>Chase cutline</span></div>';
-    h+='<div class="f1r'+(x.inChase?'':' f1out')+'" data-car="'+esc(x.car)+'"><div class="ps">'+x.rank+delta(x)+'</div>'+
-      '<div class="dv">'+chip(x.car)+'<div class="nn"><b>'+esc(dispName(x.d))+stars(x)+pepper(x.d.car)+'</b><em>'+team(x.d)+(x.d.team?mfrIco(x.d.team,'s'):'')+'</em></div></div>'+
-      '<div class="rc'+(x.startedThis?'':' z')+'">'+(x.startedThis?'+'+x.thisRace:'&ndash;')+(x.freeThis?'<small>FREE</small>':'')+'</div>'+
-      '<div class="f1pp"><b>'+x.pts+'</b><small class="'+(x.gap?'neg':'')+'">'+(x.gap?'&minus;'+x.gap:'LEADER')+'</small></div></div>';
-  });
-  return h+'</div>';
-}
 function tower(L){
   var cards=C.moverCards(L), lead=L[0], last=null;
   var race=D.races[st.n-1];
@@ -1958,18 +1907,17 @@ function tower(L){
     if(!x) return '<div class="card"><div class="k">'+k+'</div><div class="na">'+(na||'N/A')+'</div></div>';
     return '<div class="card"><div class="k">'+k+'</div><div class="v">'+chip(x.car,'sm')+'<div><div class="nm">'+esc(dispName(x.d))+'</div><div class="ex">'+ex(x)+'</div></div></div></div>';
   }
-  var F1=!/[?&]f1=0/.test(location.search);
-  var h=scrub()+(F1?f1TowerTop(L,cards,last):'<div class="cards">'+
+  var h=scrub()+'<div class="cards">'+
     card('Points Leader',lead,function(x){return x.pts+' pts';})+
     card('Last Race Winner',last,function(x){return esc(trackOf(st.n-1));})+
     card('Biggest Mover',cards.up,function(x){return '&#9650;'+x.delta+' spots, +'+x.thisRace;},st.n===1?'Needs race 2':'No one moved up')+
     card('Biggest Faller',cards.dn,function(x){return '&#9660;'+Math.abs(x.delta)+' spots';},st.n===1?'Needs race 2':'No one dropped')+
-  '</div>');
+  '</div>';
   h+=tbanner();
   var cut=D.scoring.cutline, show=st.all?L:L.slice(0,Math.max(cut,16));
-  if(!F1) h+='<div class="sec">Standings</div>';
-  if(!F1) h+='<div class="leg">Red is points behind the leader. The small gray line, like <b>&minus;2</b> <i>to P4</i>, is points behind the driver ahead.</div>';
-  if(F1) h+=f1TowerTable(show); else show.forEach(function(x,ix){
+  h+='<div class="sec">Standings</div>';
+  h+='<div class="leg">Red is points behind the leader. The small gray line, like <b>&minus;2</b> <i>to P4</i>, is points behind the driver ahead.</div>';
+  show.forEach(function(x,ix){
     var ah=''; if(ix>1){var up=show[ix-1], dd=up.pts-x.pts; ah='<span class="ah">'+(dd?'<b>&minus;'+dd+'</b> <i>to P'+up.rank+'</i>':'<b>TIE</b> <i>P'+up.rank+'</i>')+'</span>';}
     h+='<div class="row'+(x.inChase?' in':'')+'" data-car="'+esc(x.car)+'">'+
       '<div class="rk">'+x.rank+'</div>'+delta(x)+chip(x.car)+
@@ -3400,6 +3348,7 @@ function render(){
   Array.prototype.forEach.call(document.querySelectorAll('[data-tb]'),function(b){b.addEventListener('click',bracketView);});
   Array.prototype.forEach.call(document.querySelectorAll('[data-rsub]'),function(b){b.addEventListener('click',function(){var y=window.scrollY;st.rsub=b.getAttribute('data-rsub');render();window.scrollTo(0,y);});});
   Array.prototype.forEach.call(document.querySelectorAll('[data-qsel]'),function(b){b.addEventListener('click',function(){var y=window.scrollY;st.qsel=b.getAttribute('data-qsel');render();window.scrollTo(0,y);});});
+  var _mn=document.getElementById('main');if(_mn)_mn.setAttribute('data-tab',st.tab);
   Array.prototype.forEach.call(document.querySelectorAll('.recapbtn'),function(b){b.addEventListener('click',recap);});f1RailCenter();
   var vt=document.getElementById('vtog'); if(vt) vt.addEventListener('click',function(){st.vopen=!st.vopen;render();});
   var mo=document.getElementById('more'); if(mo) mo.addEventListener('click',function(){st.all=!st.all;render();});
@@ -3654,7 +3603,7 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
 <script>
 /* auto-update: compares this page's build stamp to version.json and reloads when a newer build is live */
 (function(){
-  var B='20261119011747',last=0,busy=false;
+  var B='20261119101009',last=0,busy=false;
   function chk(){
     var n=Date.now();if(busy||n-last<20000)return;last=n;busy=true;
     fetch('version.json?t='+n,{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
