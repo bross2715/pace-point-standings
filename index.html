@@ -3161,7 +3161,11 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
   var inApp=/FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|Twitter|Discord|GSA\//.test(ua);
   var notSafari=IOS&&(/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)||inApp);
   var standalone=false;try{standalone=(window.navigator.standalone===true)||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);}catch(e){}
-  if(standalone)return;
+  var FK='pace_app_have';function have(){try{return localStorage.getItem(FK)==='1';}catch(e){return false;}}function setHave(){try{localStorage.setItem(FK,'1');}catch(e){}}
+  if(standalone){setHave();return;}
+  window.addEventListener('appinstalled',function(){setHave();hideBtns();});
+  function hideBtns(){['appbtn','appbtn2','appfoot'].forEach(function(id){var n=document.getElementById(id);if(n&&n.parentNode)n.parentNode.removeChild(n);});}
+  if(have())return;
   var dp=null,tab=IOS?'ios':(/Android/.test(ua)?'and':'ios');
   window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;});
   var SH='<svg viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
@@ -3188,7 +3192,7 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
     sh.innerHTML='<div class="ahtop"><img class="ahicon" src="'+ICON+'" alt=""><div><h2>Get the app</h2><p>Put '+NAME+' on your home screen. Opens full screen, no browser bar.</p></div><button class="ahx" type="button" aria-label="Close">&times;</button></div>'
     +'<div class="ahtabs"><button type="button" data-p="ios" class="'+(tab==='ios'?'on':'')+'">iPhone</button><button type="button" data-p="and" class="'+(tab==='and'?'on':'')+'">Android</button></div>'
     +(tab==='ios'?iosHtml():andHtml())
-    +'<div class="ahact">'+(tab==='and'&&dp?'<button class="p" id="ahins" type="button">Install now</button>':'')+'<button class="g" id="ahshare" type="button">Send the link</button></div>';
+    +'<div class="ahfoot"><button id="ahhave" type="button" style="background:none;border:0;color:#9aa3ad;text-decoration:underline;font:600 13px Barlow,sans-serif;cursor:pointer;padding:4px">I already added it, hide this button</button></div>'+'<div class="ahact">'+(tab==='and'&&dp?'<button class="p" id="ahins" type="button">Install now</button>':'')+'<button class="g" id="ahshare" type="button">Send the link</button></div>';
   }
   function link(){return location.href.split('#')[0].split('?')[0];}
   function open(){draw();document.getElementById('ahov').classList.add('on');document.body.style.overflow='hidden';}
@@ -3199,6 +3203,7 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
     if(t.id==='ahov'||t.classList.contains('ahx'))return close();
     if(t.getAttribute('data-p')){tab=t.getAttribute('data-p');return draw();}
     if(t.id==='ahcopy')return copy(t);
+    if(t.id==='ahhave'){setHave();hideBtns();return close();}
     if(t.id==='ahins'&&dp){dp.prompt();dp.userChoice&&dp.userChoice.then(function(){dp=null;close();});return;}
     if(t.id==='ahshare'){var u=link();if(navigator.share){navigator.share({title:NAME,text:'Add the PACE Race Hub to your home screen',url:u}).catch(function(){});}else copy(t);}
   });
@@ -3216,7 +3221,7 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
 <script>
 /* auto-update: compares this page's build stamp to version.json and reloads when a newer build is live */
 (function(){
-  var B='20261119054501',last=0,busy=false;
+  var B='20261119054621',last=0,busy=false;
   function chk(){
     var n=Date.now();if(busy||n-last<20000)return;last=n;busy=true;
     fetch('version.json?t='+n,{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
