@@ -670,7 +670,7 @@ html[data-mv] .tpn.on{animation:none}
 .f1fl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 0 12px;padding:9px 12px;border-radius:10px;border:1px solid rgba(160,90,255,.35);background:linear-gradient(90deg,rgba(120,60,200,.28),rgba(14,16,19,.8))}
 .f1fl h5{margin:0;font-family:var(--hd);font-weight:800;font-size:15px;letter-spacing:1.4px;text-transform:uppercase;color:#fff;width:100%}
 .f1fl span{font-family:var(--hd);font-weight:700;font-size:13px;letter-spacing:.8px;color:#cdb8ff;text-transform:uppercase;white-space:nowrap}
-.f1fl span b{color:#fff;font-weight:800;margin-left:3px}
+.f1fl span b{color:#fff;font-weight:800;margin-left:3px;display:inline-flex;align-items:center;gap:6px;vertical-align:middle}.f1fl .plate{transform:scale(.8);transform-origin:left center;margin-right:-8px}
 .f1t{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--panel)}
 .f1h,.f1r{display:grid;grid-template-columns:34px minmax(0,1fr) 88px;align-items:center;gap:8px;padding:0 10px}
 .f1h{height:30px;background:rgba(255,255,255,.05);font-family:var(--hd);font-weight:700;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mut)}
@@ -2025,9 +2025,9 @@ function f1Strip(rt,race){
   if(race.ledN){Object.keys(race.ledN).forEach(function(c){if(!lead||race.ledN[c]>race.ledN[lead])lead=c;});}
   var pole=null; Object.keys(race.qual||{}).forEach(function(c){if(race.qual[c]===1&&race.fin&&race.fin[c])pole=c;});
   var bits=[];
-  if(fa) bits.push('<span>Lap<b>'+esc(lapFmt(fa.lap))+'</b></span><span>Driver<b>'+esc(dispName(fa.d))+'</b></span>');
-  if(pole) bits.push('<span>Pole<b>'+esc(nameOf(pole))+'</b></span>');
-  if(lead) bits.push('<span>Most led<b>'+esc(nameOf(lead))+' '+race.ledN[lead]+'</b></span>');
+  if(fa) bits.push('<span>Lap<b>'+esc(lapFmt(fa.lap))+'</b></span><span>Driver<b>'+chip(fa.car,'sm')+esc(dispName(fa.d))+'</b></span>');
+  if(pole) bits.push('<span>Pole<b>'+chip(pole,'sm')+esc(nameOf(pole))+'</b></span>');
+  if(lead) bits.push('<span>Most led<b>'+chip(lead,'sm')+esc(nameOf(lead))+' '+race.ledN[lead]+'</b></span>');
   if(race.cautions!=null) bits.push('<span>Cautions<b>'+race.cautions+'</b></span>');
   if(!bits.length) return '';
   return '<div class="f1fl"><h5>Fastest lap</h5>'+bits.join('')+'</div>';
