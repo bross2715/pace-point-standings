@@ -743,6 +743,9 @@ nav{background:rgba(7,8,10,.80);-webkit-backdrop-filter:blur(8px);backdrop-filte
 <style id="pace-f1d">
 #main[data-tab="leaders"] .lcard{border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#101317;position:relative;overflow:hidden}
 #main[data-tab="leaders"] .lcard:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--brand),rgba(181,34,58,0) 70%)}
+#main[data-tab="leaders"] .lr>.f1m1{color:#ffc83d}
+#main[data-tab="leaders"] .lr>.f1m2{color:#d3d9e0}
+#main[data-tab="leaders"] .lr>.f1m3{color:#d38b4d}
 #main[data-tab="leaders"] .lcard h3{color:#fff;font-size:16px;letter-spacing:1.6px;font-style:italic}
 </style>
 <style id="pace-motion2">
@@ -2154,6 +2157,16 @@ function f1Qual(i){
 }
 function f1D(md){var m=String(md||'').split('/'),N=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m.length===2&&N[+m[0]-1]?N[+m[0]-1]+' '+(+m[1]):String(md||'');}
 function f1Winner(i){var r=D.races[i];if(!r||!r.fin)return null;var w=null;Object.keys(r.fin).forEach(function(c){if(r.fin[c]===1)w=c;});return w;}
+function f1Medals(){
+  var m=document.getElementById('main'); if(!m||m.getAttribute('data-tab')!=='leaders') return;
+  Array.prototype.forEach.call(m.querySelectorAll('.lr'),function(r){
+    var e=r.firstElementChild; if(!e) return;
+    var n=parseInt((e.textContent||'').replace(/[^0-9]/g,''),10);
+    e.classList.remove('f1m1','f1m2','f1m3');
+    if(n>=1&&n<=3) e.classList.add('f1m'+n);
+  });
+}
+(function(){var m=document.getElementById('main'); if(m&&window.MutationObserver) new MutationObserver(f1Medals).observe(m,{childList:true,subtree:true});})();
 function f1Tabs(){return '<div class="vb f1vb"><button data-rsub="res" class="'+(st.rsub!=='qual'?'on':'')+'">Results</button><button data-rsub="qual" class="'+(st.rsub==='qual'?'on':'')+'">Qualifying</button></div>';}
 function f1RecapBtn(){return '<button type="button" class="more recapbtn" style="margin:14px 0 12px">Save race recap</button>';}
 function f1BC(i){var b=blockOf(i);return /challenge/i.test(b)?'#22d36b':/chase/i.test(b)?'#ffc83d':/all-star/i.test(b)?'#4da3ff':'#3a4048';}
@@ -2513,9 +2526,12 @@ function trackTypeSection(){
 }
 function leaders(){
   var L=C.standings(D,R);
+  var POD={};
+  for(var pi=0;pi<R;pi++){C.raceTable(D,pi).rows.forEach(function(r){if(r.fin>=1&&r.fin<=3){var o=POD[r.car]||(POD[r.car]=[0,0,0]);o[r.fin-1]++;}});}
+  L.forEach(function(x){var o=POD[x.car]||[0,0,0];x.podN=o[0]+o[1]+o[2];x.podTxt=o.join('-');});
   function top(fn,filter,fmt,asc,name,allf){
     function sortBy(f){return L.filter(f).sort(function(p,q){var d=asc?fn(p)-fn(q):fn(q)-fn(p);return d||(p.rank-q.rank);});}
-    function line(x,rk,v){return '<div class="lr" data-car="'+esc(x.car)+'"><div class="rk">'+rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+fmt(v)+'</div></div>';}
+    function line(x,rk,v){return '<div class="lr" data-car="'+esc(x.car)+'"><div class="rk">'+rk+'</div>'+chip(x.car,'sm')+'<div><div class="n1">'+esc(dispName(x.d))+team(x.d)+'</div><div class="n2">'+esc(x.d.tag)+'</div></div><div class="v">'+fmt(v)+(name==='Podiums'&&x.podN?'<small style="display:block;font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.6px">'+x.podTxt+'</small>':'')+'</div></div>';}
     function listAll(arr){var prev=null,rk=0,s='';arr.forEach(function(x,i){var v=fn(x);if(v!==prev){rk=i+1;prev=v;}s+=line(x,rk,v);});return s;}
     var a=sortBy(filter);
     if(!a.length) return '<div class="empty">No data yet.</div>';
@@ -2534,6 +2550,7 @@ function leaders(){
   var id=function(v){return v;};
   var defs=[
    ['Race Wins',function(x){return x.wins;},function(x){return x.wins>0;},id],
+   ['Podiums',function(x){return x.podN;},function(x){return x.podN>0;},id],
    ['Stage Points',function(x){return x.sp;},function(x){return x.sp>0;},id],
    ['Stage Wins',function(x){return x.sw;},function(x){return x.sw>0;},id],
    ['Fastest Laps',function(x){return x.fl;},function(x){return x.fl>0;},id],
@@ -2554,7 +2571,7 @@ function leaders(){
   var ttOpen=!!st.lx['ttsec'];
   h+='<div class="lcard ttfold"><div class="ttfh" data-lx="ttsec"><h3>Track Type Rankings</h3><span>'+(ttOpen?'Close &#9650;':'Open &#9660;')+'</span></div>'+(ttOpen?'':'<div class="ttn" style="margin:4px 0 0">Tap to see how everyone runs on each kind of track.</div>')+'</div>';
   if(ttOpen) h+=trackTypeSection().replace('<h3>Track Type Rankings</h3>','');
-  var DN={'Spots Gained From Start':'Starting spot minus finishing spot, averaged over races. Only start versus finish, not how the race ran in between.'};
+  var DN={'Podiums':'Top three finishes. The small numbers under the total are 1st, 2nd and 3rd place finishes.','Spots Gained From Start':'Starting spot minus finishing spot, averaged over races. Only start versus finish, not how the race ran in between.'};
   defs.forEach(function(d){h+='<div class="lcard"><h3>'+d[0]+'</h3>'+(DN[d[0]]?'<div class="ttn" style="margin:2px 0 6px">'+DN[d[0]]+'</div>':'')+top(d[1],d[2],d[3],d[4],d[0],d[5]||function(){return true;})+'</div>';});
   return h;
 }
@@ -3348,7 +3365,7 @@ function render(){
   Array.prototype.forEach.call(document.querySelectorAll('[data-tb]'),function(b){b.addEventListener('click',bracketView);});
   Array.prototype.forEach.call(document.querySelectorAll('[data-rsub]'),function(b){b.addEventListener('click',function(){var y=window.scrollY;st.rsub=b.getAttribute('data-rsub');render();window.scrollTo(0,y);});});
   Array.prototype.forEach.call(document.querySelectorAll('[data-qsel]'),function(b){b.addEventListener('click',function(){var y=window.scrollY;st.qsel=b.getAttribute('data-qsel');render();window.scrollTo(0,y);});});
-  var _mn=document.getElementById('main');if(_mn)_mn.setAttribute('data-tab',st.tab);
+  var _mn=document.getElementById('main');if(_mn)_mn.setAttribute('data-tab',st.tab);f1Medals();
   Array.prototype.forEach.call(document.querySelectorAll('.recapbtn'),function(b){b.addEventListener('click',recap);});f1RailCenter();
   var vt=document.getElementById('vtog'); if(vt) vt.addEventListener('click',function(){st.vopen=!st.vopen;render();});
   var mo=document.getElementById('more'); if(mo) mo.addEventListener('click',function(){st.all=!st.all;render();});
@@ -3603,7 +3620,7 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
 <script>
 /* auto-update: compares this page's build stamp to version.json and reloads when a newer build is live */
 (function(){
-  var B='20261119101009',last=0,busy=false;
+  var B='20261119134949',last=0,busy=false;
   function chk(){
     var n=Date.now();if(busy||n-last<20000)return;last=n;busy=true;
     fetch('version.json?t='+n,{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
