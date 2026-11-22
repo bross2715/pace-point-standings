@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07080a">
@@ -2259,16 +2260,59 @@ function watchView(race,i){
     var p=watchParse(s.url,s.host), poster=p.thumb?'<img src="'+esc(p.thumb)+'" alt="" loading="lazy">':'<div class="wph">'+(p.h==='tw'?'Twitch':'Watch')+'</div>';
     var name=p.h==='yt'?'YouTube':p.h==='tw'?'Twitch':'the link';
     h+='<div class="wc"><div class="wi"><b>'+esc(s.label||'Race stream')+'</b>'+(s.live?'<span class="wh live">LIVE</span>':'')+'<span class="wh'+(p.h==='tw'?' tw':'')+'">'+(p.h==='yt'?'YOUTUBE':p.h==='tw'?'TWITCH':'LINK')+'</span></div>'+
-      (p.src?'<button type="button" class="wm" data-wplay="'+esc(p.src)+'" aria-label="Play '+esc(s.label||'stream')+'">'+poster+'<span class="wpl"></span></button>':'')+
+      (p.src?'<div role="button" tabindex="0" class="wm" data-wplay="'+esc(p.src)+'"'+(p.id?' data-wyt="'+esc(p.id)+'"':'')+' aria-label="Play '+esc(s.label||'stream')+'">'+poster+'<span class="wpl"></span></div>':'')+
       '<a class="wopen" href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer">'+(p.h==='other'?'Open link':'Open on '+name)+' &#8599;</a></div>';
   });
   return h;
 }
+var ytApi=null,wseq=0;
+function ytLoad(){
+  if(ytApi) return ytApi;
+  ytApi=new Promise(function(res,rej){
+    if(window.YT&&window.YT.Player){res(window.YT);return;}
+    var prev=window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady=function(){try{if(prev)prev();}catch(e){}res(window.YT);};
+    var sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';sc.onerror=function(){rej(new Error('api'));};document.head.appendChild(sc);
+    setTimeout(function(){rej(new Error('timeout'));},7000);
+  });
+  ytApi.catch(function(){ytApi=null;});
+  return ytApi;
+}
+function wFail(t,code){
+  if(t._yt){try{t._yt.destroy();}catch(e){}t._yt=null;}
+  t.classList.add('on');
+  t.innerHTML='<div class="wph" style="flex-direction:column;gap:6px;text-align:center;padding:0 18px;font-size:16px">Could not play here<small style="font-size:12px;letter-spacing:1px;color:#8b929c">'+esc(code?('Error '+code+'. '):'')+'Use the link below</small></div>';
+}
+function wIframe(t,src){
+  t.innerHTML='<iframe src="'+src+'" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+}
+function wOpen(t){
+  Array.prototype.forEach.call(document.querySelectorAll('.wm.on'),function(o){
+    if(o===t) return;
+    if(o._yt){try{o._yt.destroy();}catch(e){}o._yt=null;}
+    if(o._orig!=null){o.innerHTML=o._orig;o.classList.remove('on');}
+  });
+  if(t.classList.contains('on')) return;
+  t._orig=t.innerHTML;t.classList.add('on');
+  var id=t.getAttribute('data-wyt');
+  if(!id){wIframe(t,t.getAttribute('data-wplay'));return;}
+  var box='wyt'+(++wseq);
+  t.innerHTML='<div id="'+box+'" style="position:absolute;inset:0;width:100%;height:100%"></div>';
+  ytLoad().then(function(YT){
+    var pv={autoplay:1,playsinline:1,rel:0,modestbranding:1};
+    if(/^https?:$/.test(location.protocol)) pv.origin=location.origin;
+    t._yt=new YT.Player(box,{videoId:id,playerVars:pv,
+      events:{onReady:function(ev){try{ev.target.playVideo();}catch(e){}},onError:function(ev){wFail(t,ev&&ev.data);}}});
+  }).catch(function(){wIframe(t,t.getAttribute('data-wplay'));});
+}
 document.addEventListener('click',function(e){
   var t=e.target&&e.target.closest?e.target.closest('[data-wplay]'):null; if(!t) return;
-  Array.prototype.forEach.call(document.querySelectorAll('.wm.on'),function(o){if(o._orig!=null){o.innerHTML=o._orig;o.classList.remove('on');}});
-  t._orig=t.innerHTML;t.classList.add('on');
-  t.innerHTML='<iframe src="'+t.getAttribute('data-wplay')+'" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+  wOpen(t);
+});
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter'&&e.key!==' ') return;
+  var t=e.target&&e.target.closest?e.target.closest('[data-wplay]'):null; if(!t||t.classList.contains('on')) return;
+  e.preventDefault();wOpen(t);
 });
 function f1GoRace(n){
   st.n=n;st.f1sch=false;st.rsub=(st.rsub==='watch'?'watch':'res');st.ropen=false;render();
