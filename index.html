@@ -3670,14 +3670,16 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
 <script>
 /* auto-update: compares this page's build stamp to version.json and reloads when a newer build is live */
 (function(){
-  var B='20261119141905',last=0,busy=false;
+  var B='20261123193000',last=0,busy=false;
   function chk(){
     var n=Date.now();if(busy||n-last<20000)return;last=n;busy=true;
     fetch('version.json?t='+n,{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
       busy=false;
       if(!j||!j.build||j.build===B)return;
+      if(location.search.indexOf('v='+encodeURIComponent(j.build))>=0)return; /* already reloaded for this build: never loop or hang on the splash */
       try{var k='pace_reload',t=+sessionStorage.getItem(k)||0;if(n-t<15000)return;sessionStorage.setItem(k,String(n));}catch(e){}
       if(window.PACE_splash)PACE_splash('Updating');var u=location.pathname+'?v='+encodeURIComponent(j.build)+(location.hash||'');
+      setTimeout(function(){var s=window.PACE_last;if(s&&s.parentNode)s.parentNode.removeChild(s);},4000); /* if the reload does not happen, drop the Updating screen so the app stays usable */
       location.replace(u);
     }).catch(function(){busy=false;});
   }
