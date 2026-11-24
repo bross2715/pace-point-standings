@@ -1510,7 +1510,7 @@ function recapDraw(d,imgs){
   // award cards
   function card(x0,y0,label,car,name,detail,col){
     rr(ctx,x0,y0,241,126,18);ctx.fillStyle=BG;ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#22262c';ctx.stroke();
-    ctx.fillStyle=MU;ctx.font='700 20px '+RF;ctx.fillText(fitTxt(ctx,label,241-32),x0+16,y0+30);
+    ctx.fillStyle=MU;ctx.font='700 17px '+RF;ctx.fillText(fitTxt(ctx,label,241-32),x0+16,y0+30);
     var tx=x0+16;
     if(car){var cw=drawChip(ctx,imgs[car],car,x0+16,y0+68,40,64);tx=x0+16+cw+10;}
     ctx.fillStyle=name?WH:'#6d747d';ctx.font='italic 800 30px '+RF;ctx.fillText(fitTxt(ctx,(name||'N/A').toUpperCase(),241-(tx-x0)-8),tx,y0+78);
@@ -3672,7 +3672,7 @@ document.addEventListener('toggle',function(e){var d=e.target;if(!d||d.tagName!=
 <script>
 /* auto-update: compares this page's build stamp to version.json and reloads when a newer build is live */
 (function(){
-  var B='20261124044117',last=0,busy=false;
+  var B='20261124044322',last=0,busy=false;
   function chk(){
     var n=Date.now();if(busy||n-last<20000)return;last=n;busy=true;
     fetch('version.json?t='+n,{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
